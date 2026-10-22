@@ -23,20 +23,21 @@
   };
 
   /**
-   * Konfigurasi API Endpoint Google Apps Script
-   * Jika dijalankan di GitHub Pages / Server mandiri, menggunakan URL Deployment Web App
+   * Konfigurasi API Endpoint SiAGU
+   * 1. Mode Vercel Serverless (Paling Aman): Menggunakan reverse-proxy '/api/server'.
+   *    URL Google Apps Script disimpan di Server Environment Variable Vercel (process.env.GAS_URL).
+   *    Tidak ada popup prompt dan URL tidak pernah terlihat oleh pengguna/klien.
+   * 2. Mode Google Apps Script: Menggunakan google.script.run secara native.
    */
   const API_CONFIG = {
-    GAS_URL: (typeof localStorage !== 'undefined' && localStorage.getItem('siagu_gas_api_url')) || ''
+    FALLBACK_GAS_URL: ''
   };
 
   /**
-   * Promise wrapper untuk memanggil fungsi server:
-   * - Otomatis menggunakan google.script.run jika di dalam Google Apps Script
-   * - Otomatis menggunakan fetch(API_CONFIG.GAS_URL) jika dijalankan di GitHub Pages / Luar GAS
+   * Promise wrapper untuk memanggil fungsi server
    */
   function runServer(functionName, ...args) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       // 1. Jika berjalan langsung di dalam lingkungan Google Apps Script
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run
@@ -53,27 +54,39 @@
         return;
       }
 
-      // 2. Jika berjalan di GitHub Pages atau Browser Standalone
-      let apiUrl = API_CONFIG.GAS_URL || (typeof localStorage !== 'undefined' && localStorage.getItem('siagu_gas_api_url'));
+      // 2. Mode Vercel Secure Serverless Proxy (100% Aman & Bebas Masalah CORS)
+      // Browser HANYA memanggil endpoint internal domain sendiri (/api/server)
+      try {
+        const vercelRes = await fetch('/api/server', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            action: functionName,
+            args: args
+          })
+        });
 
-      if (!apiUrl || !apiUrl.startsWith('https://script.google.com')) {
-        const inputUrl = prompt(
-          '🔌 SINKRONISASI DATABASE GOOGLE APPS SCRIPT:\n\n' +
-          'Aplikasi saat ini berjalan di GitHub Pages / Server Mandiri.\n' +
-          'Silakan tempelkan Web App URL Google Apps Script Anda:\n' +
-          '(Contoh: https://script.google.com/macros/s/AKfycb.../exec)'
-        );
-
-        if (inputUrl && inputUrl.trim().startsWith('https://script.google.com')) {
-          apiUrl = inputUrl.trim();
-          localStorage.setItem('siagu_gas_api_url', apiUrl);
-          API_CONFIG.GAS_URL = apiUrl;
-        } else {
-          return reject(new Error('Web App URL Google Apps Script belum diisi.'));
+        if (vercelRes.ok) {
+          const resData = await vercelRes.json();
+          if (resData && resData.success === false) {
+            return reject(new Error(resData.error || 'Terjadi kesalahan server'));
+          }
+          return resolve(resData);
         }
+      } catch (proxyErr) {
+        // Lanjutkan ke direct fallback jika bukan host Vercel API
       }
 
-      // Kirim request ke Google Apps Script via POST (Text/Plain untuk bypass preflight CORS)
+      // 3. Mode Direct GAS API (Fallback untuk GitHub Pages / Localhost)
+      const apiUrl = API_CONFIG.FALLBACK_GAS_URL || (typeof localStorage !== 'undefined' && localStorage.getItem('siagu_gas_api_url'));
+
+      if (!apiUrl) {
+        return reject(new Error('Koneksi server belum terhubung. Di Vercel, pastikan Environment Variable GAS_URL telah diatur.'));
+      }
+
+      // Kirim via POST (Text/Plain untuk bypass preflight)
       fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -90,7 +103,7 @@
         try {
           return JSON.parse(text);
         } catch (e) {
-          throw new Error('Respons backend bukan JSON: ' + text.substring(0, 100));
+          throw new Error('Format respon bukan JSON: ' + text.substring(0, 100));
         }
       })
       .then((response) => {
@@ -101,7 +114,7 @@
         }
       })
       .catch((postErr) => {
-        // Fallback otomatis via GET jika POST terhalang redirect browser
+        // Fallback otomatis via GET
         const paramArgs = encodeURIComponent(JSON.stringify(args));
         const getUrl = `${apiUrl}${apiUrl.includes('?') ? '&' : '?'}action=${encodeURIComponent(functionName)}&args=${paramArgs}&_t=${Date.now()}`;
 
@@ -122,15 +135,12 @@
             }
           })
           .catch((getErr) => {
-            // Fallback Tingkat 3: JSONP (100% Kebal CORS & Kebal Failed to Fetch)
+            // Fallback Tingkat 3: JSONP (100% Kebal CORS)
             callServerJsonp(apiUrl, functionName, args)
               .then(resolve)
               .catch((jsonpErr) => {
                 console.error('API connection failed completely:', postErr, getErr, jsonpErr);
-                reject(new Error(
-                  'Gagal terhubung ke Google Apps Script: ' + (postErr.message || 'Failed to fetch') + '. ' +
-                  'Pastikan Web App diatur "Who has access: Anyone" dan deployment berakhiran /exec.'
-                ));
+                reject(new Error('Gagal terhubung ke database Google Apps Script. Pastikan akses diatur Anyone.'));
               });
           });
       });
