@@ -23,15 +23,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ success: false, error: 'Metode HTTP tidak diizinkan. Gunakan POST.' });
   }
 
-  // Ambil URL Google Apps Script dari Environment Variable Vercel (Rahasia Server)
-  const gasUrl = process.env.GAS_URL || process.env.GOOGLE_SCRIPT_URL;
-
-  if (!gasUrl) {
-    return res.status(500).json({
-      success: false,
-      error: 'Environment Variable GAS_URL belum diatur di dashboard Vercel.'
-    });
-  }
+  // Ambil URL Google Apps Script dari Environment Variable Vercel atau default backend
+  const gasUrl = process.env.GAS_URL || process.env.GOOGLE_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbxrzmTAm9oJbZZLjZFBwhlZoflK-xU0_Jq27Y2FS2YrI4mdKKAL-nDn0Zxer4nj1tH1/exec';
 
   try {
     const { action, args } = req.body || {};
