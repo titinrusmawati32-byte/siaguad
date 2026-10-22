@@ -100,8 +100,34 @@
           resolve(response);
         }
       })
-      .catch((err) => {
-        reject(err);
+      .catch((postErr) => {
+        // Fallback otomatis via GET jika POST terhalang redirect browser
+        const paramArgs = encodeURIComponent(JSON.stringify(args));
+        const getUrl = `${apiUrl}${apiUrl.includes('?') ? '&' : '?'}action=${encodeURIComponent(functionName)}&args=${paramArgs}&_t=${Date.now()}`;
+
+        fetch(getUrl, { redirect: 'follow' })
+          .then(async (res) => {
+            const text = await res.text();
+            try {
+              return JSON.parse(text);
+            } catch (e) {
+              throw new Error('Respons GET bukan JSON: ' + text.substring(0, 100));
+            }
+          })
+          .then((response) => {
+            if (response && response.success === false) {
+              reject(new Error(response.error || 'Terjadi kesalahan pada server'));
+            } else {
+              resolve(response);
+            }
+          })
+          .catch((getErr) => {
+            console.error('API connection failed:', postErr, getErr);
+            reject(new Error(
+              'Gagal terhubung ke Google Apps Script: ' + (postErr.message || 'Failed to fetch') + '. ' +
+              'Pastikan Web App diatur "Who has access: Anyone" dan sudah dibuat New Deployment.'
+            ));
+          });
       });
     });
   }

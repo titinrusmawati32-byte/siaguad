@@ -11,7 +11,16 @@
 function doGet(e) {
   // 1. Dukungan API via GET (jika dipanggil dari Frontend GitHub / Eksternal)
   if (e && e.parameter && e.parameter.action) {
-    return handleApiRequest(e.parameter.action, e.parameter.args ? JSON.parse(e.parameter.args) : []);
+    let args = [];
+    if (e.parameter.args) {
+      try {
+        args = JSON.parse(e.parameter.args);
+        if (!Array.isArray(args)) args = [args];
+      } catch (err) {
+        args = [e.parameter.args];
+      }
+    }
+    return handleApiRequest(e.parameter.action, args);
   }
 
   // 2. Render Antarmuka Web App bawaan GAS
