@@ -262,6 +262,10 @@
    * Router Tampilan Instan & Responsif (Switch Views)
    */
   function switchView(viewName, forceRefresh = false) {
+    if (AppState.currentView && AppState.currentView !== viewName) {
+      AppState.previousView = AppState.currentView;
+    }
+
     // 1. Tampilkan panel target secara instan (0 milidetik - Snappy SPA)
     const views = document.querySelectorAll('.view-panel');
     views.forEach(v => v.classList.add('hidden'));
@@ -272,7 +276,40 @@
       AppState.currentView = viewName;
     }
 
-    // 2. Perbarui status tombol aktif di navigasi sidebar
+    // 1b. Kelola Header Mobile (Dashboard Header vs Subview Header)
+    const mainHdr = document.getElementById('mobile-main-header');
+    const subHdr = document.getElementById('mobile-subview-header');
+    const subTitle = document.getElementById('mobile-subview-title');
+
+    if (viewName === 'dashboard') {
+      if (mainHdr) mainHdr.classList.remove('hidden');
+      if (subHdr) subHdr.classList.add('hidden');
+    } else {
+      if (mainHdr) mainHdr.classList.add('hidden');
+      if (subHdr) subHdr.classList.remove('hidden');
+
+      const titleMap = {
+        'mobile-menu': 'Menu Utama',
+        'journal': 'Jurnal Mengajar',
+        'attendance': 'Presensi Siswa',
+        'assessment': 'Nilai & Leger',
+        'documents': 'Perangkat Ajar',
+        'behavior': 'Catatan Sikap (P3)',
+        'master': 'Kelola Siswa & Kelas',
+        'supervision': 'Monitoring Guru',
+        'manage-users': 'Kelola Guru & Akun',
+        'reports': 'Pusat Cetak Supervisi'
+      };
+      if (subTitle) subTitle.textContent = titleMap[viewName] || 'SiAGU';
+    }
+
+    // Tutup drawer sidebar mobile jika terbuka
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar && window.innerWidth < 1024) {
+      sidebar.classList.add('hidden');
+    }
+
+    // 2. Perbarui status tombol aktif di navigasi sidebar desktop
     const navItems = document.querySelectorAll('.nav-btn');
     navItems.forEach(btn => {
       const btnView = btn.getAttribute('data-view');
@@ -285,24 +322,24 @@
       }
     });
 
-    // 2b. Perbarui status tombol aktif di mobile bottom navigation bar
+    // 2b. Perbarui status tombol aktif di 4-item Mobile Bottom Navigation Bar (Dock)
     const mobileNavItems = document.querySelectorAll('.mobile-nav-btn');
     mobileNavItems.forEach(btn => {
       const btnView = btn.getAttribute('data-view');
       const textSpan = btn.querySelector('span');
       if (btnView === viewName) {
-        btn.classList.add('text-amber-400', 'bg-white/[0.08]');
+        btn.classList.add('text-[#2563EB]');
         btn.classList.remove('text-slate-400');
         if (textSpan) {
-          textSpan.classList.add('text-amber-300', 'font-black');
-          textSpan.classList.remove('text-slate-400');
+          textSpan.classList.add('text-[#2563EB]', 'font-extrabold');
+          textSpan.classList.remove('text-slate-400', 'font-medium');
         }
       } else {
-        btn.classList.remove('text-amber-400', 'bg-white/[0.08]');
+        btn.classList.remove('text-[#2563EB]');
         btn.classList.add('text-slate-400');
         if (textSpan) {
-          textSpan.classList.remove('text-amber-300', 'font-black');
-          textSpan.classList.add('text-slate-400');
+          textSpan.classList.remove('text-[#2563EB]', 'font-extrabold');
+          textSpan.classList.add('text-slate-400', 'font-medium');
         }
       }
     });
@@ -328,10 +365,20 @@
   }
 
   /**
-   * Helper Navigasi Mobile HP (Bottom Bar & Drawer Sheet)
+   * Helper Navigasi Mobile HP (Back Button, Bottom Sheet Notifikasi & Profil)
    */
-  function openMobileMenuSheet() {
-    const sheet = document.getElementById('mobile-menu-sheet');
+  function mobileNavigateBack() {
+    if (AppState.currentView === 'mobile-menu') {
+      switchView('dashboard');
+    } else if (AppState.previousView && AppState.previousView === 'mobile-menu') {
+      switchView('mobile-menu');
+    } else {
+      switchView('dashboard');
+    }
+  }
+
+  function openNotificationSheet() {
+    const sheet = document.getElementById('mobile-notification-sheet');
     if (sheet) {
       sheet.classList.remove('hidden');
       document.body.style.overflow = 'hidden';
@@ -339,17 +386,30 @@
     }
   }
 
-  function closeMobileMenuSheet() {
-    const sheet = document.getElementById('mobile-menu-sheet');
+  function closeNotificationSheet() {
+    const sheet = document.getElementById('mobile-notification-sheet');
     if (sheet) {
       sheet.classList.add('hidden');
       document.body.style.overflow = '';
     }
   }
 
-  function mobileSwitchView(viewName) {
-    closeMobileMenuSheet();
-    switchView(viewName);
+  function openProfileSheet() {
+    const sheet = document.getElementById('mobile-profile-sheet');
+    if (sheet) {
+      updateHeaderInfo();
+      sheet.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      if (window.lucide) lucide.createIcons();
+    }
+  }
+
+  function closeProfileSheet() {
+    const sheet = document.getElementById('mobile-profile-sheet');
+    if (sheet) {
+      sheet.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
   }
 
   /**
@@ -405,10 +465,11 @@
     const appLayout = document.getElementById('app-layout');
     const navSpv = document.getElementById('nav-btn-supervision');
     const navUsers = document.getElementById('nav-btn-users');
-    const mobileSpv = document.getElementById('mobile-menu-spv');
-    const mobileUsers = document.getElementById('mobile-menu-users');
+    const mobSpv = document.getElementById('mob-grid-spv');
+    const mobUsers = document.getElementById('mob-grid-users');
     const roleBadge = document.getElementById('sidebar-role-badge');
-    const mobileRole = document.getElementById('mobile-role-label');
+    const mobileRole = document.getElementById('mobile-header-role');
+    const drawerRole = document.getElementById('drawer-role-badge');
 
     if (loginView) loginView.classList.add('hidden');
     if (appLayout) appLayout.classList.remove('hidden');
@@ -417,17 +478,19 @@
     if (user.role === 'headmaster') {
       if (navSpv) navSpv.classList.remove('hidden');
       if (navUsers) navUsers.classList.remove('hidden');
-      if (mobileSpv) mobileSpv.classList.remove('hidden');
-      if (mobileUsers) mobileUsers.classList.remove('hidden');
+      if (mobSpv) mobSpv.classList.remove('hidden');
+      if (mobUsers) mobUsers.classList.remove('hidden');
       if (roleBadge) roleBadge.textContent = 'Portal Kepala Sekolah';
-      if (mobileRole) mobileRole.textContent = 'Kepala Sekolah';
+      if (mobileRole) mobileRole.textContent = 'Portal Kepala Sekolah';
+      if (drawerRole) drawerRole.textContent = 'Kepala Sekolah';
     } else {
       if (navSpv) navSpv.classList.add('hidden');
       if (navUsers) navUsers.classList.add('hidden');
-      if (mobileSpv) mobileSpv.classList.add('hidden');
-      if (mobileUsers) mobileUsers.classList.add('hidden');
+      if (mobSpv) mobSpv.classList.add('hidden');
+      if (mobUsers) mobUsers.classList.add('hidden');
       if (roleBadge) roleBadge.textContent = 'Portal Guru';
-      if (mobileRole) mobileRole.textContent = 'Guru Pengampu';
+      if (mobileRole) mobileRole.textContent = 'Portal Guru';
+      if (drawerRole) drawerRole.textContent = 'Guru Pengampu';
     }
 
     // Ambil payload konfigurasi sekolah
@@ -528,15 +591,45 @@
     const curriEl = document.getElementById('header-curriculum-badge');
     const avatarEl = document.getElementById('header-user-avatar');
 
+    // Mobile Elements
+    const drawerTeacherEl = document.getElementById('drawer-teacher-name');
+    const drawerRoleEl = document.getElementById('drawer-role-title');
+    const drawerBadgeEl = document.getElementById('drawer-role-badge');
+    const mobileHeaderRoleEl = document.getElementById('mobile-header-role');
+    const sheetProfileName = document.getElementById('sheet-profile-name');
+    const sheetProfileRole = document.getElementById('sheet-profile-role');
+    const sheetProfileNip = document.getElementById('sheet-profile-nip');
+    const sheetProfileSchool = document.getElementById('sheet-profile-school');
+    const sheetProfileCurr = document.getElementById('sheet-profile-curriculum');
+
     if (schoolEl && AppState.config.SCHOOL_NAME) schoolEl.textContent = AppState.config.SCHOOL_NAME;
     if (curriEl && AppState.config.CURRICULUM_MODE) curriEl.textContent = AppState.config.CURRICULUM_MODE;
+    if (sheetProfileSchool && AppState.config.SCHOOL_NAME) sheetProfileSchool.textContent = AppState.config.SCHOOL_NAME;
+    if (sheetProfileCurr && AppState.config.CURRICULUM_MODE) sheetProfileCurr.textContent = AppState.config.CURRICULUM_MODE;
 
     if (AppState.currentUser) {
-      if (teacherEl) teacherEl.textContent = AppState.currentUser.name;
-      if (roleTitleEl) roleTitleEl.textContent = AppState.currentUser.title;
+      const u = AppState.currentUser;
+      const isKepsek = u.role === 'headmaster';
+
+      if (teacherEl) teacherEl.textContent = u.name;
+      if (roleTitleEl) roleTitleEl.textContent = u.title;
+      if (drawerTeacherEl) drawerTeacherEl.textContent = u.name;
+      if (drawerRoleEl) drawerRoleEl.textContent = u.title;
+      if (drawerBadgeEl) drawerBadgeEl.textContent = isKepsek ? 'Kepala Sekolah' : 'Guru Pengampu';
+      if (mobileHeaderRoleEl) mobileHeaderRoleEl.textContent = isKepsek ? 'Portal Kepala Sekolah' : 'Portal Guru';
+
+      if (sheetProfileName) sheetProfileName.textContent = u.name;
+      if (sheetProfileRole) sheetProfileRole.textContent = u.title;
+      if (sheetProfileNip) sheetProfileNip.textContent = u.nip || '-';
+
+      // Update grid visibility for mobile menu
+      const mobSpv = document.getElementById('mob-grid-spv');
+      const mobUsers = document.getElementById('mob-grid-users');
+      if (mobSpv) isKepsek ? mobSpv.classList.remove('hidden') : mobSpv.classList.add('hidden');
+      if (mobUsers) isKepsek ? mobUsers.classList.remove('hidden') : mobUsers.classList.add('hidden');
 
       if (avatarEl) {
-        if (AppState.currentUser.role === 'headmaster') {
+        if (isKepsek) {
           avatarEl.className = 'w-9 h-9 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-950 font-black flex items-center justify-center text-xs shadow-md shadow-amber-500/20';
           avatarEl.innerHTML = '<i data-lucide="shield-check" class="w-4 h-4"></i>';
         } else {

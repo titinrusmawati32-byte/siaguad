@@ -80,17 +80,17 @@
     background: #454252;
   }
 
-  /* Active Sidebar Navigation Pill (Sesuai Referensi Gambar) */
+  /* Active Sidebar Navigation Pill (Sesuai Referensi Gambar Desain Screen 1) */
   .nav-active {
-    background-color: #7CC4FA !important;
-    color: #0B1320 !important;
+    background-color: #2563EB !important;
+    color: #FFFFFF !important;
     font-weight: 800 !important;
     border-radius: 1rem !important;
-    box-shadow: 0 10px 25px -5px rgba(124, 196, 250, 0.25) !important;
+    box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.45) !important;
   }
   .nav-active i, .nav-active svg {
-    color: #0B1320 !important;
-    stroke: #0B1320 !important;
+    color: #FFFFFF !important;
+    stroke: #FFFFFF !important;
   }
 
   /* Glassmorphism Card Utility */
@@ -412,31 +412,48 @@
   <!-- Kerangka Aplikasi Utama (Tampil jika sudah terautentikasi) -->
   <div id="app-layout" class="hidden flex-1 flex flex-col min-h-screen">
 
-    <!-- Mobile Header (no-print) -->
-    <header class="no-print lg:hidden bg-[#131218]/95 backdrop-blur-md border-b border-white/10 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-40 shadow-lg">
-      <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500/30 to-orange-500/30 border border-amber-500/40 text-amber-300 flex items-center justify-center font-bold text-sm">
-          S
+    <!-- 1. Mobile Main Header: Khusus Dashboard / Beranda (Screen 2) -->
+    <header id="mobile-main-header" class="no-print lg:hidden bg-[#0A101D]/95 backdrop-blur-xl border-b border-white/[0.08] text-white px-4 py-3 flex items-center justify-between sticky top-0 z-40 shadow-lg">
+      <button id="mobile-menu-toggle" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white border border-white/10 flex items-center justify-center">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+      
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500/20 via-orange-500/20 to-amber-600/10 border border-amber-500/30 text-amber-300 flex items-center justify-center font-black text-sm shadow-sm">
+          <i data-lucide="graduation-cap" class="w-4 h-4"></i>
         </div>
-        <div>
-          <h1 class="font-bold text-sm tracking-tight leading-tight text-white">SiAGU</h1>
-          <p class="text-[10px] text-amber-400 font-semibold" id="mobile-role-label">Administrasi Guru</p>
+        <div class="text-center">
+          <h1 class="font-extrabold text-sm tracking-tight text-white leading-tight">SIAGU</h1>
+          <p class="text-[10px] text-amber-400 font-semibold" id="mobile-header-role">Portal Kepala Sekolah</p>
         </div>
       </div>
-      <div class="flex items-center gap-2">
-        <button onclick="handleLogout()" class="p-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30" title="Keluar">
-          <i data-lucide="log-out" class="w-4 h-4"></i>
-        </button>
-        <button id="mobile-menu-toggle" class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white border border-white/10 focus:outline-none">
-          <i data-lucide="menu" class="w-5 h-5"></i>
+
+      <button onclick="openNotificationSheet()" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white border border-white/10 relative flex items-center justify-center">
+        <i data-lucide="bell" class="w-5 h-5"></i>
+        <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500"></span>
+      </button>
+    </header>
+
+    <!-- 2. Mobile Subview Header: Khusus Subhalaman / Menu Lain (Screens 3, 4, 5, 6) -->
+    <header id="mobile-subview-header" class="no-print lg:hidden bg-[#0A101D]/95 backdrop-blur-xl border-b border-white/[0.08] text-white px-4 py-3 items-center justify-between sticky top-0 z-40 shadow-lg hidden">
+      <button onclick="mobileNavigateBack()" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white border border-white/10 flex items-center justify-center">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      </button>
+
+      <h2 id="mobile-subview-title" class="font-extrabold text-base tracking-tight text-white">Menu Utama</h2>
+
+      <div class="flex items-center gap-1.5">
+        <button onclick="openNotificationSheet()" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white border border-white/10 flex items-center justify-center relative">
+          <i data-lucide="bell" class="w-4 h-4"></i>
+          <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-rose-500"></span>
         </button>
       </div>
     </header>
 
     <div class="flex-1 flex overflow-hidden">
 
-      <!-- Sidebar Navigation (Desktop & Mobile Drawer) (no-print) -->
-      <aside id="sidebar" class="no-print hidden lg:flex flex-col w-64 bg-[#121117]/95 backdrop-blur-xl border-r border-white/[0.08] fixed lg:static inset-y-0 left-0 z-50 transition-all duration-200 ease-in-out shadow-2xl lg:shadow-none">
+      <!-- Sidebar Navigation (Desktop & Mobile Drawer - Screen 1) -->
+      <aside id="sidebar" class="no-print hidden lg:flex flex-col w-72 bg-[#0A101D]/98 lg:bg-[#0D1220]/95 backdrop-blur-2xl border-r border-white/[0.08] fixed lg:static inset-y-0 left-0 z-50 transition-all duration-300 ease-in-out shadow-2xl lg:shadow-none">
         
         <!-- Logo Branding -->
         <div class="p-5 border-b border-white/[0.08] flex items-center justify-between">
@@ -445,19 +462,34 @@
               <i data-lucide="graduation-cap" class="w-5 h-5"></i>
             </div>
             <div>
-              <h1 class="font-extrabold text-base text-white tracking-tight leading-tight">SiAGU</h1>
-              <p class="text-[11px] font-semibold text-amber-400" id="sidebar-role-badge">Portal Administrasi</p>
+              <h1 class="font-extrabold text-base text-white tracking-tight leading-tight">SIAGU</h1>
+              <p class="text-[11px] font-semibold text-amber-400" id="sidebar-role-badge">Portal Kepala Sekolah</p>
             </div>
           </div>
-          <button id="mobile-menu-close" class="lg:hidden p-1 text-slate-400 hover:text-white">
+          <button id="mobile-menu-close" class="lg:hidden p-1.5 rounded-xl bg-white/5 text-slate-400 hover:text-white">
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
 
+        <!-- Profile Card (Screen 1 in image!) -->
+        <div class="p-4 border-b border-white/[0.08]">
+          <div onclick="openProfileSheet()" class="p-3 bg-gradient-to-r from-white/[0.04] to-white/[0.02] border border-white/10 rounded-2xl flex items-center justify-between cursor-pointer hover:bg-white/[0.07] transition group">
+            <div class="flex items-center gap-3">
+              <div id="drawer-user-avatar" class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white font-black flex items-center justify-center text-sm shadow-md shadow-blue-500/20">
+                <i data-lucide="user" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <h4 id="drawer-teacher-name" class="font-extrabold text-xs text-white truncate">Memuat...</h4>
+                <p id="drawer-role-title" class="text-[10px] text-slate-400 truncate">Kepala Satuan Pendidikan</p>
+                <span id="drawer-role-badge" class="inline-block mt-0.5 px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30">Kepala Sekolah</span>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition flex-shrink-0"></i>
+          </div>
+        </div>
+
         <!-- Navigation Links -->
         <nav class="flex-1 p-3.5 space-y-1.5 overflow-y-auto">
-          <p class="px-3 pt-2 pb-1 text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Utama</p>
-          
           <button class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition text-left text-slate-400 hover:text-white hover:bg-white/[0.05]" data-view="dashboard">
             <i data-lucide="layout-dashboard" class="w-4 h-4 flex-shrink-0"></i>
             <span>Dashboard</span>
@@ -468,7 +500,7 @@
             <span>Data Master & Kelas</span>
           </button>
 
-          <p class="px-3 pt-4 pb-1 text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Pembelajaran</p>
+          <p class="px-3 pt-3 pb-1 text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Pembelajaran</p>
 
           <button class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition text-left text-slate-400 hover:text-white hover:bg-white/[0.05]" data-view="journal">
             <i data-lucide="book-open" class="w-4 h-4 flex-shrink-0"></i>
@@ -495,7 +527,7 @@
             <span>Catatan Sikap (P3)</span>
           </button>
 
-          <p class="px-3 pt-4 pb-1 text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Supervisi & Pimpinan</p>
+          <p class="px-3 pt-3 pb-1 text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Supervisi & Pimpinan</p>
 
           <!-- Menu Khusus Kepala Sekolah -->
           <button id="nav-btn-supervision" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition text-left text-slate-400 hover:text-white hover:bg-white/[0.05]" data-view="supervision">
@@ -514,7 +546,7 @@
             <span>Pusat Cetak Supervisi</span>
           </button>
 
-          <p class="px-3 pt-4 pb-1 text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Akses & Keamanan</p>
+          <p class="px-3 pt-3 pb-1 text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Akses & Keamanan</p>
 
           <!-- Menu Halaman Login / Ganti Akun -->
           <button type="button" onclick="goToLoginPage()" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition text-left text-sky-400 hover:text-white hover:bg-sky-500/10">
@@ -523,18 +555,12 @@
           </button>
         </nav>
 
-        <!-- Sidebar Footer: Status Database & Logout -->
-        <div class="p-4 border-t border-white/[0.08] bg-[#0E0D13]/70 space-y-2">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-sm shadow-emerald-400/50"></div>
-              <p class="text-xs font-semibold text-slate-300">Spreadsheet Terhubung</p>
-            </div>
-            <button onclick="handleLogout()" class="text-xs text-rose-400 hover:text-rose-300 font-bold flex items-center gap-1 transition" title="Keluar">
-              <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-              <span>Keluar</span>
-            </button>
-          </div>
+        <!-- Sidebar Footer: Tombol Keluar Bergaya Card (Screen 1) -->
+        <div class="p-4 border-t border-white/[0.08] bg-[#070C16]">
+          <button onclick="handleLogout()" class="w-full p-3 bg-rose-950/20 hover:bg-rose-950/40 border border-rose-500/30 rounded-2xl text-xs font-bold text-rose-300 flex items-center gap-3 transition">
+            <i data-lucide="log-out" class="w-4 h-4 text-rose-400"></i>
+            <span>Keluar</span>
+          </button>
         </div>
       </aside>
 
@@ -596,92 +622,92 @@
       </p>
     </div>
 
-    <!-- Quick Actions Group -->
-    <div class="flex flex-wrap items-center gap-2.5 relative z-10">
-      <button onclick="switchView('journal')" class="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 rounded-xl text-xs sm:text-sm font-bold shadow-lg shadow-amber-500/20 transition inline-flex items-center gap-2">
-        <i data-lucide="book-open" class="w-4 h-4"></i>
+    <!-- Quick Actions Group (Sesuai Desain Screen 2 di HP) -->
+    <div class="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap items-center sm:gap-2.5 relative z-10 w-full sm:w-auto">
+      <button onclick="switchView('journal')" class="px-3 py-2.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 rounded-xl text-xs sm:text-sm font-bold shadow-sm transition inline-flex items-center justify-center gap-1.5 active:scale-95">
+        <i data-lucide="book-open" class="w-4 h-4 text-amber-400"></i>
         <span>Isi Jurnal</span>
       </button>
-      <button onclick="switchView('attendance')" class="px-4 py-2.5 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs sm:text-sm font-semibold transition inline-flex items-center gap-2 border border-white/10 backdrop-blur-md">
+      <button onclick="switchView('attendance')" class="px-3 py-2.5 bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-sky-300 rounded-xl text-xs sm:text-sm font-bold shadow-sm transition inline-flex items-center justify-center gap-1.5 active:scale-95">
         <i data-lucide="clipboard-check" class="w-4 h-4 text-sky-400"></i>
         <span>Presensi</span>
       </button>
-      <button onclick="switchView('assessment')" class="px-4 py-2.5 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs sm:text-sm font-semibold transition inline-flex items-center gap-2 border border-white/10 backdrop-blur-md">
+      <button onclick="switchView('assessment')" class="px-3 py-2.5 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 rounded-xl text-xs sm:text-sm font-bold shadow-sm transition inline-flex items-center justify-center gap-1.5 active:scale-95">
         <i data-lucide="award" class="w-4 h-4 text-emerald-400"></i>
         <span>Nilai</span>
       </button>
     </div>
   </div>
 
-  <!-- KPI Cards Grid: 4 Signature Gradients (Sesuai Desain Referensi) -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+  <!-- KPI Cards Grid: 4 Signature Gradients (Sesuai Desain Referensi Screen 2: 2x2 di HP) -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
     
     <!-- KPI 1: Golden Olive / Bronze (Total Siswa) -->
-    <div class="relative overflow-hidden rounded-2xl p-5 border border-amber-500/25 bg-gradient-to-br from-[#3D3728] via-[#262116] to-[#17140E] shadow-lg backdrop-blur-xl transition hover:scale-[1.01] hover:border-amber-500/40">
+    <div class="relative overflow-hidden rounded-2xl p-4 sm:p-5 border border-amber-500/25 bg-gradient-to-br from-[#3D3728] via-[#262116] to-[#17140E] shadow-lg backdrop-blur-xl transition hover:scale-[1.01] hover:border-amber-500/40">
       <div class="flex items-center justify-between">
-        <p class="text-xs font-semibold text-amber-200/80 uppercase tracking-wider">Total Siswa</p>
-        <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-300 flex items-center justify-center">
+        <p class="text-[10px] sm:text-xs font-semibold text-amber-200/80 uppercase tracking-wider">Total Siswa</p>
+        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-300 flex items-center justify-center">
           <i data-lucide="users" class="w-4 h-4"></i>
         </div>
       </div>
-      <div class="mt-4 flex items-baseline justify-between">
-        <h3 id="stat-total-students" class="text-3xl font-extrabold text-white tracking-tight">-</h3>
-        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+      <div class="mt-3 sm:mt-4 flex items-baseline justify-between">
+        <h3 id="stat-total-students" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">-</h3>
+        <span class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
           Aktif
         </span>
       </div>
-      <p class="text-[11px] text-amber-200/60 mt-1">Terdaftar di seluruh kelas</p>
+      <p class="text-[10px] sm:text-[11px] text-amber-200/60 mt-1 line-clamp-1">Terdaftar di seluruh kelas</p>
     </div>
 
     <!-- KPI 2: Royal Indigo / Soft Cobalt (Kelas Diampu) -->
-    <div class="relative overflow-hidden rounded-2xl p-5 border border-indigo-500/25 bg-gradient-to-br from-[#2D3960] via-[#1D2542] to-[#12172A] shadow-lg backdrop-blur-xl transition hover:scale-[1.01] hover:border-indigo-500/40">
+    <div class="relative overflow-hidden rounded-2xl p-4 sm:p-5 border border-indigo-500/25 bg-gradient-to-br from-[#2D3960] via-[#1D2542] to-[#12172A] shadow-lg backdrop-blur-xl transition hover:scale-[1.01] hover:border-indigo-500/40">
       <div class="flex items-center justify-between">
-        <p class="text-xs font-semibold text-indigo-200/80 uppercase tracking-wider">Kelas Diampu</p>
-        <div class="w-9 h-9 rounded-xl bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 flex items-center justify-center">
+        <p class="text-[10px] sm:text-xs font-semibold text-indigo-200/80 uppercase tracking-wider">Kelas Diampu</p>
+        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 flex items-center justify-center">
           <i data-lucide="layout-grid" class="w-4 h-4"></i>
         </div>
       </div>
-      <div class="mt-4 flex items-baseline justify-between">
-        <h3 id="stat-total-classes" class="text-3xl font-extrabold text-white tracking-tight">-</h3>
-        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+      <div class="mt-3 sm:mt-4 flex items-baseline justify-between">
+        <h3 id="stat-total-classes" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">-</h3>
+        <span class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
           Rombel
         </span>
       </div>
-      <p class="text-[11px] text-indigo-200/60 mt-1">Tahun ajaran berjalan</p>
+      <p class="text-[10px] sm:text-[11px] text-indigo-200/60 mt-1 line-clamp-1">Tahun ajaran berjalan</p>
     </div>
 
     <!-- KPI 3: Deep Berry / Rose Magenta (Jurnal Mengajar) -->
-    <div class="relative overflow-hidden rounded-2xl p-5 border border-pink-500/25 bg-gradient-to-br from-[#53243B] via-[#381626] to-[#220D17] shadow-lg backdrop-blur-xl transition hover:scale-[1.01] hover:border-pink-500/40">
+    <div class="relative overflow-hidden rounded-2xl p-4 sm:p-5 border border-pink-500/25 bg-gradient-to-br from-[#53243B] via-[#381626] to-[#220D17] shadow-lg backdrop-blur-xl transition hover:scale-[1.01] hover:border-pink-500/40">
       <div class="flex items-center justify-between">
-        <p class="text-xs font-semibold text-pink-200/80 uppercase tracking-wider">Jurnal Terisi</p>
-        <div class="w-9 h-9 rounded-xl bg-pink-500/20 border border-pink-500/30 text-pink-300 flex items-center justify-center">
+        <p class="text-[10px] sm:text-xs font-semibold text-pink-200/80 uppercase tracking-wider">Jurnal Terisi</p>
+        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-pink-500/20 border border-pink-500/30 text-pink-300 flex items-center justify-center">
           <i data-lucide="calendar" class="w-4 h-4"></i>
         </div>
       </div>
-      <div class="mt-4 flex items-baseline justify-between">
-        <h3 id="stat-total-journals" class="text-3xl font-extrabold text-white tracking-tight">-</h3>
-        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/30">
+      <div class="mt-3 sm:mt-4 flex items-baseline justify-between">
+        <h3 id="stat-total-journals" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">-</h3>
+        <span class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/30">
           Tercatat
         </span>
       </div>
-      <p class="text-[11px] text-pink-200/60 mt-1">Pertemuan tatap muka</p>
+      <p class="text-[10px] sm:text-[11px] text-pink-200/60 mt-1 line-clamp-1">Pertemuan tatap muka</p>
     </div>
 
     <!-- KPI 4: Warm Sunset Terracotta / Amber (Rata Kehadiran) -->
-    <div class="relative overflow-hidden rounded-2xl p-5 border border-orange-500/25 bg-gradient-to-br from-[#8C3E1F] via-[#5C2611] to-[#361407] shadow-lg backdrop-blur-xl transition hover:scale-[1.01] hover:border-orange-500/40">
+    <div class="relative overflow-hidden rounded-2xl p-4 sm:p-5 border border-orange-500/25 bg-gradient-to-br from-[#8C3E1F] via-[#5C2611] to-[#361407] shadow-lg backdrop-blur-xl transition hover:scale-[1.01] hover:border-orange-500/40">
       <div class="flex items-center justify-between">
-        <p class="text-xs font-semibold text-orange-200/80 uppercase tracking-wider">Rata Kehadiran</p>
-        <div class="w-9 h-9 rounded-xl bg-orange-500/20 border border-orange-500/30 text-orange-300 flex items-center justify-center">
+        <p class="text-[10px] sm:text-xs font-semibold text-orange-200/80 uppercase tracking-wider">Rata Kehadiran</p>
+        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-orange-500/20 border border-orange-500/30 text-orange-300 flex items-center justify-center">
           <i data-lucide="check-check" class="w-4 h-4"></i>
         </div>
       </div>
-      <div class="mt-4 flex items-baseline justify-between">
-        <h3 id="stat-attendance-rate" class="text-3xl font-extrabold text-white tracking-tight">-</h3>
-        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-500/20 text-orange-300 border border-orange-500/30">
+      <div class="mt-3 sm:mt-4 flex items-baseline justify-between">
+        <h3 id="stat-attendance-rate" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">-</h3>
+        <span class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-orange-500/20 text-orange-300 border border-orange-500/30">
           Presensi
         </span>
       </div>
-      <p class="text-[11px] text-orange-200/60 mt-1">Persentase hadir siswa</p>
+      <p class="text-[10px] sm:text-[11px] text-orange-200/60 mt-1 line-clamp-1">Persentase hadir siswa</p>
     </div>
 
   </div>
@@ -831,6 +857,125 @@
   }
 </script>
 <!-- END COMPONENT: Dashboard -->
+
+
+          <!-- Dedicated Mobile View: Menu Utama (Sesuai Desain Screen 3) -->
+          <div id="view-mobile-menu" class="view-panel space-y-4 hidden">
+            <!-- Hero Banner: Kelola Sekolah Lebih Mudah Bersama SIAGU -->
+            <div class="relative overflow-hidden rounded-3xl p-5 sm:p-6 text-white shadow-xl bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 border border-white/10">
+              <div class="absolute -right-3 -bottom-5 w-32 h-32 opacity-20 pointer-events-none">
+                <i data-lucide="school" class="w-full h-full text-white"></i>
+              </div>
+              <div class="relative z-10 space-y-1">
+                <h3 class="text-xl font-black text-white tracking-tight leading-tight">
+                  Kelola Sekolah<br>Lebih Mudah
+                </h3>
+                <p class="text-xs font-bold text-sky-200">Bersama SIAGU</p>
+              </div>
+            </div>
+
+            <!-- 2-Column Grid of Big Module Cards (Screen 3 in image!) -->
+            <div class="grid grid-cols-2 gap-3 text-left">
+              <!-- 1. Jurnal Mengajar -->
+              <div onclick="switchView('journal')" class="p-4 rounded-2xl bg-[#131B2E] hover:bg-[#1A253F] border border-white/10 transition active:scale-95 cursor-pointer flex flex-col items-start gap-3 shadow-lg">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-600/25 border border-indigo-500/30 text-indigo-400 flex items-center justify-center font-bold shadow-md">
+                  <i data-lucide="book-open" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <h4 class="font-extrabold text-sm text-white">Jurnal Mengajar</h4>
+                  <p class="text-[10px] text-slate-400 mt-0.5">Catatan tatap muka</p>
+                </div>
+              </div>
+
+              <!-- 2. Presensi Siswa -->
+              <div onclick="switchView('attendance')" class="p-4 rounded-2xl bg-[#131B2E] hover:bg-[#1A253F] border border-white/10 transition active:scale-95 cursor-pointer flex flex-col items-start gap-3 shadow-lg">
+                <div class="w-12 h-12 rounded-2xl bg-blue-600/25 border border-blue-500/30 text-blue-400 flex items-center justify-center font-bold shadow-md">
+                  <i data-lucide="calendar-check" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <h4 class="font-extrabold text-sm text-white">Presensi Siswa</h4>
+                  <p class="text-[10px] text-slate-400 mt-0.5">Kamera & barcode</p>
+                </div>
+              </div>
+
+              <!-- 3. Nilai & Leger -->
+              <div onclick="switchView('assessment')" class="p-4 rounded-2xl bg-[#131B2E] hover:bg-[#1A253F] border border-white/10 transition active:scale-95 cursor-pointer flex flex-col items-start gap-3 shadow-lg">
+                <div class="w-12 h-12 rounded-2xl bg-purple-600/25 border border-purple-500/30 text-purple-400 flex items-center justify-center font-bold shadow-md">
+                  <i data-lucide="file-spreadsheet" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <h4 class="font-extrabold text-sm text-white">Nilai & Leger</h4>
+                  <p class="text-[10px] text-slate-400 mt-0.5">Asesmen & rapor</p>
+                </div>
+              </div>
+
+              <!-- 4. Perangkat Ajar -->
+              <div onclick="switchView('documents')" class="p-4 rounded-2xl bg-[#131B2E] hover:bg-[#1A253F] border border-white/10 transition active:scale-95 cursor-pointer flex flex-col items-start gap-3 shadow-lg">
+                <div class="w-12 h-12 rounded-2xl bg-amber-600/25 border border-amber-500/30 text-amber-400 flex items-center justify-center font-bold shadow-md">
+                  <i data-lucide="folder" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <h4 class="font-extrabold text-sm text-white">Perangkat Ajar</h4>
+                  <p class="text-[10px] text-slate-400 mt-0.5">Modul ajar digital</p>
+                </div>
+              </div>
+
+              <!-- 5. Catatan Sikap (P3) -->
+              <div onclick="switchView('behavior')" class="p-4 rounded-2xl bg-[#131B2E] hover:bg-[#1A253F] border border-white/10 transition active:scale-95 cursor-pointer flex flex-col items-start gap-3 shadow-lg">
+                <div class="w-12 h-12 rounded-2xl bg-pink-600/25 border border-pink-500/30 text-pink-400 flex items-center justify-center font-bold shadow-md">
+                  <i data-lucide="heart" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <h4 class="font-extrabold text-sm text-white">Catatan Sikap (P3)</h4>
+                  <p class="text-[10px] text-slate-400 mt-0.5">Profil Pancasila</p>
+                </div>
+              </div>
+
+              <!-- 6. Monitoring Guru (Kepsek) -->
+              <div id="mob-grid-spv" onclick="switchView('supervision')" class="p-4 rounded-2xl bg-[#131B2E] hover:bg-[#1A253F] border border-white/10 transition active:scale-95 cursor-pointer flex flex-col items-start gap-3 shadow-lg">
+                <div class="w-12 h-12 rounded-2xl bg-sky-600/25 border border-sky-500/30 text-sky-400 flex items-center justify-center font-bold shadow-md">
+                  <i data-lucide="shield-check" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <h4 class="font-extrabold text-sm text-white">Monitoring Guru</h4>
+                  <p class="text-[10px] text-slate-400 mt-0.5">Supervisi kepala sekolah</p>
+                </div>
+              </div>
+
+              <!-- 7. Kelola Guru & Akun -->
+              <div id="mob-grid-users" onclick="switchView('manage-users')" class="p-4 rounded-2xl bg-[#131B2E] hover:bg-[#1A253F] border border-white/10 transition active:scale-95 cursor-pointer flex flex-col items-start gap-3 shadow-lg">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-600/25 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold shadow-md">
+                  <i data-lucide="users" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <h4 class="font-extrabold text-sm text-white">Kelola Guru & Akun</h4>
+                  <p class="text-[10px] text-slate-400 mt-0.5">Kredensial login guru</p>
+                </div>
+              </div>
+
+              <!-- 8. Pusat Cetak Supervisi -->
+              <div onclick="switchView('reports')" class="p-4 rounded-2xl bg-[#131B2E] hover:bg-[#1A253F] border border-white/10 transition active:scale-95 cursor-pointer flex flex-col items-start gap-3 shadow-lg">
+                <div class="w-12 h-12 rounded-2xl bg-teal-600/25 border border-teal-500/30 text-teal-400 flex items-center justify-center font-bold shadow-md">
+                  <i data-lucide="printer" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <h4 class="font-extrabold text-sm text-white">Pusat Cetak</h4>
+                  <p class="text-[10px] text-slate-400 mt-0.5">Laporan A4 dinas</p>
+                </div>
+              </div>
+
+              <!-- 9. Data Master & Kelas -->
+              <div onclick="switchView('master')" class="p-4 rounded-2xl bg-[#131B2E] hover:bg-[#1A253F] border border-white/10 transition active:scale-95 cursor-pointer flex flex-col items-start gap-3 shadow-lg col-span-2">
+                <div class="w-12 h-12 rounded-2xl bg-cyan-600/25 border border-cyan-500/30 text-cyan-400 flex items-center justify-center font-bold shadow-md">
+                  <i data-lucide="database" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <h4 class="font-extrabold text-sm text-white">Data Master & Kelas</h4>
+                  <p class="text-[10px] text-slate-400 mt-0.5">Rombel, mapel, dan barcode murid</p>
+                </div>
+              </div>
+            </div>
+          </div>
 
           
 <!-- START COMPONENT: Master -->
@@ -6001,117 +6146,131 @@
 
     </div>
 
-    <!-- Mobile Bottom Navigation Bar (Dock Bawah Khusus HP Guru & Kepsek) -->
-    <nav id="mobile-bottom-nav" class="no-print lg:hidden fixed bottom-0 inset-x-0 z-40 bg-[#121117]/95 backdrop-blur-2xl border-t border-white/[0.08] px-2 py-1.5 flex items-center justify-around shadow-[0_-5px_25px_rgba(0,0,0,0.5)]">
-      
-      <!-- 1. Beranda / Dashboard -->
-      <button type="button" class="mobile-nav-btn flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition text-slate-400 flex-1 active:scale-95" data-view="dashboard" onclick="switchView('dashboard')">
-        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-        <span class="text-[10px] font-bold mt-1 tracking-tight">Beranda</span>
+    <!-- Mobile Bottom Navigation Bar (Dock 4 Item Sesuai Desain Mockup) -->
+    <nav id="mobile-bottom-nav" class="no-print lg:hidden fixed bottom-0 inset-x-0 z-40 bg-[#0A101D]/95 backdrop-blur-2xl border-t border-white/[0.08] px-3 py-2 flex items-center justify-around shadow-[0_-5px_25px_rgba(0,0,0,0.6)]">
+      <!-- 1. Beranda -->
+      <button type="button" class="mobile-nav-btn flex flex-col items-center justify-center py-1 px-3 rounded-xl transition flex-1 active:scale-95 text-[#2563EB]" data-view="dashboard" onclick="switchView('dashboard')">
+        <i data-lucide="home" class="w-5 h-5"></i>
+        <span class="text-[10px] font-extrabold mt-1 tracking-tight">Beranda</span>
       </button>
 
-      <!-- 2. Presensi Siswa (Tombak Utama Kamera Barcode) -->
-      <button type="button" class="mobile-nav-btn flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition text-slate-400 flex-1 active:scale-95 relative" data-view="attendance" onclick="switchView('attendance')">
+      <!-- 2. Menu (Membuka Menu Utama - Screen 3) -->
+      <button type="button" class="mobile-nav-btn flex flex-col items-center justify-center py-1 px-3 rounded-xl transition flex-1 active:scale-95 text-slate-400" data-view="mobile-menu" onclick="switchView('mobile-menu')">
+        <i data-lucide="layout-grid" class="w-5 h-5"></i>
+        <span class="text-[10px] font-bold mt-1 tracking-tight">Menu</span>
+      </button>
+
+      <!-- 3. Notifikasi -->
+      <button type="button" class="mobile-nav-btn flex flex-col items-center justify-center py-1 px-3 rounded-xl transition flex-1 active:scale-95 text-slate-400 relative" onclick="openNotificationSheet()">
         <div class="relative">
-          <i data-lucide="clipboard-check" class="w-5 h-5 text-amber-400"></i>
-          <span class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+          <i data-lucide="bell" class="w-5 h-5"></i>
+          <span class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-rose-500"></span>
         </div>
-        <span class="text-[10px] font-extrabold mt-1 tracking-tight text-amber-300">Presensi</span>
+        <span class="text-[10px] font-bold mt-1 tracking-tight">Notifikasi</span>
       </button>
 
-      <!-- 3. Jurnal Mengajar -->
-      <button type="button" class="mobile-nav-btn flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition text-slate-400 flex-1 active:scale-95" data-view="journal" onclick="switchView('journal')">
-        <i data-lucide="book-open" class="w-5 h-5"></i>
-        <span class="text-[10px] font-bold mt-1 tracking-tight">Jurnal</span>
-      </button>
-
-      <!-- 4. Nilai Siswa -->
-      <button type="button" class="mobile-nav-btn flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition text-slate-400 flex-1 active:scale-95" data-view="assessment" onclick="switchView('assessment')">
-        <i data-lucide="award" class="w-5 h-5"></i>
-        <span class="text-[10px] font-bold mt-1 tracking-tight">Nilai</span>
-      </button>
-
-      <!-- 5. Menu Lengkap (Buka Bottom Sheet Tanpa Kepotong) -->
-      <button type="button" onclick="openMobileMenuSheet()" class="flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition text-slate-400 flex-1 active:scale-95">
-        <i data-lucide="grid" class="w-5 h-5 text-sky-400"></i>
-        <span class="text-[10px] font-bold mt-1 tracking-tight text-sky-300">Lainnya</span>
+      <!-- 4. Profil -->
+      <button type="button" class="mobile-nav-btn flex flex-col items-center justify-center py-1 px-3 rounded-xl transition flex-1 active:scale-95 text-slate-400" onclick="openProfileSheet()">
+        <i data-lucide="user" class="w-5 h-5"></i>
+        <span class="text-[10px] font-bold mt-1 tracking-tight">Profil</span>
       </button>
     </nav>
 
-    <!-- Bottom Sheet Modal Menu Lengkap HP (Tampil Utuh Tanpa Terpotong) -->
-    <div id="mobile-menu-sheet" class="no-print fixed inset-0 z-50 bg-[#0A090E]/80 backdrop-blur-md hidden transition-all duration-300 flex flex-col justify-end">
-      <div onclick="closeMobileMenuSheet()" class="flex-1"></div>
-      <div class="bg-[#17161E] border-t border-white/10 rounded-t-3xl p-5 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl animate-in slide-in-from-bottom duration-300">
-        
-        <!-- Sheet Handle Bar -->
+    <!-- Bottom Sheet Modal Notifikasi Mobile -->
+    <div id="mobile-notification-sheet" class="no-print fixed inset-0 z-50 bg-[#070C16]/80 backdrop-blur-md hidden transition-all duration-300 flex flex-col justify-end">
+      <div onclick="closeNotificationSheet()" class="flex-1"></div>
+      <div class="bg-[#101728] border-t border-white/10 rounded-t-3xl p-5 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl animate-in slide-in-from-bottom duration-300">
         <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto"></div>
-
         <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
-          <div>
-            <h3 class="font-extrabold text-white text-base">Menu Lengkap Administrasi</h3>
-            <p class="text-[11px] text-slate-400">Seluruh fitur sekolah dalam 1 sentuhan.</p>
+          <div class="flex items-center gap-2">
+            <i data-lucide="bell" class="w-5 h-5 text-amber-400"></i>
+            <h3 class="font-extrabold text-white text-base">Notifikasi & Informasi</h3>
           </div>
-          <button onclick="closeMobileMenuSheet()" class="p-1.5 rounded-xl bg-white/5 text-slate-400 hover:text-white">
+          <button onclick="closeNotificationSheet()" class="p-1.5 rounded-xl bg-white/5 text-slate-400 hover:text-white">
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
+        <div class="space-y-2.5 text-xs">
+          <div class="p-3 bg-[#172036] border border-white/10 rounded-2xl flex items-start gap-3">
+            <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h5 class="font-extrabold text-white text-xs">Presensi Siswa Berhasil Disimpan</h5>
+              <p class="text-slate-400 text-[11px] mt-0.5">Presensi kehadiran kelas telah tersinkronisasi otomatis dengan Google Spreadsheet.</p>
+              <span class="text-[10px] text-slate-500 mt-1 block">Hari ini, 07.45 WIB</span>
+            </div>
+          </div>
+          <div class="p-3 bg-[#172036] border border-white/10 rounded-2xl flex items-start gap-3">
+            <div class="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <i data-lucide="book-open" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h5 class="font-extrabold text-white text-xs">Jurnal Tatap Muka Terverifikasi</h5>
+              <p class="text-slate-400 text-[11px] mt-0.5">Kegiatan pembelajaran dan refleksi siswa telah terekam pada sistem.</p>
+              <span class="text-[10px] text-slate-500 mt-1 block">Kemarin</span>
+            </div>
+          </div>
+          <div class="p-3 bg-[#172036] border border-white/10 rounded-2xl flex items-start gap-3">
+            <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <i data-lucide="shield-check" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h5 class="font-extrabold text-white text-xs">Supervisi Akademik Berjalan</h5>
+              <p class="text-slate-400 text-[11px] mt-0.5">Portal pemantauan kepala sekolah aktif untuk periode Tahun Ajaran 2026/2027.</p>
+              <span class="text-[10px] text-slate-500 mt-1 block">Tahun Ajaran Aktif</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        <!-- Grid Menu Lengkap -->
-        <div class="grid grid-cols-2 gap-2.5 text-xs font-semibold">
-          <button onclick="mobileSwitchView('dashboard')" class="p-3 bg-[#201F29] hover:bg-[#2A2836] border border-white/10 rounded-2xl flex items-center gap-2.5 text-left text-white transition">
-            <i data-lucide="layout-dashboard" class="w-4 h-4 text-sky-400 flex-shrink-0"></i>
-            <span class="truncate">Dashboard</span>
-          </button>
-          <button onclick="mobileSwitchView('attendance')" class="p-3 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-2xl flex items-center gap-2.5 text-left text-amber-300 transition">
-            <i data-lucide="clipboard-check" class="w-4 h-4 text-amber-400 flex-shrink-0"></i>
-            <span class="truncate font-bold">Presensi Barcode</span>
-          </button>
-          <button onclick="mobileSwitchView('journal')" class="p-3 bg-[#201F29] hover:bg-[#2A2836] border border-white/10 rounded-2xl flex items-center gap-2.5 text-left text-white transition">
-            <i data-lucide="book-open" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
-            <span class="truncate">Jurnal Mengajar</span>
-          </button>
-          <button onclick="mobileSwitchView('assessment')" class="p-3 bg-[#201F29] hover:bg-[#2A2836] border border-white/10 rounded-2xl flex items-center gap-2.5 text-left text-white transition">
-            <i data-lucide="award" class="w-4 h-4 text-purple-400 flex-shrink-0"></i>
-            <span class="truncate">Nilai & Asesmen</span>
-          </button>
-          <button onclick="mobileSwitchView('documents')" class="p-3 bg-[#201F29] hover:bg-[#2A2836] border border-white/10 rounded-2xl flex items-center gap-2.5 text-left text-white transition">
-            <i data-lucide="folder-archive" class="w-4 h-4 text-orange-400 flex-shrink-0"></i>
-            <span class="truncate">Perangkat Ajar</span>
-          </button>
-          <button onclick="mobileSwitchView('behavior')" class="p-3 bg-[#201F29] hover:bg-[#2A2836] border border-white/10 rounded-2xl flex items-center gap-2.5 text-left text-white transition">
-            <i data-lucide="heart-handshake" class="w-4 h-4 text-rose-400 flex-shrink-0"></i>
-            <span class="truncate">Catatan Sikap (P3)</span>
-          </button>
-          <button onclick="mobileSwitchView('master')" class="p-3 bg-[#201F29] hover:bg-[#2A2836] border border-white/10 rounded-2xl flex items-center gap-2.5 text-left text-white transition">
-            <i data-lucide="database" class="w-4 h-4 text-cyan-400 flex-shrink-0"></i>
-            <span class="truncate">Data Master Kelas</span>
-          </button>
-          <button onclick="mobileSwitchView('reports')" class="p-3 bg-[#201F29] hover:bg-[#2A2836] border border-white/10 rounded-2xl flex items-center gap-2.5 text-left text-white transition">
-            <i data-lucide="printer" class="w-4 h-4 text-teal-400 flex-shrink-0"></i>
-            <span class="truncate">Cetak Supervisi</span>
-          </button>
-          <button id="mobile-menu-spv" onclick="mobileSwitchView('supervision')" class="p-3 bg-[#201F29] hover:bg-[#2A2836] border border-white/10 rounded-2xl flex items-center gap-2.5 text-left text-amber-300 transition">
-            <i data-lucide="shield-check" class="w-4 h-4 text-amber-400 flex-shrink-0"></i>
-            <span class="truncate">Monitoring Kepsek</span>
-          </button>
-          <button id="mobile-menu-users" onclick="mobileSwitchView('manage-users')" class="p-3 bg-[#201F29] hover:bg-[#2A2836] border border-white/10 rounded-2xl flex items-center gap-2.5 text-left text-amber-300 transition">
-            <i data-lucide="users-round" class="w-4 h-4 text-amber-400 flex-shrink-0"></i>
-            <span class="truncate">Kelola Akun Guru</span>
+    <!-- Bottom Sheet Modal Profil Pengguna Mobile -->
+    <div id="mobile-profile-sheet" class="no-print fixed inset-0 z-50 bg-[#070C16]/80 backdrop-blur-md hidden transition-all duration-300 flex flex-col justify-end">
+      <div onclick="closeProfileSheet()" class="flex-1"></div>
+      <div class="bg-[#101728] border-t border-white/10 rounded-t-3xl p-5 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl animate-in slide-in-from-bottom duration-300">
+        <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto"></div>
+        <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+          <h3 class="font-extrabold text-white text-base">Profil Pengguna</h3>
+          <button onclick="closeProfileSheet()" class="p-1.5 rounded-xl bg-white/5 text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
-
-        <!-- Menu Akses & Logout -->
-        <div class="pt-3 border-t border-white/[0.08] flex items-center justify-between gap-3">
-          <button onclick="closeMobileMenuSheet(); goToLoginPage()" class="flex-1 py-2.5 px-3 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-sky-400 flex items-center justify-center gap-1.5">
+        <div class="p-4 bg-[#172036] border border-white/10 rounded-2xl space-y-3">
+          <div class="flex items-center gap-3">
+            <div id="sheet-profile-avatar" class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white font-black flex items-center justify-center text-lg shadow-md shadow-blue-500/20">
+              <i data-lucide="user" class="w-6 h-6"></i>
+            </div>
+            <div class="min-w-0">
+              <h4 id="sheet-profile-name" class="font-extrabold text-sm text-white truncate">Memuat...</h4>
+              <p id="sheet-profile-role" class="text-xs text-amber-400 font-semibold truncate">Kepala Satuan Pendidikan</p>
+            </div>
+          </div>
+          <div class="pt-2 border-t border-white/[0.08] space-y-2 text-xs text-slate-300">
+            <div class="flex justify-between">
+              <span class="text-slate-400">NIP:</span>
+              <span id="sheet-profile-nip" class="font-bold text-white font-mono">-</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Satuan Pendidikan:</span>
+              <span id="sheet-profile-school" class="font-bold text-white">-</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Kurikulum:</span>
+              <span id="sheet-profile-curriculum" class="font-bold text-amber-300">Kurikulum Merdeka</span>
+            </div>
+          </div>
+        </div>
+        <div class="pt-2 flex items-center gap-3">
+          <button onclick="closeProfileSheet(); goToLoginPage()" class="flex-1 py-3 px-3 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-sky-400 flex items-center justify-center gap-1.5 hover:bg-white/10 transition">
             <i data-lucide="key-round" class="w-4 h-4"></i>
             <span>Ganti Akun</span>
           </button>
-          <button onclick="handleLogout()" class="flex-1 py-2.5 px-3 bg-rose-500/15 border border-rose-500/30 rounded-xl text-xs font-bold text-rose-300 flex items-center justify-center gap-1.5">
+          <button onclick="handleLogout()" class="flex-1 py-3 px-3 bg-rose-500/15 border border-rose-500/30 rounded-xl text-xs font-bold text-rose-300 flex items-center justify-center gap-1.5 hover:bg-rose-500/25 transition">
             <i data-lucide="log-out" class="w-4 h-4"></i>
             <span>Keluar</span>
           </button>
         </div>
-
       </div>
     </div>
 
@@ -6400,6 +6559,10 @@
    * Router Tampilan Instan & Responsif (Switch Views)
    */
   function switchView(viewName, forceRefresh = false) {
+    if (AppState.currentView && AppState.currentView !== viewName) {
+      AppState.previousView = AppState.currentView;
+    }
+
     // 1. Tampilkan panel target secara instan (0 milidetik - Snappy SPA)
     const views = document.querySelectorAll('.view-panel');
     views.forEach(v => v.classList.add('hidden'));
@@ -6410,7 +6573,40 @@
       AppState.currentView = viewName;
     }
 
-    // 2. Perbarui status tombol aktif di navigasi sidebar
+    // 1b. Kelola Header Mobile (Dashboard Header vs Subview Header)
+    const mainHdr = document.getElementById('mobile-main-header');
+    const subHdr = document.getElementById('mobile-subview-header');
+    const subTitle = document.getElementById('mobile-subview-title');
+
+    if (viewName === 'dashboard') {
+      if (mainHdr) mainHdr.classList.remove('hidden');
+      if (subHdr) subHdr.classList.add('hidden');
+    } else {
+      if (mainHdr) mainHdr.classList.add('hidden');
+      if (subHdr) subHdr.classList.remove('hidden');
+
+      const titleMap = {
+        'mobile-menu': 'Menu Utama',
+        'journal': 'Jurnal Mengajar',
+        'attendance': 'Presensi Siswa',
+        'assessment': 'Nilai & Leger',
+        'documents': 'Perangkat Ajar',
+        'behavior': 'Catatan Sikap (P3)',
+        'master': 'Kelola Siswa & Kelas',
+        'supervision': 'Monitoring Guru',
+        'manage-users': 'Kelola Guru & Akun',
+        'reports': 'Pusat Cetak Supervisi'
+      };
+      if (subTitle) subTitle.textContent = titleMap[viewName] || 'SiAGU';
+    }
+
+    // Tutup drawer sidebar mobile jika terbuka
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar && window.innerWidth < 1024) {
+      sidebar.classList.add('hidden');
+    }
+
+    // 2. Perbarui status tombol aktif di navigasi sidebar desktop
     const navItems = document.querySelectorAll('.nav-btn');
     navItems.forEach(btn => {
       const btnView = btn.getAttribute('data-view');
@@ -6423,24 +6619,24 @@
       }
     });
 
-    // 2b. Perbarui status tombol aktif di mobile bottom navigation bar
+    // 2b. Perbarui status tombol aktif di 4-item Mobile Bottom Navigation Bar (Dock)
     const mobileNavItems = document.querySelectorAll('.mobile-nav-btn');
     mobileNavItems.forEach(btn => {
       const btnView = btn.getAttribute('data-view');
       const textSpan = btn.querySelector('span');
       if (btnView === viewName) {
-        btn.classList.add('text-amber-400', 'bg-white/[0.08]');
+        btn.classList.add('text-[#2563EB]');
         btn.classList.remove('text-slate-400');
         if (textSpan) {
-          textSpan.classList.add('text-amber-300', 'font-black');
-          textSpan.classList.remove('text-slate-400');
+          textSpan.classList.add('text-[#2563EB]', 'font-extrabold');
+          textSpan.classList.remove('text-slate-400', 'font-medium');
         }
       } else {
-        btn.classList.remove('text-amber-400', 'bg-white/[0.08]');
+        btn.classList.remove('text-[#2563EB]');
         btn.classList.add('text-slate-400');
         if (textSpan) {
-          textSpan.classList.remove('text-amber-300', 'font-black');
-          textSpan.classList.add('text-slate-400');
+          textSpan.classList.remove('text-[#2563EB]', 'font-extrabold');
+          textSpan.classList.add('text-slate-400', 'font-medium');
         }
       }
     });
@@ -6466,10 +6662,20 @@
   }
 
   /**
-   * Helper Navigasi Mobile HP (Bottom Bar & Drawer Sheet)
+   * Helper Navigasi Mobile HP (Back Button, Bottom Sheet Notifikasi & Profil)
    */
-  function openMobileMenuSheet() {
-    const sheet = document.getElementById('mobile-menu-sheet');
+  function mobileNavigateBack() {
+    if (AppState.currentView === 'mobile-menu') {
+      switchView('dashboard');
+    } else if (AppState.previousView && AppState.previousView === 'mobile-menu') {
+      switchView('mobile-menu');
+    } else {
+      switchView('dashboard');
+    }
+  }
+
+  function openNotificationSheet() {
+    const sheet = document.getElementById('mobile-notification-sheet');
     if (sheet) {
       sheet.classList.remove('hidden');
       document.body.style.overflow = 'hidden';
@@ -6477,17 +6683,30 @@
     }
   }
 
-  function closeMobileMenuSheet() {
-    const sheet = document.getElementById('mobile-menu-sheet');
+  function closeNotificationSheet() {
+    const sheet = document.getElementById('mobile-notification-sheet');
     if (sheet) {
       sheet.classList.add('hidden');
       document.body.style.overflow = '';
     }
   }
 
-  function mobileSwitchView(viewName) {
-    closeMobileMenuSheet();
-    switchView(viewName);
+  function openProfileSheet() {
+    const sheet = document.getElementById('mobile-profile-sheet');
+    if (sheet) {
+      updateHeaderInfo();
+      sheet.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      if (window.lucide) lucide.createIcons();
+    }
+  }
+
+  function closeProfileSheet() {
+    const sheet = document.getElementById('mobile-profile-sheet');
+    if (sheet) {
+      sheet.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
   }
 
   /**
@@ -6543,10 +6762,11 @@
     const appLayout = document.getElementById('app-layout');
     const navSpv = document.getElementById('nav-btn-supervision');
     const navUsers = document.getElementById('nav-btn-users');
-    const mobileSpv = document.getElementById('mobile-menu-spv');
-    const mobileUsers = document.getElementById('mobile-menu-users');
+    const mobSpv = document.getElementById('mob-grid-spv');
+    const mobUsers = document.getElementById('mob-grid-users');
     const roleBadge = document.getElementById('sidebar-role-badge');
-    const mobileRole = document.getElementById('mobile-role-label');
+    const mobileRole = document.getElementById('mobile-header-role');
+    const drawerRole = document.getElementById('drawer-role-badge');
 
     if (loginView) loginView.classList.add('hidden');
     if (appLayout) appLayout.classList.remove('hidden');
@@ -6555,17 +6775,19 @@
     if (user.role === 'headmaster') {
       if (navSpv) navSpv.classList.remove('hidden');
       if (navUsers) navUsers.classList.remove('hidden');
-      if (mobileSpv) mobileSpv.classList.remove('hidden');
-      if (mobileUsers) mobileUsers.classList.remove('hidden');
+      if (mobSpv) mobSpv.classList.remove('hidden');
+      if (mobUsers) mobUsers.classList.remove('hidden');
       if (roleBadge) roleBadge.textContent = 'Portal Kepala Sekolah';
-      if (mobileRole) mobileRole.textContent = 'Kepala Sekolah';
+      if (mobileRole) mobileRole.textContent = 'Portal Kepala Sekolah';
+      if (drawerRole) drawerRole.textContent = 'Kepala Sekolah';
     } else {
       if (navSpv) navSpv.classList.add('hidden');
       if (navUsers) navUsers.classList.add('hidden');
-      if (mobileSpv) mobileSpv.classList.add('hidden');
-      if (mobileUsers) mobileUsers.classList.add('hidden');
+      if (mobSpv) mobSpv.classList.add('hidden');
+      if (mobUsers) mobUsers.classList.add('hidden');
       if (roleBadge) roleBadge.textContent = 'Portal Guru';
-      if (mobileRole) mobileRole.textContent = 'Guru Pengampu';
+      if (mobileRole) mobileRole.textContent = 'Portal Guru';
+      if (drawerRole) drawerRole.textContent = 'Guru Pengampu';
     }
 
     // Ambil payload konfigurasi sekolah
@@ -6666,15 +6888,45 @@
     const curriEl = document.getElementById('header-curriculum-badge');
     const avatarEl = document.getElementById('header-user-avatar');
 
+    // Mobile Elements
+    const drawerTeacherEl = document.getElementById('drawer-teacher-name');
+    const drawerRoleEl = document.getElementById('drawer-role-title');
+    const drawerBadgeEl = document.getElementById('drawer-role-badge');
+    const mobileHeaderRoleEl = document.getElementById('mobile-header-role');
+    const sheetProfileName = document.getElementById('sheet-profile-name');
+    const sheetProfileRole = document.getElementById('sheet-profile-role');
+    const sheetProfileNip = document.getElementById('sheet-profile-nip');
+    const sheetProfileSchool = document.getElementById('sheet-profile-school');
+    const sheetProfileCurr = document.getElementById('sheet-profile-curriculum');
+
     if (schoolEl && AppState.config.SCHOOL_NAME) schoolEl.textContent = AppState.config.SCHOOL_NAME;
     if (curriEl && AppState.config.CURRICULUM_MODE) curriEl.textContent = AppState.config.CURRICULUM_MODE;
+    if (sheetProfileSchool && AppState.config.SCHOOL_NAME) sheetProfileSchool.textContent = AppState.config.SCHOOL_NAME;
+    if (sheetProfileCurr && AppState.config.CURRICULUM_MODE) sheetProfileCurr.textContent = AppState.config.CURRICULUM_MODE;
 
     if (AppState.currentUser) {
-      if (teacherEl) teacherEl.textContent = AppState.currentUser.name;
-      if (roleTitleEl) roleTitleEl.textContent = AppState.currentUser.title;
+      const u = AppState.currentUser;
+      const isKepsek = u.role === 'headmaster';
+
+      if (teacherEl) teacherEl.textContent = u.name;
+      if (roleTitleEl) roleTitleEl.textContent = u.title;
+      if (drawerTeacherEl) drawerTeacherEl.textContent = u.name;
+      if (drawerRoleEl) drawerRoleEl.textContent = u.title;
+      if (drawerBadgeEl) drawerBadgeEl.textContent = isKepsek ? 'Kepala Sekolah' : 'Guru Pengampu';
+      if (mobileHeaderRoleEl) mobileHeaderRoleEl.textContent = isKepsek ? 'Portal Kepala Sekolah' : 'Portal Guru';
+
+      if (sheetProfileName) sheetProfileName.textContent = u.name;
+      if (sheetProfileRole) sheetProfileRole.textContent = u.title;
+      if (sheetProfileNip) sheetProfileNip.textContent = u.nip || '-';
+
+      // Update grid visibility for mobile menu
+      const mobSpv = document.getElementById('mob-grid-spv');
+      const mobUsers = document.getElementById('mob-grid-users');
+      if (mobSpv) isKepsek ? mobSpv.classList.remove('hidden') : mobSpv.classList.add('hidden');
+      if (mobUsers) isKepsek ? mobUsers.classList.remove('hidden') : mobUsers.classList.add('hidden');
 
       if (avatarEl) {
-        if (AppState.currentUser.role === 'headmaster') {
+        if (isKepsek) {
           avatarEl.className = 'w-9 h-9 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-950 font-black flex items-center justify-center text-xs shadow-md shadow-amber-500/20';
           avatarEl.innerHTML = '<i data-lucide="shield-check" class="w-4 h-4"></i>';
         } else {
