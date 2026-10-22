@@ -10,30 +10,319 @@ function getTeachers() {
   try {
     const ss = getDatabaseSpreadsheet();
     let sheet = ss.getSheetByName('_TEACHERS');
-    if (!sheet) {
+    if (!sheet || sheet.getLastRow() <= 1) {
       initDatabaseSchema();
       sheet = ss.getSheetByName('_TEACHERS');
     }
 
-    if (!sheet || sheet.getLastRow() <= 1) return successResponse([]);
-
-    const data = sheet.getDataRange().getValues();
     const teachers = [];
-    for (let i = 1; i < data.length; i++) {
-      teachers.push({
-        teacherId: data[i][0],
-        nip: data[i][1],
-        teacherName: data[i][2],
-        email: data[i][3],
-        subjectName: data[i][4],
-        phone: data[i][5],
-        status: data[i][6] || 'Aktif'
-      });
+    if (sheet && sheet.getLastRow() > 1) {
+      const data = sheet.getDataRange().getValues();
+      for (let i = 1; i < data.length; i++) {
+        if (!data[i][0] && !data[i][2]) continue;
+        teachers.push({
+          teacherId: data[i][0] || ('TCH-' + i),
+          nip: data[i][1] || '-',
+          teacherName: data[i][2] || 'Guru ' + i,
+          email: data[i][3] || '',
+          subjectName: data[i][4] || '-',
+          phone: data[i][5] || '',
+          status: data[i][6] || 'Aktif'
+        });
+      }
+    }
+
+    // Jika _TEACHERS masih kosong, tarik data guru dari _USERS (kecuali akun admin/kepsek)
+    if (teachers.length === 0) {
+      const uSheet = ss.getSheetByName('_USERS');
+      if (uSheet && uSheet.getLastRow() > 1) {
+        const uData = uSheet.getDataRange().getValues();
+        for (let i = 1; i < uData.length; i++) {
+          const role = String(uData[i][5] || '').toLowerCase();
+          const username = String(uData[i][1] || '').toLowerCase();
+          if (role !== 'kepsek' && username !== 'admin') {
+            teachers.push({
+              teacherId: uData[i][0],
+              nip: uData[i][4] || '-',
+              teacherName: uData[i][3],
+              email: uData[i][7] || '',
+              subjectName: uData[i][6] || '-',
+              phone: '',
+              status: uData[i][8] || 'Aktif'
+            });
+          }
+        }
+      }
     }
 
     return successResponse(teachers);
   } catch (err) {
     return errorResponse('Gagal mengambil daftar guru: ' + err.message);
+  }
+}
+
+/**
+ * Mengambil daftar guru beserta kredensial login (Tab "Daftar Guru" di Supervisi)
+ */
+function getTeacherAccountsList() {
+  try {
+    const ss = getDatabaseSpreadsheet();
+    let tSheet = ss.getSheetByName('_TEACHERS');
+    let uSheet = ss.getSheetByName('_USERS');
+
+    if (!tSheet || tSheet.getLastRow() <= 1) {
+      initDatabaseSchema();
+      tSheet = ss.getSheetByName('_TEACHERS');
+    }
+    if (!uSheet || uSheet.getLastRow() <= 1) {
+      ensureUsersSheet();
+      uSheet = ss.getSheetByName('_USERS');
+    }
+
+    // Bangun peta akun pengguna dari sheet _USERS
+    const userMap = {};
+    if (uSheet && uSheet.getLastRow() > 1) {
+      const uData = uSheet.getDataRange().getValues();
+      for (let i = 1; i < uData.length; i++) {
+        const uId = String(uData[i][0] || '').trim();
+        const uName = String(uData[i][1] || '').trim();
+        const uPass = String(uData[i][2] || '').trim();
+        const uFullName = String(uData[i][3] || '').trim();
+        const uNip = String(uData[i][4] || '').trim().replace(/\s+/g, '');
+        const uRole = String(uData[i][5] || 'guru').toLowerCase();
+        const uSubject = String(uData[i][6] || '-').trim();
+        const uEmail = String(uData[i][7] || '').trim();
+        const uStatus = String(uData[i][8] || 'Aktif').trim();
+
+        const userObj = {
+          userId: uId,
+          username: uName,
+          password: uPass,
+          fullName: uFullName,
+          nip: uData[i][4],
+          role: uRole,
+          subjectName: uSubject,
+          email: uEmail,
+          status: uStatus
+        };
+
+        if (uId) userMap[uId] = userObj;
+        if (uNip && uNip !== '-') userMap[uNip] = userObj;
+        if (uFullName) userMap[uFullName.toLowerCase()] = userObj;
+      }
+    }
+
+    const teachersList = [];
+    const seenTeacherIds = new Set();
+
+    // 1. Ambil dari sheet _TEACHERS
+    if (tSheet && tSheet.getLastRow() > 1) {
+      const tData = tSheet.getDataRange().getValues();
+      for (let i = 1; i < tData.length; i++) {
+        const tId = String(tData[i][0] || '').trim();
+        if (!tId) continue;
+
+        const nip = String(tData[i][1] || '').trim();
+        const cleanNip = nip.replace(/\s+/g, '');
+        const teacherName = String(tData[i][2] || '').trim();
+        const email = String(tData[i][3] || '').trim();
+        const subjectName = String(tData[i][4] || '-').trim();
+        const phone = String(tData[i][5] || '').trim();
+        const status = String(tData[i][6] || 'Aktif').trim();
+        let username = String(tData[i][7] || '').trim();
+        let password = String(tData[i][8] || '').trim();
+
+        // Cari di userMap jika username/password di _TEACHERS belum terisi
+        const matchedUser = userMap[tId] || userMap[cleanNip] || userMap[teacherName.toLowerCase()];
+        if (matchedUser) {
+          if (!username || username === '-') username = matchedUser.username;
+          if (!password || password === '-') password = matchedUser.password;
+        }
+
+        const hasAccount = Boolean(username && username !== '-');
+
+        seenTeacherIds.add(tId);
+        if (cleanNip && cleanNip !== '-') seenTeacherIds.add(cleanNip);
+
+        teachersList.push({
+          teacherId: tId,
+          nip: nip || '-',
+          teacherName: teacherName,
+          email: email,
+          subjectName: subjectName,
+          phone: phone,
+          status: status,
+          username: hasAccount ? username : '-',
+          password: hasAccount ? password : '-',
+          hasAccount: hasAccount
+        });
+      }
+    }
+
+    // 2. Jika di _USERS ada akun guru yang belum terdata di _TEACHERS, sertakan juga (kecuali kepsek/admin)
+    if (uSheet && uSheet.getLastRow() > 1) {
+      const uData = uSheet.getDataRange().getValues();
+      for (let i = 1; i < uData.length; i++) {
+        const uId = String(uData[i][0] || '').trim();
+        const uName = String(uData[i][1] || '').trim();
+        const uPass = String(uData[i][2] || '').trim();
+        const uFullName = String(uData[i][3] || '').trim();
+        const uNip = String(uData[i][4] || '').trim();
+        const cleanNip = uNip.replace(/\s+/g, '');
+        const uRole = String(uData[i][5] || 'guru').toLowerCase();
+        const uSubject = String(uData[i][6] || '-').trim();
+        const uEmail = String(uData[i][7] || '').trim();
+        const uStatus = String(uData[i][8] || 'Aktif').trim();
+
+        if (uRole === 'kepsek' || uName.toLowerCase() === 'admin') continue;
+
+        if (!seenTeacherIds.has(uId) && (!cleanNip || cleanNip === '-' || !seenTeacherIds.has(cleanNip))) {
+          seenTeacherIds.add(uId);
+          teachersList.push({
+            teacherId: uId,
+            nip: uNip || '-',
+            teacherName: uFullName,
+            email: uEmail,
+            subjectName: uSubject,
+            phone: '',
+            status: uStatus,
+            username: uName,
+            password: uPass,
+            hasAccount: true
+          });
+        }
+      }
+    }
+
+    return successResponse(teachersList);
+  } catch (err) {
+    return errorResponse('Gagal mengambil daftar akun guru: ' + err.message);
+  }
+}
+
+/**
+ * Membuat atau memperbarui kredensial akun guru (Username & Password)
+ */
+function generateTeacherCredentials(teacherId, username, password) {
+  const lock = LockService.getScriptLock();
+  lock.tryLock(20000);
+  try {
+    const ss = getDatabaseSpreadsheet();
+    let tSheet = ss.getSheetByName('_TEACHERS');
+    let uSheet = ensureUsersSheet();
+
+    if (!tSheet) {
+      initDatabaseSchema();
+      tSheet = ss.getSheetByName('_TEACHERS');
+    }
+
+    const cleanUser = String(username || '').trim();
+    const cleanPass = String(password || '').trim();
+
+    if (!cleanUser || !cleanPass) {
+      return errorResponse('Username dan Password tidak boleh kosong.');
+    }
+
+    // Cari info guru di _TEACHERS
+    let teacherInfo = null;
+    let teacherRowIdx = -1;
+    if (tSheet && tSheet.getLastRow() > 1) {
+      const tData = tSheet.getDataRange().getValues();
+      for (let i = 1; i < tData.length; i++) {
+        if (tData[i][0] === teacherId) {
+          teacherRowIdx = i + 1;
+          teacherInfo = {
+            teacherId: tData[i][0],
+            nip: tData[i][1],
+            teacherName: tData[i][2],
+            email: tData[i][3],
+            subjectName: tData[i][4],
+            phone: tData[i][5],
+            status: tData[i][6] || 'Aktif'
+          };
+          break;
+        }
+      }
+    }
+
+    // Jika tidak ada di _TEACHERS, cari di _USERS
+    if (!teacherInfo && uSheet && uSheet.getLastRow() > 1) {
+      const uData = uSheet.getDataRange().getValues();
+      for (let i = 1; i < uData.length; i++) {
+        if (uData[i][0] === teacherId) {
+          teacherInfo = {
+            teacherId: uData[i][0],
+            nip: uData[i][4],
+            teacherName: uData[i][3],
+            email: uData[i][7],
+            subjectName: uData[i][6],
+            phone: '',
+            status: uData[i][8] || 'Aktif'
+          };
+          break;
+        }
+      }
+    }
+
+    if (!teacherInfo) {
+      return errorResponse('Data guru dengan ID ' + teacherId + ' tidak ditemukan.');
+    }
+
+    // 1. Simpan/Update ke sheet _TEACHERS
+    if (teacherRowIdx > 0) {
+      tSheet.getRange(teacherRowIdx, 8, 1, 3).setValues([[sanitizeForSheet(cleanUser), sanitizeForSheet(cleanPass), 'guru']]);
+    } else if (tSheet) {
+      tSheet.appendRow([
+        sanitizeForSheet(teacherInfo.teacherId),
+        sanitizeForSheet(teacherInfo.nip || '-'),
+        sanitizeForSheet(teacherInfo.teacherName),
+        sanitizeForSheet(teacherInfo.email || ''),
+        sanitizeForSheet(teacherInfo.subjectName || '-'),
+        sanitizeForSheet(teacherInfo.phone || ''),
+        sanitizeForSheet(teacherInfo.status || 'Aktif'),
+        sanitizeForSheet(cleanUser),
+        sanitizeForSheet(cleanPass),
+        'guru'
+      ]);
+    }
+
+    // 2. Simpan/Update ke sheet _USERS agar guru bisa langsung login
+    const todayStr = Utilities.formatDate(new Date(), 'Asia/Jakarta', 'yyyy-MM-dd');
+    const uData = uSheet.getDataRange().getValues();
+    let uUpdated = false;
+
+    for (let i = 1; i < uData.length; i++) {
+      if (uData[i][0] === teacherInfo.teacherId || (teacherInfo.nip && teacherInfo.nip !== '-' && String(uData[i][4]).replace(/\s+/g, '') === String(teacherInfo.nip).replace(/\s+/g, ''))) {
+        uSheet.getRange(i + 1, 2, 1, 2).setValues([[sanitizeForSheet(cleanUser), sanitizeForSheet(cleanPass)]]);
+        uUpdated = true;
+        break;
+      }
+    }
+
+    if (!uUpdated) {
+      uSheet.appendRow([
+        sanitizeForSheet(teacherInfo.teacherId),
+        sanitizeForSheet(cleanUser),
+        sanitizeForSheet(cleanPass),
+        sanitizeForSheet(teacherInfo.teacherName),
+        sanitizeForSheet(teacherInfo.nip || '-'),
+        'guru',
+        sanitizeForSheet(teacherInfo.subjectName || '-'),
+        sanitizeForSheet(teacherInfo.email || ''),
+        sanitizeForSheet(teacherInfo.status || 'Aktif'),
+        todayStr
+      ]);
+    }
+
+    return successResponse({
+      teacherId: teacherInfo.teacherId,
+      username: cleanUser,
+      password: cleanPass
+    }, 'Kredensial login untuk ' + teacherInfo.teacherName + ' berhasil dibuat.');
+  } catch (err) {
+    return errorResponse('Gagal membuat kredensial guru: ' + err.message);
+  } finally {
+    lock.releaseLock();
   }
 }
 
@@ -298,6 +587,43 @@ function saveTeacherSupervision(data) {
     return errorResponse('Gagal menyimpan hasil supervisi: ' + err.message);
   } finally {
     lock.releaseLock();
+  }
+}
+
+/**
+ * Helper mengambil data header cetak dari _CONFIG
+ */
+function getPrintHeaderInfo() {
+  try {
+    const ss = getDatabaseSpreadsheet();
+    const configSheet = ss.getSheetByName('_CONFIG');
+    const config = {};
+    if (configSheet && configSheet.getLastRow() > 1) {
+      const data = configSheet.getDataRange().getValues();
+      for (let i = 1; i < data.length; i++) {
+        if (data[i][0]) config[data[i][0]] = data[i][1];
+      }
+    }
+    const today = Utilities.formatDate(new Date(), 'Asia/Jakarta', 'd MMMM yyyy');
+    return {
+      schoolName: config.SCHOOL_NAME || 'SMA NEGERI 1 INDONESIA',
+      schoolNpsn: config.SCHOOL_NPSN || '20104050',
+      academicYear: config.ACADEMIC_YEAR || '2026/2027',
+      semester: config.SEMESTER || 'Ganjil',
+      headmasterName: config.HEADMASTER_NAME || 'Dr. Hj. Siti Rahma, M.M.',
+      headmasterNip: config.HEADMASTER_NIP || '19760315 200212 2 003',
+      printDate: today
+    };
+  } catch (e) {
+    return {
+      schoolName: 'SMA NEGERI 1 INDONESIA',
+      schoolNpsn: '20104050',
+      academicYear: '2026/2027',
+      semester: 'Ganjil',
+      headmasterName: 'Dr. Hj. Siti Rahma, M.M.',
+      headmasterNip: '19760315 200212 2 003',
+      printDate: '23 Oktober 2026'
+    };
   }
 }
 

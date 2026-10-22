@@ -5125,6 +5125,8 @@
     const tbody = document.getElementById('spv-monitoring-tbody');
     if (!tbody) return;
 
+    window.monitoringListCache = list || [];
+
     if (list.length === 0) {
       tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-500 text-xs">Belum ada data guru terdaftar.</td></tr>`;
       return;
@@ -5163,7 +5165,7 @@
           </td>
           <td class="py-3 px-3 text-center">${statusBadge}</td>
           <td class="py-3 px-4 text-right">
-            <button onclick='openSuperviseModal(${JSON.stringify(item)})' class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 rounded-xl text-xs font-extrabold shadow-sm transition inline-flex items-center gap-1">
+            <button onclick="openSuperviseModal(${idx})" class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 rounded-xl text-xs font-extrabold shadow-sm transition inline-flex items-center gap-1">
               <i data-lucide="clipboard-signature" class="w-3.5 h-3.5"></i>
               <span>Telaah</span>
             </button>
@@ -5185,12 +5187,23 @@
     renderMonitoringTable(filtered);
   }
 
-  function openSuperviseModal(item) {
-    document.getElementById('spv-form-teacher-id').value = item.teacherId;
-    document.getElementById('modal-spv-teacher-info').textContent = `Guru: ${item.teacherName} (${item.subjectName}) • NIP: ${item.nip || '-'}`;
+  function openSuperviseModal(itemOrIdx) {
+    const item = typeof itemOrIdx === 'number' ? (window.monitoringListCache && window.monitoringListCache[itemOrIdx] ? window.monitoringListCache[itemOrIdx] : {}) : (itemOrIdx || {});
+    document.getElementById('spv-form-teacher-id').value = item.teacherId || '';
+    document.getElementById('modal-spv-teacher-info').textContent = `Guru: ${item.teacherName || '-'} (${item.subjectName || '-'}) • NIP: ${item.nip || '-'}`;
 
     const spv = item.supervision || {};
     document.getElementById('spv-score-dev').value = spv.scoreDevice || 90;
+    document.getElementById('spv-score-jrn').value = spv.scoreJournal || 88;
+    document.getElementById('spv-score-att').value = spv.scoreAttendance || 92;
+    document.getElementById('spv-score-asm').value = spv.scoreAssessment || 85;
+    document.getElementById('spv-feedback').value = spv.feedback || '';
+    document.getElementById('spv-status-approval').value = spv.statusApproval || 'Disetujui';
+
+    calculateSupervisionScore();
+    document.getElementById('modal-supervise-teacher').classList.remove('hidden');
+    lucide.createIcons();
+  }
     document.getElementById('spv-score-jrn').value = spv.scoreJournal || 88;
     document.getElementById('spv-score-att').value = spv.scoreAttendance || 92;
     document.getElementById('spv-score-asm').value = spv.scoreAssessment || 85;
@@ -5253,16 +5266,18 @@
       setLoading(true, 'Memuat akun dan data guru...');
       const res = await runServer('getTeacherAccountsList');
       const teachers = res.data || [];
+      window.teachersTableCache = teachers;
+
       const tbody = document.getElementById('spv-teachers-tbody');
       if (!tbody) return;
 
       if (teachers.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500 text-xs">Belum ada guru terdaftar.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-400 text-xs">Belum ada guru terdaftar. Klik tombol <strong>Tambah Guru Baru</strong> di atas untuk mendaftarkan pendidik.</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = teachers.map(t => {
-        const hasAcc = t.hasAccount && t.username !== '-';
+      tbody.innerHTML = teachers.map((t, idx) => {
+        const hasAcc = t.hasAccount && t.username && t.username !== '-';
         return `
           <tr class="hover:bg-white/[0.02] border-b border-white/[0.04] transition">
             <td class="py-3 px-4">
@@ -5282,16 +5297,16 @@
               <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">${t.status}</span>
             </td>
             <td class="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
-              <button onclick='openGenerateAccountModal(${JSON.stringify(t)})' class="px-2.5 py-1 bg-white/5 hover:bg-white/10 text-amber-300 border border-white/10 rounded-lg text-xs font-bold transition inline-flex items-center gap-1">
+              <button onclick="openGenerateAccountModal(${idx})" class="px-2.5 py-1 bg-white/5 hover:bg-white/10 text-amber-300 border border-white/10 rounded-lg text-xs font-bold transition inline-flex items-center gap-1">
                 <i data-lucide="key" class="w-3.5 h-3.5"></i>
                 <span>${hasAcc ? 'Reset PIN' : 'Buat Akun'}</span>
               </button>
               ${hasAcc ? `
-                <button onclick='openAccountSlipModal(${JSON.stringify(t)})' class="p-1.5 bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 rounded-lg text-xs font-semibold transition" title="Lihat & Salin Slip Akun">
+                <button onclick="openAccountSlipModal(${idx})" class="p-1.5 bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 rounded-lg text-xs font-semibold transition" title="Lihat & Salin Slip Akun">
                   <i data-lucide="share-2" class="w-3.5 h-3.5 inline"></i>
                 </button>
               ` : ''}
-              <button onclick='openTeacherModal(${JSON.stringify(t)})' class="text-amber-400 hover:text-amber-300 text-xs font-bold px-1.5 py-1">Edit</button>
+              <button onclick="openTeacherModal(${idx})" class="text-amber-400 hover:text-amber-300 text-xs font-bold px-1.5 py-1">Edit</button>
               <button onclick="handleDeleteTeacher('${t.teacherId}')" class="text-rose-400 hover:text-rose-300 text-xs font-bold px-1.5 py-1">Hapus</button>
             </td>
           </tr>
@@ -5305,12 +5320,13 @@
     }
   }
 
-  function openGenerateAccountModal(t) {
-    document.getElementById('gen-teacher-id').value = t.teacherId;
-    document.getElementById('gen-teacher-title-info').textContent = `Guru: ${t.teacherName} (${t.subjectName})`;
+  function openGenerateAccountModal(tOrIdx) {
+    const t = typeof tOrIdx === 'number' ? (window.teachersTableCache && window.teachersTableCache[tOrIdx] ? window.teachersTableCache[tOrIdx] : {}) : (tOrIdx || {});
+    document.getElementById('gen-teacher-id').value = t.teacherId || '';
+    document.getElementById('gen-teacher-title-info').textContent = `Guru: ${t.teacherName || '-'} (${t.subjectName || '-'})`;
 
     // Generate saran username & password
-    const cleanName = t.teacherName.replace(/[^a-zA-Z]/g, '').toLowerCase().substring(0, 8);
+    const cleanName = (t.teacherName || 'guru').replace(/[^a-zA-Z]/g, '').toLowerCase().substring(0, 8);
     document.getElementById('gen-username').value = (t.username && t.username !== '-') ? t.username : 'guru_' + cleanName;
     
     // 6 digit PIN acak
@@ -5344,12 +5360,13 @@
     }
   }
 
-  function openAccountSlipModal(t) {
-    document.getElementById('slip-teacher-name').textContent = t.teacherName;
+  function openAccountSlipModal(tOrIdx) {
+    const t = typeof tOrIdx === 'number' ? (window.teachersTableCache && window.teachersTableCache[tOrIdx] ? window.teachersTableCache[tOrIdx] : {}) : (tOrIdx || {});
+    document.getElementById('slip-teacher-name').textContent = t.teacherName || '-';
     document.getElementById('slip-teacher-nip').textContent = t.nip || '-';
-    document.getElementById('slip-teacher-subject').textContent = t.subjectName;
-    document.getElementById('slip-username').textContent = t.username;
-    document.getElementById('slip-password').textContent = t.password;
+    document.getElementById('slip-teacher-subject').textContent = t.subjectName || '-';
+    document.getElementById('slip-username').textContent = t.username || '-';
+    document.getElementById('slip-password').textContent = t.password || '-';
     document.getElementById('modal-account-slip').classList.remove('hidden');
     lucide.createIcons();
   }
@@ -5370,7 +5387,8 @@
     });
   }
 
-  function openTeacherModal(t = null) {
+  function openTeacherModal(tOrIdx = null) {
+    const t = typeof tOrIdx === 'number' ? (window.teachersTableCache && window.teachersTableCache[tOrIdx] ? window.teachersTableCache[tOrIdx] : null) : (tOrIdx || null);
     document.getElementById('form-teacher-id').value = t ? t.teacherId : '';
     document.getElementById('form-teacher-name').value = t ? t.teacherName : '';
     document.getElementById('form-teacher-nip').value = t ? t.nip : '';
@@ -5493,6 +5511,11 @@
       setLoading(false);
     }
   }
+
+  // Expose global functions to window
+  window.loadSupervisionView = loadSupervisionView;
+  window.loadTeachersTable = loadTeachersTable;
+  window.switchSupervisionTab = switchSupervisionTab;
 </script>
 <!-- END COMPONENT: Supervision -->
 
