@@ -24,7 +24,7 @@ if (!fs.existsSync(indexTemplatePath)) {
 let indexContent = fs.readFileSync(indexTemplatePath, 'utf8');
 
 // Regex untuk mencocokkan pola include Google Apps Script: <?!= include('views/XYZ'); ?> atau <?!= include('XYZ'); ?>
-const includeRegex = /<\?!\s*include\(['"]([^'"]+)['"]\);\s*\?>/g;
+const includeRegex = /<\?!={0,1}\s*include\(['"]([^'"]+)['"]\);\s*\?>/g;
 
 indexContent = indexContent.replace(includeRegex, (match, componentPath) => {
   // Bersihkan prefix 'views/' jika ada
