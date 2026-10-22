@@ -96,7 +96,37 @@ function saveDocument(doc, userRole = null) {
 }
 
 /**
- * Upload berkas langsung ke Google Drive guru & catat ke sheet _DOCUMENTS
+ * Dapatkan atau buat folder "SiAGU_Arsip_Guru" di Google Drive dengan Folder ID Caching (Performa Cepat <0.1 detik)
+ */
+function getOrCreateArsipFolder() {
+  const props = PropertiesService.getScriptProperties();
+  const cachedFolderId = props.getProperty('SIAGU_DOC_FOLDER_ID');
+
+  if (cachedFolderId) {
+    try {
+      const folder = DriveApp.getFolderById(cachedFolderId);
+      if (folder && !folder.isTrashed()) return folder;
+    } catch (e) {
+      // ID cache tidak valid lagi, cari/buat baru
+    }
+  }
+
+  const folderName = 'SiAGU_Arsip_Guru';
+  const folders = DriveApp.getFoldersByName(folderName);
+  let folder;
+  if (folders.hasNext()) {
+    folder = folders.next();
+  } else {
+    folder = DriveApp.createFolder(folderName);
+    folder.setDescription('Folder penyimpanan otomatis berkas perangkat ajar SiAGU');
+  }
+
+  props.setProperty('SIAGU_DOC_FOLDER_ID', folder.getId());
+  return folder;
+}
+
+/**
+ * Upload berkas langsung ke Google Drive guru & catat ke sheet _DOCUMENTS (Optimized High-Speed)
  * Hanya boleh dieksekusi oleh akun Admin / Kepala Sekolah
  */
 function uploadFileToDrive(fileBase64, fileName, mimeType, category, gradeLevel, userRole = null) {
@@ -104,52 +134,61 @@ function uploadFileToDrive(fileBase64, fileName, mimeType, category, gradeLevel,
     return errorResponse('Akses ditolak: Hanya akun Admin yang dapat mengunggah berkas.');
   }
 
-  const lock = LockService.getScriptLock();
-  lock.tryLock(30000);
-
   try {
-    // 1. Cari atau buat folder "SiAGU_Arsip_Guru" di Google Drive
-    const folderName = 'SiAGU_Arsip_Guru';
-    let folder;
-    const folders = DriveApp.getFoldersByName(folderName);
-    if (folders.hasNext()) {
-      folder = folders.next();
-    } else {
-      folder = DriveApp.createFolder(folderName);
-      folder.setDescription('Folder penyimpanan otomatis berkas perangkat ajar SiAGU');
-    }
+    // 1. Dapatkan folder secara instan via cache ID (<0.1s)
+    const folder = getOrCreateArsipFolder();
 
-    // 2. Decode file base64 dan simpan ke folder
+    // 2. Decode file base64 dan buat file di Google Drive
     const dataPart = fileBase64.indexOf(',') > -1 ? fileBase64.split(',')[1] : fileBase64;
     const decodedBytes = Utilities.base64Decode(dataPart);
     const blob = Utilities.newBlob(decodedBytes, mimeType, fileName);
     const file = folder.createFile(blob);
 
-    // Atur akses agar pemilik link dapat melihat berkas
+    // Atur akses agar pengguna dengan link dapat melihat berkas
     file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 
     const fileUrl = file.getUrl();
     const fileId = file.getId();
 
-    // 3. Simpan ke database sheet _DOCUMENTS
-    const docData = {
-      title: fileName.replace(/\.[^/.]+$/, ''), // Hilangkan ekstensi
+    // 3. Simpan ke database sheet _DOCUMENTS secara instan (appendRow langsung)
+    const ss = getDatabaseSpreadsheet();
+    const sheet = ss.getSheetByName('_DOCUMENTS');
+    if (!sheet) throw new Error('Sheet _DOCUMENTS tidak ditemukan.');
+
+    const docId = 'DOC-' + Utilities.getUuid().substring(0, 8).toUpperCase();
+    const todayStr = Utilities.formatDate(new Date(), 'Asia/Jakarta', 'yyyy-MM-dd');
+    const cleanTitle = fileName.replace(/\.[^/.]+$/, '');
+
+    const rowData = [
+      sanitizeForSheet(docId),
+      sanitizeForSheet(cleanTitle),
+      sanitizeForSheet(category || 'Modul Ajar'),
+      sanitizeForSheet(gradeLevel || '10'),
+      sanitizeForSheet(fileUrl),
+      sanitizeForSheet(fileId),
+      todayStr
+    ];
+
+    sheet.appendRow(rowData);
+
+    // Kembalikan objek data baru lengkap agar frontend bisa langsung render tanpa refetch
+    return successResponse({
+      docId: docId,
+      title: cleanTitle,
       category: category || 'Modul Ajar',
       gradeLevel: gradeLevel || '10',
       fileUrl: fileUrl,
-      fileId: fileId
-    };
+      fileId: fileId,
+      uploadDate: todayStr
+    }, 'Berkas berhasil diupload ke Google Drive');
 
-    return saveDocument(docData);
   } catch (err) {
     return errorResponse('Gagal mengupload berkas ke Google Drive: ' + err.message);
-  } finally {
-    lock.releaseLock();
   }
 }
 
 /**
- * Menghapus arsip dokumen
+ * Menghapus arsip dokumen secara cepat
  * Hanya boleh dieksekusi oleh akun Admin / Kepala Sekolah
  */
 function deleteDocument(docId, userRole = null) {
@@ -157,33 +196,39 @@ function deleteDocument(docId, userRole = null) {
     return errorResponse('Akses ditolak: Guru tidak diizinkan menghapus dokumen arsip sekolah.');
   }
 
-  const lock = LockService.getScriptLock();
-  lock.tryLock(15000);
   try {
     const ss = getDatabaseSpreadsheet();
     const sheet = ss.getSheetByName('_DOCUMENTS');
     if (!sheet) throw new Error('Sheet _DOCUMENTS tidak ditemukan.');
 
     const data = sheet.getDataRange().getValues();
+    let rowToDelete = -1;
+    let fileIdToDelete = '';
+
     for (let i = 1; i < data.length; i++) {
       if (data[i][0] === docId) {
-        // Hapus file dari Drive jika ada fileId
-        const fileId = data[i][5];
-        if (fileId) {
-          try {
-            DriveApp.getFileById(fileId).setTrashed(true);
-          } catch (e) {
-            console.warn('Gagal menghapus file dari Drive:', e);
-          }
-        }
-        sheet.deleteRow(i + 1);
-        return successResponse(null, 'Dokumen berhasil dihapus');
+        rowToDelete = i + 1;
+        fileIdToDelete = data[i][5];
+        break;
       }
     }
+
+    if (rowToDelete > -1) {
+      sheet.deleteRow(rowToDelete);
+
+      // Pindahkan file ke sampah Drive jika ada fileId
+      if (fileIdToDelete) {
+        try {
+          DriveApp.getFileById(fileIdToDelete).setTrashed(true);
+        } catch (e) {
+          console.warn('File Drive tidak ditemukan:', e);
+        }
+      }
+      return successResponse({ docId }, 'Dokumen berhasil dihapus');
+    }
+
     return errorResponse('Dokumen tidak ditemukan');
   } catch (err) {
     return errorResponse('Gagal menghapus dokumen: ' + err.message);
-  } finally {
-    lock.releaseLock();
   }
 }

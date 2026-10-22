@@ -110,10 +110,26 @@
       </div>
 
       <!-- Mode 2: Upload File -->
-      <div id="doc-input-upload-wrap" class="hidden">
-        <label class="block text-xs font-bold text-slate-300 mb-1">Pilih File (PDF, Word, PPT - Maks 10 MB)</label>
-        <input type="file" id="doc-file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs text-slate-300 file:mr-3 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-500/20 file:text-amber-300 hover:file:bg-amber-500/30">
-        <p class="text-[10px] text-slate-500 mt-1">Berkas akan diupload otomatis ke folder "SiAGU_Arsip_Guru" di Google Drive.</p>
+      <div id="doc-input-upload-wrap" class="hidden space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Pilih File (PDF, Word, PPT - Maks 25 MB)</label>
+          <input type="file" id="doc-file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs text-slate-300 file:mr-3 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-500/20 file:text-amber-300 hover:file:bg-amber-500/30">
+          <p class="text-[10px] text-slate-500 mt-1">Berkas akan diupload otomatis ke folder "SiAGU_Arsip_Guru" di Google Drive.</p>
+        </div>
+
+        <!-- Live Visual Progress Bar Saat Unggah File Besar -->
+        <div id="doc-upload-progress-container" class="hidden space-y-2 p-3 bg-black/40 border border-amber-500/20 rounded-xl">
+          <div class="flex items-center justify-between text-xs">
+            <span id="doc-upload-status-text" class="font-bold text-amber-300 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+              <span id="doc-upload-step-label">Menyiapkan berkas...</span>
+            </span>
+            <span id="doc-upload-percent" class="font-black text-amber-400">0%</span>
+          </div>
+          <div class="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+            <div id="doc-upload-progress-bar" class="h-full bg-gradient-to-r from-amber-500 via-orange-500 to-amber-400 transition-all duration-300 rounded-full" style="width: 0%;"></div>
+          </div>
+        </div>
       </div>
 
       <div class="flex justify-end gap-2 pt-3 border-t border-white/[0.08]">
@@ -241,7 +257,7 @@
     const admin = isUserAdmin();
 
     container.innerHTML = docs.map(d => `
-      <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg p-5 hover:border-amber-500/30 transition flex flex-col justify-between space-y-4">
+      <div id="doc-card-${d.docId}" class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg p-5 hover:border-amber-500/30 transition-all duration-300 flex flex-col justify-between space-y-4">
         <div class="space-y-3">
           <div class="flex items-center justify-between">
             <span class="px-2.5 py-1 rounded-xl text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
@@ -285,6 +301,11 @@
     document.getElementById('doc-url').value = '';
     const fileInput = document.getElementById('doc-file');
     if (fileInput) fileInput.value = '';
+    
+    // Reset progress bar
+    const progressContainer = document.getElementById('doc-upload-progress-container');
+    if (progressContainer) progressContainer.classList.add('hidden');
+
     setDocInputMode('link');
     document.getElementById('modal-document').classList.remove('hidden');
     lucide.createIcons();
@@ -301,6 +322,17 @@
     const category = document.getElementById('doc-category').value;
     const gradeLevel = document.getElementById('doc-grade').value;
     const submitBtn = document.getElementById('btn-submit-doc');
+    const progressContainer = document.getElementById('doc-upload-progress-container');
+    const progressBar = document.getElementById('doc-upload-progress-bar');
+    const progressPercent = document.getElementById('doc-upload-percent');
+    const stepLabel = document.getElementById('doc-upload-step-label');
+
+    const updateProgress = (pct, label) => {
+      if (progressContainer) progressContainer.classList.remove('hidden');
+      if (progressBar) progressBar.style.width = pct + '%';
+      if (progressPercent) progressPercent.textContent = pct + '%';
+      if (stepLabel) stepLabel.textContent = label;
+    };
 
     if (docInputMode === 'upload') {
       const fileInput = document.getElementById('doc-file');
@@ -310,34 +342,60 @@
       }
 
       const file = fileInput.files[0];
-      // Validasi ukuran berkas (Maksimal 10 MB) agar upload cepat dan tidak freeze
-      const maxSizeBytes = 10 * 1024 * 1024;
+      const maxSizeBytes = 25 * 1024 * 1024; // 25 MB
       if (file.size > maxSizeBytes) {
-        showToast(`Ukuran berkas (${(file.size / (1024*1024)).toFixed(1)} MB) melebihi batas 10 MB. Harap perkecil ukuran berkas atau gunakan opsi Tautkan Link.`, 'warning');
+        showToast(`Ukuran berkas (${(file.size / (1024*1024)).toFixed(1)} MB) melebihi batas 25 MB. Harap perkecil berkas atau gunakan opsi Tautkan Link.`, 'warning');
         return;
       }
 
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Membaca berkas...';
+        submitBtn.textContent = 'Memproses...';
       }
+
+      updateProgress(15, `Membaca ${file.name} (${(file.size / (1024*1024)).toFixed(1)} MB)...`);
 
       const reader = new FileReader();
       reader.onload = async (event) => {
         try {
-          if (submitBtn) submitBtn.textContent = 'Mengunggah ke Drive...';
-          setLoading(true, 'Mengunggah berkas ke Google Drive...');
+          updateProgress(45, 'Mengirim berkas ke Google Drive...');
+          
+          // Simulasi loncatan progres halus
+          const progTimer = setInterval(() => {
+            let current = parseInt(progressPercent.textContent) || 45;
+            if (current < 85) updateProgress(current + 5, 'Mengunggah & mengamankan berkas di Drive...');
+          }, 350);
+
           const base64Data = event.target.result;
           const res = await runServer('uploadFileToDrive', base64Data, file.name, file.type, category, gradeLevel);
+          clearInterval(progTimer);
+
           if (res && res.success) {
+            updateProgress(100, 'Unggah selesai!');
             closeModal('modal-document');
             showToast('Berkas berhasil disimpan ke Google Drive!', 'success');
-            await loadDocumentsGrid(true);
+
+            // Optimistic Update: Tambahkan berkas baru ke daftar tanpa perlu refetch seluruh data
+            const newDoc = res.data || {
+              docId: 'DOC-' + Date.now(),
+              title: file.name.replace(/\.[^/.]+$/, ''),
+              category: category,
+              gradeLevel: gradeLevel,
+              fileUrl: '#',
+              uploadDate: new Date().toISOString().split('T')[0]
+            };
+
+            if (!AppState.cache) AppState.cache = {};
+            if (!AppState.cache.documents) AppState.cache.documents = [];
+            AppState.cache.documents.unshift(newDoc);
+            renderDocumentsList(AppState.cache.documents);
+          } else {
+            throw new Error(res ? res.error : 'Gagal simpan di server');
           }
         } catch (err) {
           showToast('Upload gagal: ' + err.message, 'error');
         } finally {
-          setLoading(false);
+          if (progressContainer) progressContainer.classList.add('hidden');
           if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Simpan Perangkat Ajar';
@@ -347,6 +405,7 @@
 
       reader.onerror = () => {
         showToast('Gagal membaca berkas di browser', 'error');
+        if (progressContainer) progressContainer.classList.add('hidden');
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.textContent = 'Simpan Perangkat Ajar';
@@ -377,6 +436,7 @@
     }
   }
 
+  // Penghapusan Super Cepat (Optimistic UI - 0 Milidetik Latensi Pengguna)
   async function handleDeleteDocument(docId) {
     if (!isUserAdmin()) {
       showToast('Akses ditolak: Hanya akun Admin yang dapat menghapus perangkat ajar', 'warning');
@@ -384,17 +444,36 @@
     }
 
     if (!confirm('Hapus arsip dokumen ini?')) return;
+
+    // 1. Optimistic UI: Animasi langsung hilang seketika (0 milidetik respon visual)
+    const cardEl = document.getElementById(`doc-card-${docId}`);
+    if (cardEl) {
+      cardEl.style.transition = 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
+      cardEl.style.opacity = '0';
+      cardEl.style.transform = 'scale(0.92)';
+      setTimeout(() => cardEl.remove(), 250);
+    }
+
+    // Simpan backup data jika terjadi kendala jaringan
+    const previousDocs = AppState.cache && AppState.cache.documents ? [...AppState.cache.documents] : [];
+    if (AppState.cache && AppState.cache.documents) {
+      AppState.cache.documents = AppState.cache.documents.filter(d => d.docId !== docId);
+    }
+
+    showToast('Dokumen berhasil dihapus', 'success');
+
+    // 2. Eksekusi server diam-diam di background (Non-blocking)
     try {
-      setLoading(true, 'Menghapus dokumen...');
       const res = await runServer('deleteDocument', docId);
-      if (res && res.success) {
-        showToast('Dokumen berhasil dihapus', 'success');
-        await loadDocumentsGrid(true);
+      if (res && res.success === false) {
+        throw new Error(res.error || 'Server menolak penghapusan');
       }
     } catch (err) {
-      showToast(err.message, 'error');
-    } finally {
-      setLoading(false);
+      console.error('Gagal hapus dokumen di cloud:', err);
+      // Rollback jika server gagal
+      if (AppState.cache) AppState.cache.documents = previousDocs;
+      renderDocumentsList(previousDocs);
+      showToast('Gagal menghapus berkas dari cloud: ' + err.message, 'error');
     }
   }
 </script>

@@ -280,7 +280,7 @@
     }
 
     tbody.innerHTML = list.map((u, idx) => `
-      <tr class="hover:bg-white/[0.02] border-b border-white/[0.04] transition">
+      <tr id="usr-row-${u.userId}" class="hover:bg-white/[0.02] border-b border-white/[0.04] transition-all duration-300">
         <td class="py-3 px-4 text-center text-slate-500 text-xs">${idx + 1}</td>
         <td class="py-3 px-4">
           <div class="font-extrabold text-white">${u.fullName}</div>
@@ -413,21 +413,34 @@
     }
   }
 
+  // Hapus Akun Guru Instan (Optimistic UI - 0 Milidetik)
   async function handleDeleteUser(userId) {
     if (!confirm('Hapus akun guru ini dari sistem? Guru bersangkutan tidak akan dapat login lagi.')) return;
+
+    // 1. Optimistic UI: Animasi baris langsung memudar seketika
+    const rowEl = document.getElementById(`usr-row-${userId}`);
+    if (rowEl) {
+      rowEl.style.transition = 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
+      rowEl.style.opacity = '0';
+      rowEl.style.transform = 'scale(0.95)';
+      setTimeout(() => rowEl.remove(), 250);
+    }
+
+    const previousList = [...rawUsersList];
+    rawUsersList = rawUsersList.filter(u => u.userId !== userId);
+    showToast('Akun guru berhasil dihapus', 'success');
+
+    // 2. Eksekusi server di background
     try {
-      setLoading(true, 'Menghapus akun...');
       const res = await runServer('deleteUserAccount', userId);
-      if (res && res.success) {
-        showToast('Akun guru berhasil dihapus', 'success');
-        await loadManageUsersView();
-      } else {
-        showToast(res ? res.error : 'Gagal hapus', 'error');
+      if (res && res.success === false) {
+        throw new Error(res.error || 'Server menolak penghapusan');
       }
     } catch (err) {
-      showToast(err.message, 'error');
-    } finally {
-      setLoading(false);
+      console.error('Gagal hapus akun di server:', err);
+      rawUsersList = previousList;
+      renderUsersTable(previousList);
+      showToast('Gagal menghapus akun dari cloud: ' + err.message, 'error');
     }
   }
 

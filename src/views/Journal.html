@@ -181,7 +181,7 @@
     }
 
     container.innerHTML = list.map(j => `
-      <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg p-5 hover:border-amber-500/30 transition space-y-3">
+      <div id="journal-card-${j.journalId}" class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg p-5 hover:border-amber-500/30 transition-all duration-300 space-y-3">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/[0.06] pb-3">
           <div class="flex items-center gap-2.5">
             <span class="px-2.5 py-1 rounded-xl text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
@@ -293,19 +293,34 @@
     }
   }
 
+  // Hapus Jurnal Mengajar Instan (Optimistic UI - 0 Milidetik)
   async function handleDeleteJournal(journalId) {
     if (!confirm('Hapus catatan jurnal ini?')) return;
+
+    // 1. Optimistic UI: Animasi langsung hilang seketika
+    const cardEl = document.getElementById(`journal-card-${journalId}`);
+    if (cardEl) {
+      cardEl.style.transition = 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
+      cardEl.style.opacity = '0';
+      cardEl.style.transform = 'scale(0.92)';
+      setTimeout(() => cardEl.remove(), 250);
+    }
+
+    const previousList = [...rawJournalsList];
+    rawJournalsList = rawJournalsList.filter(j => j.journalId !== journalId);
+    showToast('Jurnal berhasil dihapus', 'success');
+
+    // 2. Eksekusi server di background
     try {
-      setLoading(true, 'Menghapus jurnal...');
       const res = await runServer('deleteJournal', journalId);
-      if (res && res.success) {
-        showToast('Jurnal berhasil dihapus', 'success');
-        await loadJournalsTable();
+      if (res && res.success === false) {
+        throw new Error(res.error || 'Server menolak');
       }
     } catch (err) {
-      showToast(err.message, 'error');
-    } finally {
-      setLoading(false);
+      console.error('Gagal hapus jurnal di server:', err);
+      rawJournalsList = previousList;
+      renderJournalCards(previousList);
+      showToast('Gagal menghapus jurnal dari cloud: ' + err.message, 'error');
     }
   }
 </script>
