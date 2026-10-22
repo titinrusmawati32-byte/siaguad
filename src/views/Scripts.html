@@ -122,13 +122,57 @@
             }
           })
           .catch((getErr) => {
-            console.error('API connection failed:', postErr, getErr);
-            reject(new Error(
-              'Gagal terhubung ke Google Apps Script: ' + (postErr.message || 'Failed to fetch') + '. ' +
-              'Pastikan Web App diatur "Who has access: Anyone" dan sudah dibuat New Deployment.'
-            ));
+            // Fallback Tingkat 3: JSONP (100% Kebal CORS & Kebal Failed to Fetch)
+            callServerJsonp(apiUrl, functionName, args)
+              .then(resolve)
+              .catch((jsonpErr) => {
+                console.error('API connection failed completely:', postErr, getErr, jsonpErr);
+                reject(new Error(
+                  'Gagal terhubung ke Google Apps Script: ' + (postErr.message || 'Failed to fetch') + '. ' +
+                  'Pastikan Web App diatur "Who has access: Anyone" dan deployment berakhiran /exec.'
+                ));
+              });
           });
       });
+    });
+  }
+
+  /**
+   * Driver Komunikasi JSONP (Bypass Seluruh Blokir CORS Browser & Iframe)
+   */
+  function callServerJsonp(apiUrl, functionName, args) {
+    return new Promise((resolve, reject) => {
+      const callbackName = 'jsonp_siagu_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+      const script = document.createElement('script');
+      
+      const timeout = setTimeout(() => {
+        cleanup();
+        reject(new Error('Koneksi timeout (15 detik)'));
+      }, 15000);
+
+      function cleanup() {
+        clearTimeout(timeout);
+        delete window[callbackName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+      }
+
+      window[callbackName] = function(res) {
+        cleanup();
+        if (res && res.success === false) {
+          reject(new Error(res.error || 'Terjadi kesalahan pada backend'));
+        } else {
+          resolve(res);
+        }
+      };
+
+      script.onerror = function() {
+        cleanup();
+        reject(new Error('Gagal memuat skrip JSONP dari Google Apps Script'));
+      };
+
+      const paramArgs = encodeURIComponent(JSON.stringify(args));
+      script.src = `${apiUrl}${apiUrl.includes('?') ? '&' : '?'}action=${encodeURIComponent(functionName)}&args=${paramArgs}&callback=${callbackName}&_t=${Date.now()}`;
+      document.head.appendChild(script);
     });
   }
 

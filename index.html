@@ -271,6 +271,14 @@
       </div>
     </div>
 
+    <!-- Tombol Pengaturan URL Google Apps Script -->
+    <div class="text-center pt-2">
+      <button type="button" onclick="changeGasApiUrl()" class="text-[11px] text-amber-400/80 hover:text-amber-300 flex items-center justify-center gap-1 mx-auto underline transition cursor-pointer">
+        <i data-lucide="settings" class="w-3 h-3"></i>
+        <span>Pengaturan URL Google Apps Script</span>
+      </button>
+    </div>
+
     <!-- Footer Copyright -->
     <div class="text-center text-[11px] text-slate-500 pt-1">
       <p>Serverless Google Apps Script • Terhubung ke Spreadsheet Sekolah</p>
@@ -320,6 +328,21 @@
     setLoginRoleTab(role);
     document.getElementById('login-username').value = u;
     document.getElementById('login-password').value = p;
+  }
+
+  function changeGasApiUrl() {
+    const currentUrl = localStorage.getItem('siagu_gas_api_url') || '';
+    const newUrl = prompt('Masukkan Web App URL Google Apps Script Anda (wajib berakhiran /exec):', currentUrl);
+    if (newUrl !== null) {
+      const clean = newUrl.trim();
+      if (clean.startsWith('https://script.google.com') && clean.includes('/exec')) {
+        localStorage.setItem('siagu_gas_api_url', clean);
+        if (typeof API_CONFIG !== 'undefined') API_CONFIG.GAS_URL = clean;
+        showToast('URL Google Apps Script berhasil diperbarui!', 'success');
+      } else {
+        showToast('URL tidak valid. Pastikan berawalan https://script.google.com dan berakhiran /exec', 'error');
+      }
+    }
   }
 
   async function handleFormLogin(e) {
@@ -5968,13 +5991,57 @@
             }
           })
           .catch((getErr) => {
-            console.error('API connection failed:', postErr, getErr);
-            reject(new Error(
-              'Gagal terhubung ke Google Apps Script: ' + (postErr.message || 'Failed to fetch') + '. ' +
-              'Pastikan Web App diatur "Who has access: Anyone" dan sudah dibuat New Deployment.'
-            ));
+            // Fallback Tingkat 3: JSONP (100% Kebal CORS & Kebal Failed to Fetch)
+            callServerJsonp(apiUrl, functionName, args)
+              .then(resolve)
+              .catch((jsonpErr) => {
+                console.error('API connection failed completely:', postErr, getErr, jsonpErr);
+                reject(new Error(
+                  'Gagal terhubung ke Google Apps Script: ' + (postErr.message || 'Failed to fetch') + '. ' +
+                  'Pastikan Web App diatur "Who has access: Anyone" dan deployment berakhiran /exec.'
+                ));
+              });
           });
       });
+    });
+  }
+
+  /**
+   * Driver Komunikasi JSONP (Bypass Seluruh Blokir CORS Browser & Iframe)
+   */
+  function callServerJsonp(apiUrl, functionName, args) {
+    return new Promise((resolve, reject) => {
+      const callbackName = 'jsonp_siagu_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+      const script = document.createElement('script');
+      
+      const timeout = setTimeout(() => {
+        cleanup();
+        reject(new Error('Koneksi timeout (15 detik)'));
+      }, 15000);
+
+      function cleanup() {
+        clearTimeout(timeout);
+        delete window[callbackName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+      }
+
+      window[callbackName] = function(res) {
+        cleanup();
+        if (res && res.success === false) {
+          reject(new Error(res.error || 'Terjadi kesalahan pada backend'));
+        } else {
+          resolve(res);
+        }
+      };
+
+      script.onerror = function() {
+        cleanup();
+        reject(new Error('Gagal memuat skrip JSONP dari Google Apps Script'));
+      };
+
+      const paramArgs = encodeURIComponent(JSON.stringify(args));
+      script.src = `${apiUrl}${apiUrl.includes('?') ? '&' : '?'}action=${encodeURIComponent(functionName)}&args=${paramArgs}&callback=${callbackName}&_t=${Date.now()}`;
+      document.head.appendChild(script);
     });
   }
 

@@ -9,7 +9,7 @@
  * 2. Jika diakses biasa di browser, menyajikan Web App UI
  */
 function doGet(e) {
-  // 1. Dukungan API via GET (jika dipanggil dari Frontend GitHub / Eksternal)
+  // 1. Dukungan API via GET / JSONP (jika dipanggil dari Frontend GitHub / Eksternal)
   if (e && e.parameter && e.parameter.action) {
     let args = [];
     if (e.parameter.args) {
@@ -20,7 +20,7 @@ function doGet(e) {
         args = [e.parameter.args];
       }
     }
-    return handleApiRequest(e.parameter.action, args);
+    return handleApiRequest(e.parameter.action, args, e.parameter.callback);
   }
 
   // 2. Render Antarmuka Web App bawaan GAS
@@ -79,39 +79,47 @@ function doPost(e) {
 }
 
 /**
- * Router Terpusat untuk memanggil fungsi Service di Google Apps Script
+ * Router Terpusat untuk memanggil fungsi Service di Google Apps Script (Mendukung JSON & JSONP)
  */
-function handleApiRequest(action, args = []) {
+function handleApiRequest(action, args = [], callback = null) {
   try {
     if (!action) {
-      return ContentService.createTextOutput(JSON.stringify({
+      return renderResponse({
         success: false,
         error: 'Parameter "action" wajib disertakan.'
-      })).setMimeType(ContentService.MimeType.JSON);
+      }, callback);
     }
 
     // Cari fungsi yang cocok di scope global GAS
     const fn = globalThis[action];
     if (typeof fn !== 'function') {
-      return ContentService.createTextOutput(JSON.stringify({
+      return renderResponse({
         success: false,
         error: `Fungsi API "${action}" tidak ditemukan di server Google Apps Script.`
-      })).setMimeType(ContentService.MimeType.JSON);
+      }, callback);
     }
 
     // Eksekusi fungsi dan ambil hasilnya
     const result = fn.apply(null, args);
-
-    return ContentService.createTextOutput(JSON.stringify(result !== undefined ? result : { success: true }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return renderResponse(result !== undefined ? result : { success: true }, callback);
 
   } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({
+    return renderResponse({
       success: false,
       error: err.message,
       stack: err.stack
-    })).setMimeType(ContentService.MimeType.JSON);
+    }, callback);
   }
+}
+
+function renderResponse(dataObj, callback) {
+  const jsonStr = JSON.stringify(dataObj);
+  if (callback) {
+    return ContentService.createTextOutput(`${callback}(${jsonStr})`)
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+  return ContentService.createTextOutput(jsonStr)
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 /**
