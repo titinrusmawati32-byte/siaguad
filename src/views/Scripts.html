@@ -285,6 +285,28 @@
       }
     });
 
+    // 2b. Perbarui status tombol aktif di mobile bottom navigation bar
+    const mobileNavItems = document.querySelectorAll('.mobile-nav-btn');
+    mobileNavItems.forEach(btn => {
+      const btnView = btn.getAttribute('data-view');
+      const textSpan = btn.querySelector('span');
+      if (btnView === viewName) {
+        btn.classList.add('text-amber-400', 'bg-white/[0.08]');
+        btn.classList.remove('text-slate-400');
+        if (textSpan) {
+          textSpan.classList.add('text-amber-300', 'font-black');
+          textSpan.classList.remove('text-slate-400');
+        }
+      } else {
+        btn.classList.remove('text-amber-400', 'bg-white/[0.08]');
+        btn.classList.add('text-slate-400');
+        if (textSpan) {
+          textSpan.classList.remove('text-amber-300', 'font-black');
+          textSpan.classList.add('text-slate-400');
+        }
+      }
+    });
+
     // 3. Efisiensi Caching: Muat data server hanya jika belum pernah dimuat atau diminta refresh
     const alreadyLoaded = AppState.viewsLoaded[viewName];
     if (!alreadyLoaded || forceRefresh) {
@@ -303,6 +325,31 @@
   function capitalize(str) {
     if (!str) return '';
     return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  /**
+   * Helper Navigasi Mobile HP (Bottom Bar & Drawer Sheet)
+   */
+  function openMobileMenuSheet() {
+    const sheet = document.getElementById('mobile-menu-sheet');
+    if (sheet) {
+      sheet.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      if (window.lucide) lucide.createIcons();
+    }
+  }
+
+  function closeMobileMenuSheet() {
+    const sheet = document.getElementById('mobile-menu-sheet');
+    if (sheet) {
+      sheet.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+  }
+
+  function mobileSwitchView(viewName) {
+    closeMobileMenuSheet();
+    switchView(viewName);
   }
 
   /**
@@ -358,6 +405,8 @@
     const appLayout = document.getElementById('app-layout');
     const navSpv = document.getElementById('nav-btn-supervision');
     const navUsers = document.getElementById('nav-btn-users');
+    const mobileSpv = document.getElementById('mobile-menu-spv');
+    const mobileUsers = document.getElementById('mobile-menu-users');
     const roleBadge = document.getElementById('sidebar-role-badge');
     const mobileRole = document.getElementById('mobile-role-label');
 
@@ -368,11 +417,15 @@
     if (user.role === 'headmaster') {
       if (navSpv) navSpv.classList.remove('hidden');
       if (navUsers) navUsers.classList.remove('hidden');
+      if (mobileSpv) mobileSpv.classList.remove('hidden');
+      if (mobileUsers) mobileUsers.classList.remove('hidden');
       if (roleBadge) roleBadge.textContent = 'Portal Kepala Sekolah';
       if (mobileRole) mobileRole.textContent = 'Kepala Sekolah';
     } else {
       if (navSpv) navSpv.classList.add('hidden');
       if (navUsers) navUsers.classList.add('hidden');
+      if (mobileSpv) mobileSpv.classList.add('hidden');
+      if (mobileUsers) mobileUsers.classList.add('hidden');
       if (roleBadge) roleBadge.textContent = 'Portal Guru';
       if (mobileRole) mobileRole.textContent = 'Guru Pengampu';
     }

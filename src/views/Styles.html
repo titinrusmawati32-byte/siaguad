@@ -146,4 +146,52 @@
     from { opacity: 0; transform: translateY(4px); }
     to { opacity: 1; transform: translateY(0); }
   }
+
+  /* Optimasi Tampilan Khusus Smartphone / HP */
+  @media (max-width: 640px) {
+    /* Skala font terkontrol agar tidak terpotong di layar HP */
+    h1, .text-3xl {
+      font-size: 1.25rem !important;
+      line-height: 1.6rem !important;
+    }
+    h2, .text-2xl {
+      font-size: 1.125rem !important;
+      line-height: 1.5rem !important;
+    }
+    h3, .text-xl {
+      font-size: 1rem !important;
+      line-height: 1.4rem !important;
+    }
+
+    /* Mencegah auto-zoom browser iOS Safari pada input teks */
+    input, select, textarea {
+      font-size: 14px !important;
+    }
+
+    /* Tabel & Data card di HP: overflow lancar dengan padding kompak */
+    .overflow-x-auto {
+      -webkit-overflow-scrolling: touch;
+      margin-left: -0.5rem;
+      margin-right: -0.5rem;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+    }
+    table th, table td {
+      padding-left: 0.6rem !important;
+      padding-right: 0.6rem !important;
+      padding-top: 0.5rem !important;
+      padding-bottom: 0.5rem !important;
+      font-size: 11px !important;
+    }
+
+    /* Grid cards di HP */
+    .grid-cols-2, .grid-cols-3, .grid-cols-4 {
+      gap: 0.625rem !important;
+    }
+
+    /* Bottom dock floating shadow */
+    #mobile-bottom-nav {
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.45);
+    }
+  }
 </style>
