@@ -1,0 +1,311 @@
+<!-- View: Jurnal Mengajar & Agenda Harian -->
+<div id="view-journal" class="view-panel space-y-6 hidden">
+
+  <!-- Header Section -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h2 class="text-xl sm:text-2xl font-extrabold text-white">Jurnal Mengajar & Agenda Harian</h2>
+      <p class="text-xs text-slate-400">Dokumentasi tatap muka, Capaian Pembelajaran (CP), dan refleksi kelas.</p>
+    </div>
+
+    <button onclick="openJournalModal()" class="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition inline-flex items-center gap-2 self-start sm:self-auto">
+      <i data-lucide="plus" class="w-4 h-4"></i>
+      <span>Catat Agenda Baru</span>
+    </button>
+  </div>
+
+  <!-- Filter & Search Bar -->
+  <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+    <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+      <div class="flex items-center gap-2">
+        <label class="text-xs font-bold text-slate-300">Kelas:</label>
+        <select id="journal-filter-class" onchange="loadJournalsTable()" class="px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs font-semibold text-white focus:border-amber-400 outline-none">
+          <option value="">Semua Kelas</option>
+        </select>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <label class="text-xs font-bold text-slate-300">Cari:</label>
+        <input type="text" id="journal-search-query" oninput="filterJournalCards()" placeholder="Cari materi / CP / TP..." class="px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:border-amber-400 outline-none w-48">
+      </div>
+    </div>
+
+    <span id="journal-count-badge" class="text-xs font-semibold text-slate-400 self-end sm:self-auto">
+      Total: 0 pertemuan
+    </span>
+  </div>
+
+  <!-- Daftar Jurnal Container -->
+  <div id="journal-list-container" class="space-y-4">
+    <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 p-8 text-center text-slate-500 text-xs">
+      Memuat riwayat agenda mengajar...
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal Tambah/Edit Jurnal -->
+<div id="modal-journal" class="fixed inset-0 bg-[#0A090E]/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4 overflow-y-auto">
+  <div class="rounded-3xl max-w-xl w-full p-6 sm:p-7 shadow-2xl border border-white/10 bg-[#181722] text-white space-y-4 my-8">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+      <h4 class="font-extrabold text-white text-base" id="modal-journal-title">Catat Jurnal Mengajar</h4>
+      <button onclick="closeModal('modal-journal')" class="p-1 text-slate-400 hover:text-white transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <form onsubmit="handleSaveJournal(event)" class="space-y-4">
+      <input type="hidden" id="form-journal-id">
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Tanggal Tatap Muka</label>
+          <input type="date" id="form-journal-date" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none" required>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Jam Pelajaran Ke</label>
+          <input type="text" id="form-journal-timeslot" placeholder="Contoh: Jam 1-3 (07.15 - 09.30)" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Kelas / Rombel</label>
+          <select id="form-journal-class" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none" required>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Mata Pelajaran</label>
+          <select id="form-journal-subject" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none" required>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Materi Pokok / Capaian Pembelajaran (CP) / TP / KD</label>
+        <textarea id="form-journal-topic" rows="2" placeholder="TP 10.2: Memahami struktur membran sel dan transport zat..." class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required></textarea>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Uraian Ringkas Kegiatan Pembelajaran</label>
+        <textarea id="form-journal-activities" rows="3" placeholder="Praktikum pengamatan osmosis kentang dan presentasi hasil kelompok..." class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required></textarea>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Refleksi / Catatan Kendala & Hambatan</label>
+        <textarea id="form-journal-reflection" rows="2" placeholder="Siswa sangat antusias. Perlu perbaikan alokasi waktu pada sesi tanya jawab..." class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:border-amber-400 outline-none"></textarea>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Status Keterlaksanaan</label>
+        <select id="form-journal-status" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none">
+          <option value="Terlaksana" class="bg-[#181722] text-emerald-400">Terlaksana Penuh</option>
+          <option value="Sebagian Terlaksana" class="bg-[#181722] text-amber-400">Sebagian Terlaksana</option>
+          <option value="Diganti Penugasan" class="bg-[#181722] text-sky-400">Diganti Penugasan Mandiri</option>
+          <option value="Tertunda" class="bg-[#181722] text-rose-400">Tertunda (Libur / Agenda Sekolah)</option>
+        </select>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-3 border-t border-white/[0.08]">
+        <button type="button" onclick="closeModal('modal-journal')" class="px-4 py-2 border border-white/10 rounded-xl text-xs font-semibold text-slate-400 hover:text-white">Batal</button>
+        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20">Simpan Agenda Jurnal</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  let rawJournalsList = [];
+
+  function loadJournalView() {
+    populateJournalClassAndSubjectSelects();
+    loadJournalsTable();
+  }
+
+  function populateJournalClassAndSubjectSelects() {
+    const classFilter = document.getElementById('journal-filter-class');
+    const formClass = document.getElementById('form-journal-class');
+    const formSubject = document.getElementById('form-journal-subject');
+
+    if (classFilter) {
+      let fHtml = '<option value="">Semua Kelas</option>';
+      AppState.classes.forEach(c => fHtml += `<option value="${c.classId}">${c.className}</option>`);
+      classFilter.innerHTML = fHtml;
+    }
+
+    if (formClass) {
+      let cHtml = '<option value="" disabled selected>Pilih Rombel Kelas...</option>';
+      AppState.classes.forEach(c => cHtml += `<option value="${c.classId}">${c.className} (${c.gradeLevel})</option>`);
+      formClass.innerHTML = cHtml;
+    }
+
+    if (formSubject) {
+      let sHtml = '<option value="" disabled selected>Pilih Mata Pelajaran...</option>';
+      AppState.subjects.forEach(s => sHtml += `<option value="${s.subjectId}">${s.subjectName}</option>`);
+      formSubject.innerHTML = sHtml;
+    }
+  }
+
+  async function loadJournalsTable() {
+    const filterClass = document.getElementById('journal-filter-class').value;
+    try {
+      setLoading(true, 'Memuat daftar jurnal...');
+      const res = await runServer('getJournals', filterClass || null);
+      rawJournalsList = res.data || [];
+      renderJournalCards(rawJournalsList);
+    } catch (err) {
+      showToast('Gagal memuat jurnal: ' + err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function renderJournalCards(list) {
+    const container = document.getElementById('journal-list-container');
+    const badge = document.getElementById('journal-count-badge');
+    if (badge) badge.textContent = `Total: ${list.length} pertemuan`;
+    if (!container) return;
+
+    if (list.length === 0) {
+      container.innerHTML = `
+        <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 p-12 text-center space-y-3">
+          <div class="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center justify-center mx-auto">
+            <i data-lucide="book-open" class="w-6 h-6"></i>
+          </div>
+          <p class="text-sm font-bold text-white">Belum ada agenda jurnal mengajar</p>
+          <p class="text-xs text-slate-400">Klik tombol "Catat Agenda Baru" untuk menambahkan riwayat tatap muka.</p>
+        </div>
+      `;
+      lucide.createIcons();
+      return;
+    }
+
+    container.innerHTML = list.map(j => `
+      <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg p-5 hover:border-amber-500/30 transition space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/[0.06] pb-3">
+          <div class="flex items-center gap-2.5">
+            <span class="px-2.5 py-1 rounded-xl text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+              ${j.className}
+            </span>
+            <span class="text-xs font-bold text-sky-300">${j.subjectName}</span>
+            <span class="text-slate-600">•</span>
+            <span class="text-xs text-slate-400 flex items-center gap-1">
+              <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+              ${j.timeSlot}
+            </span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${j.status === 'Terlaksana' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">
+              ${j.status}
+            </span>
+            <span class="text-xs font-medium text-slate-400">${j.date}</span>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-extrabold text-white text-sm leading-snug">${j.topic}</h4>
+          <p class="text-xs text-slate-300 mt-1 leading-relaxed">${j.activities}</p>
+        </div>
+
+        ${j.reflection ? `
+          <div class="p-3 bg-[#1F1E28] rounded-xl text-xs text-slate-300 border-l-2 border-amber-400">
+            <span class="font-bold text-amber-300">Refleksi Guru:</span> ${j.reflection}
+          </div>
+        ` : ''}
+
+        <div class="flex items-center justify-end gap-3 pt-2 text-xs border-t border-white/[0.04]">
+          <button onclick='openJournalModal(${JSON.stringify(j)})' class="text-amber-400 hover:text-amber-300 font-bold inline-flex items-center gap-1 transition">
+            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+            <span>Edit</span>
+          </button>
+          <button onclick="handleDeleteJournal('${j.journalId}')" class="text-rose-400 hover:text-rose-300 font-bold inline-flex items-center gap-1 transition">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <span>Hapus</span>
+          </button>
+        </div>
+      </div>
+    `).join('');
+
+    lucide.createIcons();
+  }
+
+  function filterJournalCards() {
+    const q = (document.getElementById('journal-search-query').value || '').toLowerCase();
+    const filtered = rawJournalsList.filter(j => 
+      j.topic.toLowerCase().includes(q) ||
+      j.activities.toLowerCase().includes(q) ||
+      (j.reflection && j.reflection.toLowerCase().includes(q))
+    );
+    renderJournalCards(filtered);
+  }
+
+  function openJournalModal(j = null) {
+    populateJournalClassAndSubjectSelects();
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    document.getElementById('form-journal-id').value = j ? j.journalId : '';
+    document.getElementById('form-journal-date').value = j ? j.date : todayStr;
+    document.getElementById('form-journal-timeslot').value = j ? j.timeSlot : 'Jam 1-2 (07.15 - 08.45)';
+    document.getElementById('form-journal-topic').value = j ? j.topic : '';
+    document.getElementById('form-journal-activities').value = j ? j.activities : '';
+    document.getElementById('form-journal-reflection').value = j ? (j.reflection || '') : '';
+    document.getElementById('form-journal-status').value = j ? j.status : 'Terlaksana';
+
+    if (j) {
+      document.getElementById('form-journal-class').value = j.classId;
+      document.getElementById('form-journal-subject').value = j.subjectId;
+      document.getElementById('modal-journal-title').textContent = 'Edit Agenda Jurnal';
+    } else {
+      document.getElementById('modal-journal-title').textContent = 'Catat Jurnal Mengajar Baru';
+    }
+
+    document.getElementById('modal-journal').classList.remove('hidden');
+    lucide.createIcons();
+  }
+
+  async function handleSaveJournal(e) {
+    e.preventDefault();
+    const journalData = {
+      journalId: document.getElementById('form-journal-id').value,
+      date: document.getElementById('form-journal-date').value,
+      timeSlot: document.getElementById('form-journal-timeslot').value,
+      classId: document.getElementById('form-journal-class').value,
+      subjectId: document.getElementById('form-journal-subject').value,
+      topic: document.getElementById('form-journal-topic').value,
+      activities: document.getElementById('form-journal-activities').value,
+      reflection: document.getElementById('form-journal-reflection').value,
+      status: document.getElementById('form-journal-status').value
+    };
+
+    try {
+      setLoading(true, 'Menyimpan agenda jurnal...');
+      const res = await runServer('saveJournal', journalData);
+      if (res && res.success) {
+        closeModal('modal-journal');
+        showToast('Jurnal mengajar berhasil disimpan', 'success');
+        await loadJournalsTable();
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDeleteJournal(journalId) {
+    if (!confirm('Hapus catatan jurnal ini?')) return;
+    try {
+      setLoading(true, 'Menghapus jurnal...');
+      const res = await runServer('deleteJournal', journalId);
+      if (res && res.success) {
+        showToast('Jurnal berhasil dihapus', 'success');
+        await loadJournalsTable();
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+</script>

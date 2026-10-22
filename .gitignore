@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+.npm/
+
+# Google Apps Script Clasp Credentials (Wajib di-ignore agar akun Google aman)
+.clasprc.json
+
+# Environment / Secret Keys
+.env
+.env.local
+
+# OS Files
+.DS_Store
+Thumbs.db

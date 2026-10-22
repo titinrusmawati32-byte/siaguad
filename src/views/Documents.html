@@ -1,0 +1,400 @@
+<!-- View: Bank Perangkat Ajar & Arsip Digital -->
+<div id="view-documents" class="view-panel space-y-6 hidden">
+
+  <!-- Header Section -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h2 class="text-xl sm:text-2xl font-extrabold text-white">Bank Perangkat Ajar & Arsip Digital</h2>
+      <p class="text-xs text-slate-400">Pusat repositori Modul Ajar, RPP, Alur Tujuan Pembelajaran (ATP), dan Silabus terintegrasi Google Drive.</p>
+    </div>
+
+    <!-- Container Tombol Aksi / Badge Hak Akses -->
+    <div id="doc-action-container">
+      <!-- Tombol Upload (Hanya tampil untuk Admin/Kepsek) -->
+      <button id="btn-upload-document" onclick="openDocumentModal()" class="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition inline-flex items-center gap-2 self-start sm:self-auto">
+        <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+        <span>Upload / Tambah Dokumen</span>
+      </button>
+
+      <!-- Badge Info Guru (Hanya tampil jika Guru login) -->
+      <div id="badge-doc-readonly" class="hidden px-3.5 py-2 rounded-xl bg-sky-500/10 border border-sky-500/25 text-sky-300 text-xs font-semibold flex items-center gap-2 shadow-sm">
+        <i data-lucide="shield-alert" class="w-4 h-4 text-sky-400"></i>
+        <span>Mode Akses Arsip (Upload & Kelola Berkas dikhususkan untuk Admin)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Category Chips -->
+  <div class="flex flex-wrap items-center gap-2">
+    <button onclick="filterDocumentsCategory('')" class="doc-cat-chip px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-[#7CC4FA] text-slate-950 shadow-md shadow-sky-500/20 transition">
+      Semua Berkas
+    </button>
+    <button onclick="filterDocumentsCategory('Modul Ajar')" class="doc-cat-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition">
+      Modul Ajar
+    </button>
+    <button onclick="filterDocumentsCategory('RPP')" class="doc-cat-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition">
+      RPP / Rencana Ajar
+    </button>
+    <button onclick="filterDocumentsCategory('ATP')" class="doc-cat-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition">
+      Alur Tujuan Pembelajaran (ATP)
+    </button>
+    <button onclick="filterDocumentsCategory('Silabus')" class="doc-cat-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition">
+      Silabus
+    </button>
+    <button onclick="filterDocumentsCategory('Prota/Promes')" class="doc-cat-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition">
+      Prota / Promes
+    </button>
+  </div>
+
+  <!-- Grid Dokumen Container -->
+  <div id="documents-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    <div class="col-span-full py-12 text-center text-slate-500 text-xs">
+      Memuat arsip perangkat ajar...
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal Tambah / Upload Dokumen (Admin Only) -->
+<div id="modal-document" class="fixed inset-0 bg-[#0A090E]/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+  <div class="rounded-3xl max-w-md w-full p-6 shadow-2xl border border-white/10 bg-[#181722] text-white space-y-4">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center">
+          <i data-lucide="shield-check" class="w-4 h-4"></i>
+        </div>
+        <h4 class="font-extrabold text-white text-base">Tambah Perangkat Ajar (Admin)</h4>
+      </div>
+      <button onclick="closeModal('modal-document')" class="p-1 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <!-- Toggle Pilihan Input: Link atau Upload -->
+    <div class="flex rounded-2xl bg-[#121117] border border-white/10 p-1 text-xs font-bold">
+      <button type="button" onclick="setDocInputMode('link')" id="btn-docmode-link" class="flex-1 py-2 rounded-xl bg-[#7CC4FA] text-slate-950 font-extrabold shadow-sm transition">
+        Link Google Docs/Drive
+      </button>
+      <button type="button" onclick="setDocInputMode('upload')" id="btn-docmode-upload" class="flex-1 py-2 rounded-xl text-slate-400 hover:text-white transition">
+        Upload File Langsung
+      </button>
+    </div>
+
+    <form onsubmit="handleSaveDocument(event)" class="space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Judul Dokumen Perangkat Ajar</label>
+        <input type="text" id="doc-title" placeholder="Contoh: Modul Ajar Bab 1 - Keanekaragaman Hayati" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Kategori</label>
+          <select id="doc-category" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none">
+            <option value="Modul Ajar">Modul Ajar</option>
+            <option value="RPP">RPP</option>
+            <option value="ATP">Alur Tujuan Pembelajaran (ATP)</option>
+            <option value="Silabus">Silabus</option>
+            <option value="Prota/Promes">Program Tahunan / Semester</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Tingkat Kelas</label>
+          <input type="text" id="doc-grade" placeholder="10 / 11 / 12" value="10" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none">
+        </div>
+      </div>
+
+      <!-- Mode 1: Tempel Link -->
+      <div id="doc-input-link-wrap">
+        <label class="block text-xs font-bold text-slate-300 mb-1">URL Link Google Drive / Docs / Canva</label>
+        <input type="url" id="doc-url" placeholder="https://drive.google.com/..." class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none">
+      </div>
+
+      <!-- Mode 2: Upload File -->
+      <div id="doc-input-upload-wrap" class="hidden">
+        <label class="block text-xs font-bold text-slate-300 mb-1">Pilih File (PDF, Word, PPT - Maks 10 MB)</label>
+        <input type="file" id="doc-file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs text-slate-300 file:mr-3 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-500/20 file:text-amber-300 hover:file:bg-amber-500/30">
+        <p class="text-[10px] text-slate-500 mt-1">Berkas akan diupload otomatis ke folder "SiAGU_Arsip_Guru" di Google Drive.</p>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-3 border-t border-white/[0.08]">
+        <button type="button" onclick="closeModal('modal-document')" class="px-4 py-2 border border-white/10 rounded-xl text-xs font-semibold text-slate-400 hover:text-white">Batal</button>
+        <button type="submit" id="btn-submit-doc" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20 transition">Simpan Perangkat Ajar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  let activeDocCategory = '';
+  let docInputMode = 'link';
+
+  function isUserAdmin() {
+    return AppState.currentUser && (AppState.currentUser.role === 'headmaster' || AppState.currentUser.role === 'admin');
+  }
+
+  function updateDocumentPermissionUI() {
+    const btnUpload = document.getElementById('btn-upload-document');
+    const badgeReadonly = document.getElementById('badge-doc-readonly');
+
+    if (isUserAdmin()) {
+      if (btnUpload) btnUpload.classList.remove('hidden');
+      if (badgeReadonly) badgeReadonly.classList.add('hidden');
+    } else {
+      // Guru biasa: dilarang upload
+      if (btnUpload) btnUpload.classList.add('hidden');
+      if (badgeReadonly) badgeReadonly.classList.remove('hidden');
+    }
+  }
+
+  function loadDocumentsView(forceReload = false) {
+    updateDocumentPermissionUI();
+    loadDocumentsGrid(forceReload);
+  }
+
+  function setDocInputMode(mode) {
+    docInputMode = mode;
+    const btnLink = document.getElementById('btn-docmode-link');
+    const btnUpload = document.getElementById('btn-docmode-upload');
+    const wrapLink = document.getElementById('doc-input-link-wrap');
+    const wrapUpload = document.getElementById('doc-input-upload-wrap');
+
+    if (mode === 'link') {
+      btnLink.className = 'flex-1 py-2 rounded-xl bg-[#7CC4FA] text-slate-950 font-extrabold shadow-sm transition';
+      btnUpload.className = 'flex-1 py-2 rounded-xl text-slate-400 hover:text-white transition';
+      wrapLink.classList.remove('hidden');
+      wrapUpload.classList.add('hidden');
+    } else {
+      btnUpload.className = 'flex-1 py-2 rounded-xl bg-[#7CC4FA] text-slate-950 font-extrabold shadow-sm transition';
+      btnLink.className = 'flex-1 py-2 rounded-xl text-slate-400 hover:text-white transition';
+      wrapUpload.classList.remove('hidden');
+      wrapLink.classList.add('hidden');
+    }
+  }
+
+  function filterDocumentsCategory(cat) {
+    activeDocCategory = cat;
+    document.querySelectorAll('.doc-cat-chip').forEach(b => {
+      if ((cat === '' && b.textContent.trim().startsWith('Semua')) || b.textContent.trim() === cat) {
+        b.className = 'doc-cat-chip px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-[#7CC4FA] text-slate-950 shadow-md shadow-sky-500/20 transition';
+      } else {
+        b.className = 'doc-cat-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition';
+      }
+    });
+    loadDocumentsGrid(false);
+  }
+
+  async function loadDocumentsGrid(forceReload = false) {
+    const container = document.getElementById('documents-grid');
+    if (!container) return;
+
+    // Gunakan in-memory cache jika sudah ada dan tidak dipaksa reload
+    if (!forceReload && AppState.cache && AppState.cache.documents) {
+      renderDocumentsList(AppState.cache.documents);
+      return;
+    }
+
+    try {
+      container.innerHTML = `
+        <div class="col-span-full py-12 text-center text-slate-400 text-xs flex items-center justify-center gap-2">
+          <div class="w-4 h-4 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin"></div>
+          <span>Memuat arsip modul ajar...</span>
+        </div>
+      `;
+
+      const res = await runServer('getDocuments', null);
+      const allDocs = res.data || [];
+      if (!AppState.cache) AppState.cache = {};
+      AppState.cache.documents = allDocs;
+
+      renderDocumentsList(allDocs);
+    } catch (err) {
+      container.innerHTML = `
+        <div class="col-span-full py-8 text-center text-rose-400 text-xs">
+          Gagal memuat dokumen: ${err.message}
+        </div>
+      `;
+    }
+  }
+
+  function renderDocumentsList(allDocs) {
+    const container = document.getElementById('documents-grid');
+    if (!container) return;
+
+    const docs = activeDocCategory 
+      ? allDocs.filter(d => d.category === activeDocCategory) 
+      : allDocs;
+
+    if (docs.length === 0) {
+      container.innerHTML = `
+        <div class="col-span-full rounded-2xl border border-white/[0.08] bg-[#16151D]/90 p-12 text-center space-y-3">
+          <div class="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center justify-center mx-auto">
+            <i data-lucide="folder-search" class="w-6 h-6"></i>
+          </div>
+          <p class="text-sm font-bold text-white">Belum ada berkas perangkat ajar</p>
+          <p class="text-xs text-slate-400">${isUserAdmin() ? 'Klik "Upload / Tambah Dokumen" untuk mengarsipkan Modul Ajar atau RPP.' : 'Dokumen akan muncul setelah diunggah oleh Admin / Kepala Sekolah.'}</p>
+        </div>
+      `;
+      lucide.createIcons();
+      return;
+    }
+
+    const admin = isUserAdmin();
+
+    container.innerHTML = docs.map(d => `
+      <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg p-5 hover:border-amber-500/30 transition flex flex-col justify-between space-y-4">
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="px-2.5 py-1 rounded-xl text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+              ${d.category}
+            </span>
+            <span class="text-[11px] text-slate-400 font-semibold">Kelas ${d.gradeLevel}</span>
+          </div>
+
+          <div>
+            <h4 class="font-extrabold text-white text-sm leading-snug line-clamp-2">${d.title}</h4>
+            <p class="text-[11px] text-slate-400 mt-1">Diunggah: ${d.uploadDate}</p>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-white/[0.06] flex items-center justify-between">
+          <a href="${d.fileUrl}" target="_blank" class="px-3.5 py-1.5 bg-white/5 hover:bg-white/10 text-amber-300 border border-amber-500/25 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 transition">
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            <span>Buka Dokumen</span>
+          </a>
+          ${admin ? `
+            <button onclick="handleDeleteDocument('${d.docId}')" class="text-rose-400 hover:text-rose-300 p-1.5 rounded-lg hover:bg-white/5 transition" title="Hapus Dokumen (Admin)">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          ` : `
+            <span class="text-[10px] text-slate-500 font-medium italic">Read-only</span>
+          `}
+        </div>
+      </div>
+    `).join('');
+
+    lucide.createIcons();
+  }
+
+  function openDocumentModal() {
+    if (!isUserAdmin()) {
+      showToast('Akses ditolak: Hanya akun Admin / Kepala Sekolah yang diizinkan mengunggah dokumen perangkat ajar.', 'warning');
+      return;
+    }
+
+    document.getElementById('doc-title').value = '';
+    document.getElementById('doc-url').value = '';
+    const fileInput = document.getElementById('doc-file');
+    if (fileInput) fileInput.value = '';
+    setDocInputMode('link');
+    document.getElementById('modal-document').classList.remove('hidden');
+    lucide.createIcons();
+  }
+
+  async function handleSaveDocument(e) {
+    e.preventDefault();
+    if (!isUserAdmin()) {
+      showToast('Akses ditolak: Hanya akun Admin yang dapat mengunggah perangkat ajar', 'error');
+      return;
+    }
+
+    const title = document.getElementById('doc-title').value;
+    const category = document.getElementById('doc-category').value;
+    const gradeLevel = document.getElementById('doc-grade').value;
+    const submitBtn = document.getElementById('btn-submit-doc');
+
+    if (docInputMode === 'upload') {
+      const fileInput = document.getElementById('doc-file');
+      if (!fileInput.files || fileInput.files.length === 0) {
+        showToast('Pilih berkas yang akan diupload', 'warning');
+        return;
+      }
+
+      const file = fileInput.files[0];
+      // Validasi ukuran berkas (Maksimal 10 MB) agar upload cepat dan tidak freeze
+      const maxSizeBytes = 10 * 1024 * 1024;
+      if (file.size > maxSizeBytes) {
+        showToast(`Ukuran berkas (${(file.size / (1024*1024)).toFixed(1)} MB) melebihi batas 10 MB. Harap perkecil ukuran berkas atau gunakan opsi Tautkan Link.`, 'warning');
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Membaca berkas...';
+      }
+
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          if (submitBtn) submitBtn.textContent = 'Mengunggah ke Drive...';
+          setLoading(true, 'Mengunggah berkas ke Google Drive...');
+          const base64Data = event.target.result;
+          const res = await runServer('uploadFileToDrive', base64Data, file.name, file.type, category, gradeLevel);
+          if (res && res.success) {
+            closeModal('modal-document');
+            showToast('Berkas berhasil disimpan ke Google Drive!', 'success');
+            await loadDocumentsGrid(true);
+          }
+        } catch (err) {
+          showToast('Upload gagal: ' + err.message, 'error');
+        } finally {
+          setLoading(false);
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Simpan Perangkat Ajar';
+          }
+        }
+      };
+
+      reader.onerror = () => {
+        showToast('Gagal membaca berkas di browser', 'error');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Simpan Perangkat Ajar';
+        }
+      };
+
+      reader.readAsDataURL(file);
+    } else {
+      const url = document.getElementById('doc-url').value;
+      if (!url) {
+        showToast('Tautkan link dokumen terlebih dahulu', 'warning');
+        return;
+      }
+
+      try {
+        setLoading(true, 'Menyimpan link perangkat ajar...');
+        const res = await runServer('saveDocument', { title, category, gradeLevel, fileUrl: url });
+        if (res && res.success) {
+          closeModal('modal-document');
+          showToast('Tautan dokumen berhasil disimpan', 'success');
+          await loadDocumentsGrid(true);
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        setLoading(false);
+      }
+    }
+  }
+
+  async function handleDeleteDocument(docId) {
+    if (!isUserAdmin()) {
+      showToast('Akses ditolak: Hanya akun Admin yang dapat menghapus perangkat ajar', 'warning');
+      return;
+    }
+
+    if (!confirm('Hapus arsip dokumen ini?')) return;
+    try {
+      setLoading(true, 'Menghapus dokumen...');
+      const res = await runServer('deleteDocument', docId);
+      if (res && res.success) {
+        showToast('Dokumen berhasil dihapus', 'success');
+        await loadDocumentsGrid(true);
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+</script>

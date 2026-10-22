@@ -1,0 +1,344 @@
+<!-- View: Pusat Cetak & Laporan Supervisi -->
+<div id="view-reports" class="view-panel space-y-6 hidden">
+
+  <!-- Header Section (no-print) -->
+  <div class="no-print flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h2 class="text-xl sm:text-2xl font-extrabold text-white">Pusat Cetak & Laporan Supervisi</h2>
+      <p class="text-xs text-slate-400">Generate dokumen resmi siap cetak A4 atau ekspor langsung ke Excel & PDF.</p>
+    </div>
+
+    <div class="flex items-center gap-2 self-start sm:self-auto">
+      <button onclick="handleDownloadExcel()" class="px-3.5 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-bold rounded-xl text-xs transition inline-flex items-center gap-1.5">
+        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+        <span>Download Excel (.xlsx)</span>
+      </button>
+      <button onclick="window.print()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20 transition inline-flex items-center gap-1.5">
+        <i data-lucide="printer" class="w-4 h-4"></i>
+        <span>Cetak Lembar A4 (PDF)</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Selector Bar (no-print) -->
+  <div class="no-print rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg p-5">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Pilih Jenis Laporan</label>
+        <select id="rpt-doc-type" onchange="renderActiveReport()" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs font-semibold text-white focus:border-amber-400 outline-none">
+          <option value="journal">Lembar Supervisi Jurnal Mengajar</option>
+          <option value="attendance">Rekapitulasi Kehadiran Siswa</option>
+          <option value="leger">Leger Nilai & Capaian Kompetensi</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Pilih Kelas</label>
+        <select id="rpt-class" onchange="renderActiveReport()" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs font-semibold text-white focus:border-amber-400 outline-none">
+        </select>
+      </div>
+
+      <div id="rpt-subject-wrap">
+        <label class="block text-xs font-bold text-slate-300 mb-1">Pilih Mata Pelajaran</label>
+        <select id="rpt-subject" onchange="renderActiveReport()" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs font-semibold text-white focus:border-amber-400 outline-none">
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEMBAR CETAK RESMI (Tampil di Layar & Cetak A4 Standar Dinas) -->
+  <div id="print-area" class="bg-white text-slate-900 rounded-3xl border border-slate-200/80 shadow-2xl p-8 sm:p-12 print-card space-y-6">
+
+    <!-- KOP SURAT SEKOLAH -->
+    <div class="border-b-2 border-slate-900 pb-3 text-center space-y-0.5">
+      <h3 id="prt-school-name" class="text-xl sm:text-2xl font-black uppercase tracking-wide text-slate-900">SMA NEGERI 1 INDONESIA</h3>
+      <p class="text-xs text-slate-700 font-medium">NPSN: <span id="prt-school-npsn">20104050</span> • Akreditasi A</p>
+      <p class="text-[11px] text-slate-600">Alur Administrasi & Laporan Keterlaksanaan Pembelajaran Kurikulum Nasional</p>
+    </div>
+
+    <!-- JUDUL DOKUMEN -->
+    <div class="text-center space-y-1">
+      <h4 id="prt-doc-title" class="text-base sm:text-lg font-extrabold uppercase underline underline-offset-4 text-slate-900">
+        JURNAL AGENDA HARIAN MENGAJAR GURU
+      </h4>
+      <p id="prt-doc-subtitle" class="text-xs text-slate-600">
+        Tahun Ajaran <span id="prt-academic-year">2026/2027</span> • Semester <span id="prt-semester">Ganjil</span>
+      </p>
+    </div>
+
+    <!-- METADATA TABEL INFORMASI -->
+    <div class="grid grid-cols-2 text-xs text-slate-800 py-1 gap-y-1 border-t border-b border-slate-200">
+      <div><span class="font-bold">Guru Pengampu:</span> <span id="prt-teacher-name">-</span></div>
+      <div><span class="font-bold">Kelas / Rombel:</span> <span id="prt-class-name">-</span></div>
+      <div><span class="font-bold">NIP / NUPTK:</span> <span id="prt-teacher-nip">-</span></div>
+      <div><span class="font-bold">Mata Pelajaran:</span> <span id="prt-subject-name">-</span></div>
+    </div>
+
+    <!-- KONTEN TABEL LAPORAN (DINAMIS SESUAI PILIHAN) -->
+    <div id="prt-dynamic-content" class="overflow-x-auto">
+      <p class="text-center py-8 text-xs text-slate-400">Menyiapkan format dokumen...</p>
+    </div>
+
+    <!-- LEMBAR PENGESAHAN (TANDA TANGAN RESMI) -->
+    <div class="pt-8 grid grid-cols-2 text-xs text-slate-900 break-inside-avoid">
+      
+      <!-- Mengetahui Kepala Sekolah -->
+      <div class="text-center space-y-16">
+        <p>Mengetahui,<br><span class="font-semibold">Kepala Satuan Pendidikan</span></p>
+        <div>
+          <p id="prt-sign-headmaster" class="font-bold underline text-sm">-</p>
+          <p class="text-[11px]">NIP. <span id="prt-sign-headmaster-nip">-</span></p>
+        </div>
+      </div>
+
+      <!-- Guru Pengampu Mata Pelajaran -->
+      <div class="text-center space-y-16">
+        <p><span id="prt-sign-location">Nusantara</span>, <span id="prt-sign-date">22 Oktober 2026</span><br><span class="font-semibold">Guru Pengampu</span></p>
+        <div>
+          <p id="prt-sign-teacher" class="font-bold underline text-sm">-</p>
+          <p class="text-[11px]">NIP. <span id="prt-sign-teacher-nip">-</span></p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  function loadReportsView() {
+    populateReportSelects();
+    renderActiveReport();
+  }
+
+  function populateReportSelects() {
+    const classSel = document.getElementById('rpt-class');
+    const sbjSel = document.getElementById('rpt-subject');
+
+    if (classSel) {
+      let html = '';
+      AppState.classes.forEach(c => html += `<option value="${c.classId}">${c.className}</option>`);
+      classSel.innerHTML = html;
+    }
+
+    if (sbjSel) {
+      let html = '';
+      AppState.subjects.forEach(s => html += `<option value="${s.subjectId}">${s.subjectName}</option>`);
+      sbjSel.innerHTML = html;
+    }
+  }
+
+  async function renderActiveReport() {
+    const type = document.getElementById('rpt-doc-type').value;
+    const classId = document.getElementById('rpt-class').value;
+    const subjectId = document.getElementById('rpt-subject').value;
+    const subjectWrap = document.getElementById('rpt-subject-wrap');
+
+    if (subjectWrap) {
+      subjectWrap.style.display = (type === 'attendance') ? 'none' : 'block';
+    }
+
+    if (type === 'journal') {
+      await renderJournalReport(classId);
+    } else if (type === 'attendance') {
+      await renderAttendanceReport(classId);
+    } else if (type === 'leger') {
+      await renderLegerReport(classId, subjectId);
+    }
+  }
+
+  function updatePrintHeader(hdr, className, subjectName, docTitle) {
+    document.getElementById('prt-school-name').textContent = hdr.schoolName || 'SATUAN PENDIDIKAN';
+    document.getElementById('prt-school-npsn').textContent = hdr.schoolNpsn || '-';
+    document.getElementById('prt-doc-title').textContent = docTitle;
+    document.getElementById('prt-academic-year').textContent = hdr.academicYear || '2026/2027';
+    document.getElementById('prt-semester').textContent = hdr.semester || 'Ganjil';
+    document.getElementById('prt-teacher-name').textContent = hdr.teacherName || '-';
+    document.getElementById('prt-teacher-nip').textContent = hdr.teacherNip || '-';
+    document.getElementById('prt-class-name').textContent = className || '-';
+    document.getElementById('prt-subject-name').textContent = subjectName || '-';
+
+    // Tanda tangan
+    document.getElementById('prt-sign-headmaster').textContent = hdr.headmasterName || 'Kepala Sekolah';
+    document.getElementById('prt-sign-headmaster-nip').textContent = hdr.headmasterNip || '-';
+    document.getElementById('prt-sign-teacher').textContent = hdr.teacherName || 'Guru Pengampu';
+    document.getElementById('prt-sign-teacher-nip').textContent = hdr.teacherNip || '-';
+    document.getElementById('prt-sign-date').textContent = hdr.printDate || new Date().toLocaleDateString('id-ID');
+  }
+
+  async function renderJournalReport(classId) {
+    try {
+      setLoading(true, 'Menyiapkan lembar supervisi jurnal...');
+      const res = await runServer('getJournalPrintData', classId || null);
+      const data = res.data || {};
+      const hdr = data.header || {};
+      const journals = data.journals || [];
+
+      updatePrintHeader(hdr, data.className, 'Mata Pelajaran Pengampu', 'JURNAL AGENDA MENGAJAR GURU');
+
+      const container = document.getElementById('prt-dynamic-content');
+      if (journals.length === 0) {
+        container.innerHTML = `<p class="text-center py-6 text-xs text-slate-400">Belum ada catatan jurnal pada kelas ini.</p>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <table class="w-full text-left text-xs border-collapse border border-slate-300">
+          <thead>
+            <tr class="bg-slate-100 border-b border-slate-300 font-bold text-slate-900">
+              <th class="border border-slate-300 py-2 px-2.5 w-10 text-center">No</th>
+              <th class="border border-slate-300 py-2 px-2.5 w-24">Tanggal</th>
+              <th class="border border-slate-300 py-2 px-2.5 w-28">Jam Ke</th>
+              <th class="border border-slate-300 py-2 px-2.5">Capaian Pembelajaran (CP) / TP</th>
+              <th class="border border-slate-300 py-2 px-2.5">Kegiatan & Refleksi Pembelajaran</th>
+              <th class="border border-slate-300 py-2 px-2.5 w-24 text-center">Keterlaksanaan</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${journals.map((j, idx) => `
+              <tr class="border-b border-slate-200">
+                <td class="border border-slate-300 py-2 px-2.5 text-center text-slate-500">${idx + 1}</td>
+                <td class="border border-slate-300 py-2 px-2.5 whitespace-nowrap font-medium">${j.date}</td>
+                <td class="border border-slate-300 py-2 px-2.5 text-slate-600">${j.timeSlot}</td>
+                <td class="border border-slate-300 py-2 px-2.5 font-semibold text-slate-900 leading-tight">${j.topic}</td>
+                <td class="border border-slate-300 py-2 px-2.5 text-slate-700 leading-relaxed">
+                  <div>${j.activities}</div>
+                  ${j.reflection ? `<div class="italic text-[11px] text-slate-500 mt-1">Refleksi: ${j.reflection}</div>` : ''}
+                </td>
+                <td class="border border-slate-300 py-2 px-2.5 text-center font-bold text-teal-800">${j.status}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    } catch (err) {
+      showToast('Gagal memuat laporan: ' + err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function renderAttendanceReport(classId) {
+    try {
+      setLoading(true, 'Menyiapkan rekapitulasi kehadiran...');
+      const res = await runServer('getAttendancePrintData', classId || null);
+      const data = res.data || {};
+      const hdr = data.header || {};
+      const list = data.attendance || [];
+
+      updatePrintHeader(hdr, data.className, 'Semua Pertemuan', 'REKAPITULASI KEHADIRAN SISWA');
+
+      const container = document.getElementById('prt-dynamic-content');
+      if (list.length === 0) {
+        container.innerHTML = `<p class="text-center py-6 text-xs text-slate-400">Belum ada data absensi pada kelas ini.</p>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <table class="w-full text-left text-xs border-collapse border border-slate-300">
+          <thead>
+            <tr class="bg-slate-100 border-b border-slate-300 font-bold text-slate-900">
+              <th class="border border-slate-300 py-2 px-2.5 w-10 text-center">No</th>
+              <th class="border border-slate-300 py-2 px-2.5 w-24">NIS</th>
+              <th class="border border-slate-300 py-2 px-2.5">Nama Lengkap Siswa</th>
+              <th class="border border-slate-300 py-2 px-2 text-center w-14">Hadir</th>
+              <th class="border border-slate-300 py-2 px-2 text-center w-14">Sakit</th>
+              <th class="border border-slate-300 py-2 px-2 text-center w-14">Izin</th>
+              <th class="border border-slate-300 py-2 px-2 text-center w-14">Alpa</th>
+              <th class="border border-slate-300 py-2 px-2 text-center w-20">Total Sesi</th>
+              <th class="border border-slate-300 py-2 px-2 text-center w-20 font-extrabold">% Kehadiran</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${list.map((s, idx) => `
+              <tr class="border-b border-slate-200">
+                <td class="border border-slate-300 py-2 px-2.5 text-center text-slate-500">${idx + 1}</td>
+                <td class="border border-slate-300 py-2 px-2.5 font-mono text-slate-600">${s.nis || '-'}</td>
+                <td class="border border-slate-300 py-2 px-2.5 font-semibold text-slate-900">${s.studentName}</td>
+                <td class="border border-slate-300 py-2 px-2 text-center font-bold text-emerald-800">${s.hadir}</td>
+                <td class="border border-slate-300 py-2 px-2 text-center">${s.sakit}</td>
+                <td class="border border-slate-300 py-2 px-2 text-center">${s.izin}</td>
+                <td class="border border-slate-300 py-2 px-2 text-center ${s.alpa > 0 ? 'font-bold text-rose-700' : ''}">${s.alpa}</td>
+                <td class="border border-slate-300 py-2 px-2 text-center">${s.totalPertemuan}</td>
+                <td class="border border-slate-300 py-2 px-2 text-center font-extrabold text-slate-900">${s.persentase}%</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    } catch (err) {
+      showToast('Gagal memuat rekap: ' + err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function renderLegerReport(classId, subjectId) {
+    try {
+      setLoading(true, 'Menyiapkan lembar leger nilai...');
+      const res = await runServer('getLegerPrintData', classId, subjectId);
+      const data = res.data || {};
+      const hdr = data.header || {};
+      const rows = data.rows || [];
+
+      updatePrintHeader(hdr, data.className, data.subjectName, 'LEGER NILAI & CAPAIAN KOMPETENSI SISWA');
+
+      const container = document.getElementById('prt-dynamic-content');
+      if (rows.length === 0) {
+        container.innerHTML = `<p class="text-center py-6 text-xs text-slate-400">Belum ada nilai yang diinputkan untuk kelas dan mapel ini.</p>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <table class="w-full text-left text-xs border-collapse border border-slate-300">
+          <thead>
+            <tr class="bg-slate-100 border-b border-slate-300 font-bold text-slate-900">
+              <th class="border border-slate-300 py-2 px-2 w-10 text-center">No</th>
+              <th class="border border-slate-300 py-2 px-2.5">Nama Lengkap Siswa</th>
+              <th class="border border-slate-300 py-2 px-2 text-center w-16">Rata Formatif</th>
+              <th class="border border-slate-300 py-2 px-2 text-center w-16">Rata Sumatif</th>
+              <th class="border border-slate-300 py-2 px-2 text-center w-16 bg-slate-200/50 font-extrabold">Nilai Akhir</th>
+              <th class="border border-slate-300 py-2 px-2 text-center w-12 font-bold">Predikat</th>
+              <th class="border border-slate-300 py-2 px-2.5">Deskripsi Capaian Kompetensi</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map((r, idx) => `
+              <tr class="border-b border-slate-200">
+                <td class="border border-slate-300 py-2 px-2 text-center text-slate-500">${idx + 1}</td>
+                <td class="border border-slate-300 py-2 px-2.5 font-semibold text-slate-900">${r.studentName}</td>
+                <td class="border border-slate-300 py-2 px-2 text-center">${r.avgFormative || '-'}</td>
+                <td class="border border-slate-300 py-2 px-2 text-center">${r.avgSummative || '-'}</td>
+                <td class="border border-slate-300 py-2 px-2 text-center font-extrabold text-sm ${r.finalScore >= 75 ? 'text-teal-900' : 'text-rose-700'} bg-slate-100/50">
+                  ${r.finalScore || '-'}
+                </td>
+                <td class="border border-slate-300 py-2 px-2 text-center font-bold">${r.predikat}</td>
+                <td class="border border-slate-300 py-2 px-2.5 text-slate-700 leading-snug">${r.deskripsi}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    } catch (err) {
+      showToast('Gagal memuat leger: ' + err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDownloadExcel() {
+    try {
+      setLoading(true, 'Menyiapkan file spreadsheet...');
+      const res = await runServer('getSpreadsheetExportUrls');
+      if (res && res.data && res.data.excelUrl) {
+        window.open(res.data.excelUrl, '_blank');
+        showToast('Mengunduh spreadsheet Excel...', 'success');
+      }
+    } catch (err) {
+      showToast('Gagal unduh Excel: ' + err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+</script>

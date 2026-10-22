@@ -1,0 +1,459 @@
+<!-- View: Kelola Guru & Akun Login (Khusus Kepala Sekolah / Admin) -->
+<div id="view-manage-users" class="view-panel space-y-6 hidden">
+
+  <!-- Header Section -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 mb-1">
+        <i data-lucide="users-round" class="w-3.5 h-3.5"></i>
+        <span>Manajemen Kredensial Sekolah</span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-extrabold text-white">Kelola Akun Guru & Akses Login</h2>
+      <p class="text-xs text-slate-400">Tambah akun guru baru, kelola password, dan bagikan kartu kredensial login kepada guru.</p>
+    </div>
+
+    <button onclick="openCreateUserModal()" class="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition inline-flex items-center gap-2 self-start sm:self-auto">
+      <i data-lucide="user-plus" class="w-4 h-4"></i>
+      <span>Tambah Akun Guru Baru</span>
+    </button>
+  </div>
+
+  <!-- KPI Statistik Pengguna (Gradient Glass Cards) -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+    
+    <!-- KPI 1: Total Akun (Bronze) -->
+    <div class="rounded-2xl p-5 border border-amber-500/25 bg-gradient-to-br from-[#3D3728] via-[#262116] to-[#17140E] shadow-lg backdrop-blur-xl transition hover:scale-[1.01]">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold text-amber-200/80 uppercase tracking-wider">Total Akun Terdaftar</p>
+        <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-300 flex items-center justify-center">
+          <i data-lucide="users" class="w-4 h-4"></i>
+        </div>
+      </div>
+      <div class="mt-4 flex items-baseline justify-between">
+        <h3 id="usr-stat-total" class="text-3xl font-extrabold text-white tracking-tight">-</h3>
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+          Database _USERS
+        </span>
+      </div>
+      <p class="text-[11px] text-amber-200/60 mt-1">Akun pendidik & admin</p>
+    </div>
+
+    <!-- KPI 2: Akun Aktif (Emerald/Cobalt) -->
+    <div class="rounded-2xl p-5 border border-emerald-500/25 bg-gradient-to-br from-[#1E3A34] via-[#162724] to-[#0E1B19] shadow-lg backdrop-blur-xl transition hover:scale-[1.01]">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold text-emerald-200/80 uppercase tracking-wider">Akun Aktif</p>
+        <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 flex items-center justify-center">
+          <i data-lucide="shield-check" class="w-4 h-4"></i>
+        </div>
+      </div>
+      <div class="mt-4 flex items-baseline justify-between">
+        <h3 id="usr-stat-active" class="text-3xl font-extrabold text-white tracking-tight">-</h3>
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          Siap Login
+        </span>
+      </div>
+      <p class="text-[11px] text-emerald-200/60 mt-1">Dapat mengakses sistem</p>
+    </div>
+
+    <!-- KPI 3: Akun Nonaktif (Rose/Berry) -->
+    <div class="rounded-2xl p-5 border border-pink-500/25 bg-gradient-to-br from-[#53243B] via-[#381626] to-[#220D17] shadow-lg backdrop-blur-xl transition hover:scale-[1.01]">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold text-pink-200/80 uppercase tracking-wider">Akun Nonaktif</p>
+        <div class="w-9 h-9 rounded-xl bg-pink-500/20 border border-pink-500/30 text-pink-300 flex items-center justify-center">
+          <i data-lucide="user-x" class="w-4 h-4"></i>
+        </div>
+      </div>
+      <div class="mt-4 flex items-baseline justify-between">
+        <h3 id="usr-stat-inactive" class="text-3xl font-extrabold text-white tracking-tight">0</h3>
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/30">
+          Diblokir
+        </span>
+      </div>
+      <p class="text-[11px] text-pink-200/60 mt-1">Akses dinonaktifkan</p>
+    </div>
+
+  </div>
+
+  <!-- Filter & Search Bar -->
+  <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+    <div class="flex items-center gap-2 w-full sm:w-auto">
+      <label class="text-xs font-bold text-slate-300">Pencarian:</label>
+      <div class="relative flex-1 sm:w-72">
+        <input type="text" id="usr-search-query" oninput="filterUsersTable()" placeholder="Cari nama guru, NIP, atau username..." class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition">
+      </div>
+    </div>
+
+    <span id="usr-count-badge" class="text-xs font-semibold text-slate-400 self-end sm:self-auto">
+      Total: 0 akun
+    </span>
+  </div>
+
+  <!-- Tabel Data Akun Pengguna (_USERS) -->
+  <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-white/[0.02] text-slate-400 text-xs uppercase font-semibold border-b border-white/[0.06]">
+          <tr>
+            <th class="py-3 px-4 w-12 text-center">No</th>
+            <th class="py-3 px-4">Nama Lengkap & NIP</th>
+            <th class="py-3 px-4">Mata Pelajaran</th>
+            <th class="py-3 px-4">Username Login</th>
+            <th class="py-3 px-4">Password / PIN</th>
+            <th class="py-3 px-4 text-center">Peran</th>
+            <th class="py-3 px-4 text-center">Status</th>
+            <th class="py-3 px-4 text-right">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="manage-users-tbody" class="divide-y divide-white/[0.05]">
+          <tr>
+            <td colspan="8" class="py-8 text-center text-slate-500 text-xs">
+              Memuat data pengguna dari database Google Sheets (_USERS)...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal Tambah / Edit Akun Pengguna -->
+<div id="modal-user-account" class="fixed inset-0 bg-[#0A090E]/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4 overflow-y-auto">
+  <div class="rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-white/10 bg-[#181722] text-white space-y-4 my-8">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+      <div>
+        <h4 class="font-extrabold text-white text-base" id="modal-user-account-title">Tambah Akun Guru Baru</h4>
+        <p class="text-xs text-slate-400">Buat username dan password agar guru dapat login ke aplikasi.</p>
+      </div>
+      <button onclick="closeModal('modal-user-account')" class="p-1 text-slate-400 hover:text-white transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <form onsubmit="handleSaveUserAccount(event)" class="space-y-4">
+      <input type="hidden" id="usr-form-id">
+
+      <!-- Nama & NIP -->
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Nama Lengkap Guru (dengan Gelar)</label>
+        <input type="text" id="usr-form-name" oninput="autoSuggestUsername()" placeholder="Contoh: Ahmad Yani, S.Pd." class="w-full px-3 py-2.5 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition" required>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">NIP / NUPTK</label>
+          <input type="text" id="usr-form-nip" placeholder="Nomor Induk Pegawai" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Mata Pelajaran yang Diampu</label>
+          <input type="text" id="usr-form-subject" placeholder="Contoh: Matematika" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition" required>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Email Belajar.id / Google (Opsional)</label>
+        <input type="email" id="usr-form-email" placeholder="nama@guru.sma.belajar.id" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition">
+      </div>
+
+      <!-- Kredensial Login (Username & Password) -->
+      <div class="p-4 bg-[#201F2B] rounded-2xl border border-white/10 space-y-3">
+        <p class="text-xs font-extrabold text-amber-300 uppercase tracking-widest">Kredensial Akses Masuk</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Username Login</label>
+            <input type="text" id="usr-form-username" placeholder="guru_nama" class="w-full px-3 py-2 bg-[#17161E] border border-white/10 rounded-xl text-xs font-mono font-bold text-amber-300 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none" required>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-xs font-semibold text-slate-300">Password / PIN</label>
+              <button type="button" onclick="generateRandomPin()" class="text-[11px] text-amber-400 hover:text-amber-300 font-bold">Acak PIN</button>
+            </div>
+            <input type="text" id="usr-form-password" placeholder="PIN atau Password" class="w-full px-3 py-2 bg-[#17161E] border border-white/10 rounded-xl text-xs font-mono font-bold text-sky-300 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none" required>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Keaktifan -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Peran Akses</label>
+          <select id="usr-form-role" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none">
+            <option value="guru">Guru Pengampu</option>
+            <option value="kepsek">Kepala Sekolah / Admin</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Status Akun</label>
+          <select id="usr-form-status" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none">
+            <option value="Aktif">Aktif (Dapat Login)</option>
+            <option value="Nonaktif">Non-aktif (Diblokir)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-3 border-t border-white/[0.08]">
+        <button type="button" onclick="closeModal('modal-user-account')" class="px-4 py-2 border border-white/10 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/[0.05]">Batal</button>
+        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20">Simpan Akun Guru</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Kartu Akses Login Guru -->
+<div id="modal-user-slip" class="fixed inset-0 bg-[#0A090E]/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+  <div class="rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-white/10 bg-[#181722] text-white space-y-4">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+      <h4 class="font-extrabold text-white text-base">Kartu Akses Login Guru</h4>
+      <button onclick="closeModal('modal-user-slip')" class="p-1 text-slate-400 hover:text-white transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <!-- Tampilan Kartu Kredensial -->
+    <div class="p-4 bg-[#201F2B] border border-amber-500/20 rounded-2xl space-y-3 text-xs">
+      <div class="border-b border-white/[0.08] pb-2">
+        <h5 class="font-extrabold text-amber-300 text-sm" id="user-slip-name">Nama Guru</h5>
+        <p class="text-[11px] text-sky-300 font-semibold" id="user-slip-subject">Mata Pelajaran</p>
+        <p class="text-[10px] text-slate-400">NIP: <span id="user-slip-nip">-</span></p>
+      </div>
+
+      <div class="space-y-2">
+        <div class="flex justify-between items-center bg-[#17161E] p-2.5 rounded-xl border border-white/[0.06]">
+          <span class="text-slate-400 font-medium">Username Login:</span>
+          <span class="font-mono font-bold text-amber-300 text-xs" id="user-slip-username">-</span>
+        </div>
+        <div class="flex justify-between items-center bg-[#17161E] p-2.5 rounded-xl border border-white/[0.06]">
+          <span class="text-slate-400 font-medium">Password / PIN:</span>
+          <span class="font-mono font-extrabold text-sky-300 text-xs" id="user-slip-password">-</span>
+        </div>
+      </div>
+
+      <p class="text-[10px] text-slate-400 italic">Gunakan kredensial di atas untuk masuk ke aplikasi SiAGU.</p>
+    </div>
+
+    <div class="flex items-center justify-end gap-2 pt-2 border-t border-white/[0.08]">
+      <button type="button" onclick="closeModal('modal-user-slip')" class="px-3 py-2 border border-white/10 rounded-xl text-xs font-semibold text-slate-400 hover:text-white">Tutup</button>
+      <button type="button" onclick="copyUserSlipText()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20 inline-flex items-center gap-1.5">
+        <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+        <span>Salin ke WhatsApp</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let rawUsersList = [];
+
+  async function loadManageUsersView() {
+    try {
+      setLoading(true, 'Memuat database akun guru (_USERS)...');
+      const res = await runServer('getUsersList');
+      rawUsersList = res.data || [];
+
+      // Update KPI
+      const total = rawUsersList.length;
+      const active = rawUsersList.filter(u => u.status === 'Aktif').length;
+      const inactive = total - active;
+
+      document.getElementById('usr-stat-total').textContent = total;
+      document.getElementById('usr-stat-active').textContent = active;
+      document.getElementById('usr-stat-inactive').textContent = inactive;
+
+      renderUsersTable(rawUsersList);
+    } catch (err) {
+      showToast('Gagal memuat akun: ' + err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function renderUsersTable(list) {
+    const tbody = document.getElementById('manage-users-tbody');
+    const badge = document.getElementById('usr-count-badge');
+    if (badge) badge.textContent = `Total: ${list.length} akun`;
+    if (!tbody) return;
+
+    if (list.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500 text-xs">Belum ada akun guru di database. Klik tombol "Tambah Akun Guru Baru" di atas.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = list.map((u, idx) => `
+      <tr class="hover:bg-white/[0.02] border-b border-white/[0.04] transition">
+        <td class="py-3 px-4 text-center text-slate-500 text-xs">${idx + 1}</td>
+        <td class="py-3 px-4">
+          <div class="font-extrabold text-white">${u.fullName}</div>
+          <div class="text-[11px] text-slate-400">NIP: ${u.nip || '-'}</div>
+        </td>
+        <td class="py-3 px-4 font-bold text-sky-300">${u.subjectName}</td>
+        <td class="py-3 px-4">
+          <span class="font-mono text-xs font-bold text-amber-300 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/30">
+            ${u.username}
+          </span>
+        </td>
+        <td class="py-3 px-4">
+          <span class="font-mono text-xs font-extrabold text-sky-300 bg-sky-500/10 px-2.5 py-1 rounded-lg border border-sky-500/30">
+            ${u.password}
+          </span>
+        </td>
+        <td class="py-3 px-4 text-center">
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${u.role === 'kepsek' || u.role === 'admin' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-sky-500/20 text-sky-300 border border-sky-500/30'}">
+            ${u.role === 'kepsek' || u.role === 'admin' ? 'Kepala Sekolah' : 'Guru'}
+          </span>
+        </td>
+        <td class="py-3 px-4 text-center">
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${u.status === 'Aktif' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}">
+            ${u.status}
+          </span>
+        </td>
+        <td class="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
+          <button onclick='openUserSlipModal(${JSON.stringify(u)})' class="p-1.5 bg-white/5 hover:bg-white/10 text-amber-300 border border-white/10 rounded-lg text-xs transition" title="Lihat Slip Akun">
+            <i data-lucide="share-2" class="w-3.5 h-3.5 inline"></i>
+          </button>
+          <button onclick='openEditUserModal(${JSON.stringify(u)})' class="text-amber-400 hover:text-amber-300 text-xs font-bold px-1.5 py-1">Edit</button>
+          ${u.username !== 'admin' ? `
+            <button onclick="handleDeleteUser('${u.userId}')" class="text-rose-400 hover:text-rose-300 text-xs font-bold px-1.5 py-1">Hapus</button>
+          ` : ''}
+        </td>
+      </tr>
+    `).join('');
+
+    lucide.createIcons();
+  }
+
+  function filterUsersTable() {
+    const q = (document.getElementById('usr-search-query').value || '').toLowerCase();
+    const filtered = rawUsersList.filter(u => 
+      u.fullName.toLowerCase().includes(q) ||
+      u.username.toLowerCase().includes(q) ||
+      u.subjectName.toLowerCase().includes(q) ||
+      (u.nip && u.nip.includes(q))
+    );
+    renderUsersTable(filtered);
+  }
+
+  function openCreateUserModal() {
+    document.getElementById('usr-form-id').value = '';
+    document.getElementById('usr-form-name').value = '';
+    document.getElementById('usr-form-nip').value = '';
+    document.getElementById('usr-form-subject').value = '';
+    document.getElementById('usr-form-email').value = '';
+    document.getElementById('usr-form-username').value = '';
+    document.getElementById('usr-form-role').value = 'guru';
+    document.getElementById('usr-form-status').value = 'Aktif';
+    document.getElementById('modal-user-account-title').textContent = 'Tambah Akun Guru Baru';
+
+    generateRandomPin();
+    document.getElementById('modal-user-account').classList.remove('hidden');
+    lucide.createIcons();
+  }
+
+  function openEditUserModal(u) {
+    document.getElementById('usr-form-id').value = u.userId;
+    document.getElementById('usr-form-name').value = u.fullName;
+    document.getElementById('usr-form-nip').value = u.nip || '';
+    document.getElementById('usr-form-subject').value = u.subjectName || '';
+    document.getElementById('usr-form-email').value = u.email || '';
+    document.getElementById('usr-form-username').value = u.username;
+    document.getElementById('usr-form-password').value = u.password;
+    document.getElementById('usr-form-role').value = u.role || 'guru';
+    document.getElementById('usr-form-status').value = u.status || 'Aktif';
+    document.getElementById('modal-user-account-title').textContent = 'Edit Akun Guru';
+
+    document.getElementById('modal-user-account').classList.remove('hidden');
+    lucide.createIcons();
+  }
+
+  function autoSuggestUsername() {
+    const name = document.getElementById('usr-form-name').value;
+    const currentId = document.getElementById('usr-form-id').value;
+    // Hanya auto-suggest jika form create baru
+    if (!currentId && name) {
+      const clean = name.replace(/[^a-zA-Z]/g, '').toLowerCase().substring(0, 8);
+      document.getElementById('usr-form-username').value = 'guru_' + clean;
+    }
+  }
+
+  function generateRandomPin() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let pin = '';
+    for (let k = 0; k < 6; k++) pin += chars.charAt(Math.floor(Math.random() * chars.length));
+    document.getElementById('usr-form-password').value = pin;
+  }
+
+  async function handleSaveUserAccount(e) {
+    e.preventDefault();
+    const payload = {
+      userId: document.getElementById('usr-form-id').value,
+      fullName: document.getElementById('usr-form-name').value,
+      nip: document.getElementById('usr-form-nip').value,
+      subjectName: document.getElementById('usr-form-subject').value,
+      email: document.getElementById('usr-form-email').value,
+      username: document.getElementById('usr-form-username').value.trim(),
+      password: document.getElementById('usr-form-password').value.trim(),
+      role: document.getElementById('usr-form-role').value,
+      status: document.getElementById('usr-form-status').value
+    };
+
+    try {
+      setLoading(true, 'Menyimpan akun ke database _USERS...');
+      const res = await runServer('saveUserAccount', payload);
+      if (res && res.success) {
+        closeModal('modal-user-account');
+        showToast(res.message || 'Akun guru berhasil disimpan!', 'success');
+        await loadManageUsersView();
+      } else {
+        showToast(res ? res.error : 'Gagal simpan', 'error');
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDeleteUser(userId) {
+    if (!confirm('Hapus akun guru ini dari sistem? Guru bersangkutan tidak akan dapat login lagi.')) return;
+    try {
+      setLoading(true, 'Menghapus akun...');
+      const res = await runServer('deleteUserAccount', userId);
+      if (res && res.success) {
+        showToast('Akun guru berhasil dihapus', 'success');
+        await loadManageUsersView();
+      } else {
+        showToast(res ? res.error : 'Gagal hapus', 'error');
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function openUserSlipModal(u) {
+    document.getElementById('user-slip-name').textContent = u.fullName;
+    document.getElementById('user-slip-nip').textContent = u.nip || '-';
+    document.getElementById('user-slip-subject').textContent = u.subjectName;
+    document.getElementById('user-slip-username').textContent = u.username;
+    document.getElementById('user-slip-password').textContent = u.password;
+    document.getElementById('modal-user-slip').classList.remove('hidden');
+    lucide.createIcons();
+  }
+
+  function copyUserSlipText() {
+    const name = document.getElementById('user-slip-name').textContent;
+    const nip = document.getElementById('user-slip-nip').textContent;
+    const user = document.getElementById('user-slip-username').textContent;
+    const pass = document.getElementById('user-slip-password').textContent;
+    const school = AppState.config.SCHOOL_NAME || 'Sekolah';
+
+    const text = `*INFORMASI AKUN SIAGU*\nSatuan Pendidikan: ${school}\n\nKepada Yth. *${name}*\nNIP: ${nip}\n\nBerikut akun login Anda di aplikasi SiAGU:\n👤 Username: *${user}*\n🔑 Password/PIN: *${pass}*\n\nSilakan masuk dan lakukan pengisian administrasi mengajar. Terima kasih.`;
+
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('Slip akun berhasil disalin ke clipboard!', 'success');
+    }).catch(() => {
+      showToast('Gagal menyalin slip', 'error');
+    });
+  }
+</script>

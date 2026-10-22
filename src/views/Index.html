@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>SiAGU — Sistem Informasi Administrasi Guru</title>
+  <?!= include('views/Styles'); ?>
+</head>
+<body class="bg-[#0D0C10] text-[#F8FAFC] min-h-screen flex flex-col antialiased selection:bg-amber-500/20 selection:text-amber-300">
+
+  <!-- Halaman Login (Tampil jika belum login) -->
+  <?!= include('views/Login'); ?>
+
+  <!-- Kerangka Aplikasi Utama (Tampil jika sudah terautentikasi) -->
+  <div id="app-layout" class="hidden flex-1 flex flex-col min-h-screen">
+
+    <!-- Mobile Header (no-print) -->
+    <header class="no-print lg:hidden bg-[#131218]/95 backdrop-blur-md border-b border-white/10 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-40 shadow-lg">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500/30 to-orange-500/30 border border-amber-500/40 text-amber-300 flex items-center justify-center font-bold text-sm">
+          S
+        </div>
+        <div>
+          <h1 class="font-bold text-sm tracking-tight leading-tight text-white">SiAGU</h1>
+          <p class="text-[10px] text-amber-400 font-semibold" id="mobile-role-label">Administrasi Guru</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="handleLogout()" class="p-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30" title="Keluar">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </button>
+        <button id="mobile-menu-toggle" class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white border border-white/10 focus:outline-none">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden">
+
+      <!-- Sidebar Navigation (Desktop & Mobile Drawer) (no-print) -->
+      <aside id="sidebar" class="no-print hidden lg:flex flex-col w-64 bg-[#121117]/95 backdrop-blur-xl border-r border-white/[0.08] fixed lg:static inset-y-0 left-0 z-50 transition-all duration-200 ease-in-out shadow-2xl lg:shadow-none">
+        
+        <!-- Logo Branding -->
+        <div class="p-5 border-b border-white/[0.08] flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500/20 via-orange-500/20 to-amber-600/10 border border-amber-500/30 text-amber-300 flex items-center justify-center font-black text-lg shadow-lg shadow-amber-500/10">
+              <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h1 class="font-extrabold text-base text-white tracking-tight leading-tight">SiAGU</h1>
+              <p class="text-[11px] font-semibold text-amber-400" id="sidebar-role-badge">Portal Administrasi</p>
+            </div>
+          </div>
+          <button id="mobile-menu-close" class="lg:hidden p-1 text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="flex-1 p-3.5 space-y-1.5 overflow-y-auto">
+          <p class="px-3 pt-2 pb-1 text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Utama</p>
+          
+          <button class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition text-left text-slate-400 hover:text-white hover:bg-white/[0.05]" data-view="dashboard">
+            <i data-lucide="layout-dashboard" class="w-4 h-4 flex-shrink-0"></i>
+            <span>Dashboard</span>
+          </button>
+
+          <button class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition text-left text-slate-400 hover:text-white hover:bg-white/[0.05]" data-view="master">
+            <i data-lucide="database" class="w-4 h-4 flex-shrink-0"></i>
+            <span>Data Master & Kelas</span>
+          </button>
+
+          <p class="px-3 pt-4 pb-1 text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Pembelajaran</p>
+
+          <button class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition text-left text-slate-400 hover:text-white hover:bg-white/[0.05]" data-view="journal">
+            <i data-lucide="book-open" class="w-4 h-4 flex-shrink-0"></i>
+            <span>Jurnal Mengajar</span>
+          </button>
+
+          <button class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition text-left text-slate-400 hover:text-white hover:bg-white/[0.05]" data-view="attendance">
+            <i data-lucide="clipboard-check" class="w-4 h-4 flex-shrink-0"></i>
+            <span>Presensi Siswa</span>
+          </button>
+
+          <button class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition text-left text-slate-400 hover:text-white hover:bg-white/[0.05]" data-view="assessment">
+            <i data-lucide="award" class="w-4 h-4 flex-shrink-0"></i>
+            <span>Nilai & Leger</span>
+          </button>
+
+          <button class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition text-left text-slate-400 hover:text-white hover:bg-white/[0.05]" data-view="documents">
+            <i data-lucide="folder-archive" class="w-4 h-4 flex-shrink-0"></i>
+            <span>Perangkat Ajar</span>
+          </button>
+
+          <button class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition text-left text-slate-400 hover:text-white hover:bg-white/[0.05]" data-view="behavior">
+            <i data-lucide="heart-handshake" class="w-4 h-4 flex-shrink-0"></i>
+            <span>Catatan Sikap (P3)</span>
+          </button>
+
+          <p class="px-3 pt-4 pb-1 text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Supervisi & Pimpinan</p>
+
+          <!-- Menu Khusus Kepala Sekolah -->
+          <button id="nav-btn-supervision" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition text-left text-slate-400 hover:text-white hover:bg-white/[0.05]" data-view="supervision">
+            <i data-lucide="shield-check" class="w-4 h-4 flex-shrink-0 text-amber-400"></i>
+            <span>Monitoring Guru (Kepsek)</span>
+          </button>
+
+          <!-- Menu Kelola Guru & Akun -->
+          <button id="nav-btn-users" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition text-left text-slate-400 hover:text-white hover:bg-white/[0.05]" data-view="manage-users">
+            <i data-lucide="users-round" class="w-4 h-4 flex-shrink-0 text-amber-400"></i>
+            <span>Kelola Guru & Akun</span>
+          </button>
+
+          <button class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition text-left text-slate-400 hover:text-white hover:bg-white/[0.05]" data-view="reports">
+            <i data-lucide="printer" class="w-4 h-4 flex-shrink-0"></i>
+            <span>Pusat Cetak Supervisi</span>
+          </button>
+
+          <p class="px-3 pt-4 pb-1 text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Akses & Keamanan</p>
+
+          <!-- Menu Halaman Login / Ganti Akun -->
+          <button type="button" onclick="goToLoginPage()" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition text-left text-sky-400 hover:text-white hover:bg-sky-500/10">
+            <i data-lucide="key-round" class="w-4 h-4 flex-shrink-0"></i>
+            <span>Menu Login / Ganti Akun</span>
+          </button>
+        </nav>
+
+        <!-- Sidebar Footer: Status Database & Logout -->
+        <div class="p-4 border-t border-white/[0.08] bg-[#0E0D13]/70 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-sm shadow-emerald-400/50"></div>
+              <p class="text-xs font-semibold text-slate-300">Spreadsheet Terhubung</p>
+            </div>
+            <button onclick="handleLogout()" class="text-xs text-rose-400 hover:text-rose-300 font-bold flex items-center gap-1 transition" title="Keluar">
+              <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+              <span>Keluar</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        
+        <!-- Topbar Header (no-print) -->
+        <div class="no-print bg-[#14131A]/80 backdrop-blur-md border-b border-white/[0.08] px-6 py-3.5 flex items-center justify-between sticky top-0 z-30">
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-bold text-slate-300 hidden sm:inline" id="header-school-name">Memuat Data Sekolah...</span>
+            <span class="text-slate-600 hidden sm:inline">•</span>
+            <span id="header-curriculum-badge" class="px-3 py-0.5 rounded-full text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+              Kurikulum Merdeka
+            </span>
+          </div>
+
+          <!-- Profil User & Logout Action -->
+          <div class="flex items-center gap-3">
+            
+            <div class="text-right hidden sm:block">
+              <p id="header-teacher-name" class="text-xs font-extrabold text-white">Guru Pengampu</p>
+              <p id="header-role-title" class="text-[11px] text-amber-400 font-semibold">Mode Guru</p>
+            </div>
+
+            <div id="header-user-avatar" class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-sky-400 to-blue-600 text-slate-950 font-black flex items-center justify-center text-xs shadow-md shadow-sky-500/20">
+              <i data-lucide="user" class="w-4 h-4"></i>
+            </div>
+
+            <!-- Tombol Keluar / Logout -->
+            <button onclick="handleLogout()" class="px-3 py-1.5 rounded-full bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs font-bold transition flex items-center gap-1.5 ml-1">
+              <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+              <span class="hidden md:inline">Keluar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Container Tampilan Aplikasi (View Panels) -->
+        <div class="p-4 sm:p-6 lg:p-8 flex-1 max-w-7xl w-full mx-auto">
+          <?!= include('views/Dashboard'); ?>
+          <?!= include('views/Master'); ?>
+          <?!= include('views/Journal'); ?>
+          <?!= include('views/Attendance'); ?>
+          <?!= include('views/Assessment'); ?>
+          <?!= include('views/Documents'); ?>
+          <?!= include('views/Behavior'); ?>
+          <?!= include('views/Reports'); ?>
+          <?!= include('views/Supervision'); ?>
+          <?!= include('views/ManageUsers'); ?>
+        </div>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- Top Progress Bar (Non-blocking visual indicator saat navigasi menu) -->
+  <div id="top-progress-bar" class="no-print fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-sky-400 to-amber-500 z-50 transform -translate-y-full transition-transform duration-200 pointer-events-none shadow-[0_0_12px_rgba(245,158,11,0.8)]"></div>
+
+  <!-- Global Toast Notification Container -->
+  <div id="toast-container" class="no-print fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- Global Loading Overlay -->
+  <div id="global-loading-overlay" class="no-print fixed inset-0 bg-[#0A090E]/80 backdrop-blur-md z-50 flex items-center justify-center hidden">
+    <div class="bg-[#181722] rounded-3xl p-7 shadow-2xl flex flex-col items-center gap-4 max-w-xs text-center border border-white/10 text-white">
+      <div class="w-10 h-10 border-4 border-amber-500/20 border-t-amber-400 rounded-full animate-spin"></div>
+      <div>
+        <h4 class="font-bold text-white text-sm" id="global-loading-text">Sedang memproses...</h4>
+        <p class="text-xs text-slate-400 mt-1">Menghubungkan ke Google Apps Script</p>
+      </div>
+    </div>
+  </div>
+
+  <?!= include('views/Scripts'); ?>
+
+  <script>
+    // Responsive Mobile Menu Handler
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    const mobileMenuClose = document.getElementById('mobile-menu-close');
+    const sidebar = document.getElementById('sidebar');
+
+    if (mobileMenuToggle && sidebar) {
+      mobileMenuToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('hidden');
+      });
+    }
+
+    if (mobileMenuClose && sidebar) {
+      mobileMenuClose.addEventListener('click', () => {
+        sidebar.classList.add('hidden');
+      });
+    }
+
+    // Auto close drawer when menu item is clicked on mobile
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (window.innerWidth < 1024 && sidebar) {
+          sidebar.classList.add('hidden');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

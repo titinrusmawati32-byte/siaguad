@@ -1,0 +1,732 @@
+<!-- View: Data Master & Pengaturan -->
+<div id="view-master" class="view-panel space-y-6 hidden">
+
+  <!-- Header Section -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h2 class="text-xl sm:text-2xl font-extrabold text-white">Data Master & Pengaturan</h2>
+      <p class="text-xs text-slate-400">Konfigurasi profil sekolah, kurikulum, rombel kelas, siswa, dan mata pelajaran.</p>
+    </div>
+
+    <!-- Tab Navigation Pills -->
+    <div class="inline-flex p-1 bg-[#121117] border border-white/10 rounded-2xl text-xs font-bold gap-1 self-start sm:self-auto overflow-x-auto max-w-full">
+      <button onclick="switchMasterTab('config')" id="tab-btn-config" class="master-tab-btn px-3.5 py-2 rounded-xl transition bg-[#7CC4FA] text-slate-950 font-extrabold shadow-md shadow-sky-500/20">
+        Profil & Kurikulum
+      </button>
+      <button onclick="switchMasterTab('classes')" id="tab-btn-classes" class="master-tab-btn px-3.5 py-2 rounded-xl transition text-slate-400 hover:text-white">
+        Kelas & Rombel
+      </button>
+      <button onclick="switchMasterTab('students')" id="tab-btn-students" class="master-tab-btn px-3.5 py-2 rounded-xl transition text-slate-400 hover:text-white">
+        Data Siswa
+      </button>
+      <button onclick="switchMasterTab('subjects')" id="tab-btn-subjects" class="master-tab-btn px-3.5 py-2 rounded-xl transition text-slate-400 hover:text-white">
+        Mata Pelajaran
+      </button>
+    </div>
+  </div>
+
+  <!-- TAB 1: PROFIL & KURIKULUM -->
+  <div id="master-tab-config" class="master-content rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg p-6 space-y-6">
+    <div class="border-b border-white/[0.08] pb-4">
+      <h3 class="font-extrabold text-white text-base">Identitas Satuan Pendidikan & Guru Pengampu</h3>
+      <p class="text-xs text-slate-400">Informasi ini akan dicetak otomatis pada kop laporan supervisi dan lembar penilaian.</p>
+    </div>
+
+    <form id="form-config" onsubmit="handleSaveConfig(event)" class="space-y-6">
+      
+      <!-- Grid Sekolah -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Nama Satuan Pendidikan / Sekolah</label>
+          <input type="text" id="cfg-SCHOOL_NAME" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" placeholder="Contoh: SMA Negeri 1..." required>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">NPSN Sekolah</label>
+          <input type="text" id="cfg-SCHOOL_NPSN" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" placeholder="Nomor Pokok Sekolah Nasional">
+        </div>
+      </div>
+
+      <!-- Grid Guru & Kepala Sekolah -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Nama Lengkap Guru (dengan Gelar)</label>
+          <input type="text" id="cfg-TEACHER_NAME" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none" required>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">NIP / NUPTK Guru</label>
+          <input type="text" id="cfg-TEACHER_NIP" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Nama Kepala Sekolah (dengan Gelar)</label>
+          <input type="text" id="cfg-HEADMASTER_NAME" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none" required>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">NIP Kepala Sekolah</label>
+          <input type="text" id="cfg-HEADMASTER_NIP" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none">
+        </div>
+      </div>
+
+      <!-- Grid Kurikulum & Periode Aktif -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-white/[0.08]">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Model Kurikulum</label>
+          <select id="cfg-CURRICULUM_MODE" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none">
+            <option value="Kurikulum Merdeka">Kurikulum Merdeka (Fase & TP)</option>
+            <option value="Kurikulum 2013 (K13)">Kurikulum 2013 / K13 (KD & KI)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Tahun Ajaran Aktif</label>
+          <input type="text" id="cfg-ACADEMIC_YEAR" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none" placeholder="2026/2027" required>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Semester Aktif</label>
+          <select id="cfg-SEMESTER" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none">
+            <option value="Ganjil">Semester Ganjil</option>
+            <option value="Genap">Semester Genap</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-4 border-t border-white/[0.08]">
+        <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-sm shadow-lg shadow-amber-500/20 transition inline-flex items-center gap-2">
+          <i data-lucide="save" class="w-4 h-4"></i>
+          <span>Simpan Profil & Kurikulum</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- TAB 2: KELAS & ROMBEL -->
+  <div id="master-tab-classes" class="master-content rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg p-6 space-y-6 hidden">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-4">
+      <div>
+        <h3 class="font-extrabold text-white text-base">Rombongan Belajar (Kelas)</h3>
+        <p class="text-xs text-slate-400">Daftar kelas yang diampu pada tahun ajaran ini.</p>
+      </div>
+      <button onclick="openClassModal()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20 transition inline-flex items-center gap-1.5">
+        <i data-lucide="plus" class="w-4 h-4"></i>
+        <span>Tambah Kelas</span>
+      </button>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-white/[0.02] text-slate-400 text-xs uppercase font-semibold border-b border-white/[0.06]">
+          <tr>
+            <th class="py-3 px-4">Nama Kelas</th>
+            <th class="py-3 px-4">Tingkat</th>
+            <th class="py-3 px-4">Jurusan / Fase</th>
+            <th class="py-3 px-4">Tahun Ajaran</th>
+            <th class="py-3 px-4 text-right">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="master-classes-tbody" class="divide-y divide-white/[0.05]">
+          <tr><td colspan="5" class="py-6 text-center text-slate-500 text-xs">Memuat daftar kelas...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB 3: DATA SISWA -->
+  <div id="master-tab-students" class="master-content rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg p-6 space-y-6 hidden">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-4">
+      <div>
+        <h3 class="font-extrabold text-white text-base">Data Siswa per Kelas</h3>
+        <p class="text-xs text-slate-400">Kelola buku induk presensi dan penilaian siswa.</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="openBatchStudentModal()" class="px-3.5 py-2 bg-white/5 hover:bg-white/10 text-slate-300 font-bold rounded-xl text-xs transition inline-flex items-center gap-1.5 border border-white/10">
+          <i data-lucide="file-up" class="w-4 h-4"></i>
+          <span>Impor Cepat (Paste)</span>
+        </button>
+        <button onclick="openStudentModal()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20 transition inline-flex items-center gap-1.5">
+          <i data-lucide="user-plus" class="w-4 h-4"></i>
+          <span>Tambah Siswa</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Filter Kelas Siswa -->
+    <div class="flex items-center gap-3">
+      <label class="text-xs font-bold text-slate-300">Pilih Kelas:</label>
+      <select id="student-filter-class" onchange="loadStudentsTable()" class="px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs font-semibold text-white focus:border-amber-400 outline-none">
+        <option value="">Semua Kelas</option>
+      </select>
+      <span id="student-count-badge" class="text-xs text-slate-400 font-semibold ml-2">Total: 0 siswa</span>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-white/[0.02] text-slate-400 text-xs uppercase font-semibold border-b border-white/[0.06]">
+          <tr>
+            <th class="py-3 px-4">No</th>
+            <th class="py-3 px-4">NIS</th>
+            <th class="py-3 px-4">Nama Lengkap Siswa</th>
+            <th class="py-3 px-4">L/P</th>
+            <th class="py-3 px-4">Kelas</th>
+            <th class="py-3 px-4 text-right">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="master-students-tbody" class="divide-y divide-white/[0.05]">
+          <tr><td colspan="6" class="py-6 text-center text-slate-500 text-xs">Memuat data siswa...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB 4: MATA PELAJARAN -->
+  <div id="master-tab-subjects" class="master-content rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg p-6 space-y-6 hidden">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-4">
+      <div>
+        <h3 class="font-extrabold text-white text-base">Mata Pelajaran & Bobot Asesmen</h3>
+        <p class="text-xs text-slate-400">Atur porsi persentase Nilai Formatif (Tugas/Kuis) dan Sumatif (STS/SAS).</p>
+      </div>
+      <button onclick="openSubjectModal()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20 transition inline-flex items-center gap-1.5">
+        <i data-lucide="plus" class="w-4 h-4"></i>
+        <span>Tambah Mapel</span>
+      </button>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-white/[0.02] text-slate-400 text-xs uppercase font-semibold border-b border-white/[0.06]">
+          <tr>
+            <th class="py-3 px-4">Nama Mata Pelajaran</th>
+            <th class="py-3 px-4">Tingkat</th>
+            <th class="py-3 px-4">Bobot Formatif</th>
+            <th class="py-3 px-4">Bobot Sumatif</th>
+            <th class="py-3 px-4 text-right">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="master-subjects-tbody" class="divide-y divide-white/[0.05]">
+          <tr><td colspan="5" class="py-6 text-center text-slate-500 text-xs">Memuat daftar mata pelajaran...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal Tambah/Edit Kelas -->
+<div id="modal-class" class="fixed inset-0 bg-[#0A090E]/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+  <div class="rounded-3xl max-w-md w-full p-6 shadow-2xl border border-white/10 bg-[#181722] text-white space-y-4">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+      <h4 class="font-extrabold text-white text-base" id="modal-class-title">Tambah Kelas Baru</h4>
+      <button onclick="closeModal('modal-class')" class="p-1 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+    <form onsubmit="handleSaveClass(event)" class="space-y-4">
+      <input type="hidden" id="form-class-id">
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Nama Kelas / Rombel</label>
+        <input type="text" id="form-class-name" placeholder="Contoh: X-A atau XI MIPA 1" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Tingkat</label>
+          <select id="form-class-grade" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none">
+            <option value="10">Kelas 10 (Fase E)</option>
+            <option value="11">Kelas 11 (Fase F)</option>
+            <option value="12">Kelas 12 (Fase F)</option>
+            <option value="7">Kelas 7 (Fase D)</option>
+            <option value="8">Kelas 8 (Fase D)</option>
+            <option value="9">Kelas 9 (Fase D)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Fase / Peminatan</label>
+          <input type="text" id="form-class-phase" placeholder="Fase E / MIPA" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none">
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-3 border-t border-white/[0.08]">
+        <button type="button" onclick="closeModal('modal-class')" class="px-4 py-2 border border-white/10 rounded-xl text-xs font-semibold text-slate-400 hover:text-white">Batal</button>
+        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20">Simpan Kelas</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Tambah/Edit Siswa -->
+<div id="modal-student" class="fixed inset-0 bg-[#0A090E]/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+  <div class="rounded-3xl max-w-md w-full p-6 shadow-2xl border border-white/10 bg-[#181722] text-white space-y-4">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+      <h4 class="font-extrabold text-white text-base" id="modal-student-title">Tambah Siswa</h4>
+      <button onclick="closeModal('modal-student')" class="p-1 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+    <form onsubmit="handleSaveStudent(event)" class="space-y-4">
+      <input type="hidden" id="form-student-id">
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Pilih Kelas</label>
+        <select id="form-student-class" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none" required>
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">NIS</label>
+          <input type="text" id="form-student-nis" placeholder="Nomor Induk" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Jenis Kelamin</label>
+          <select id="form-student-gender" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none">
+            <option value="L">Laki-laki (L)</option>
+            <option value="P">Perempuan (P)</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Nama Lengkap Siswa</label>
+        <input type="text" id="form-student-name" placeholder="Nama lengkap sesuai akta" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required>
+      </div>
+      <div class="flex justify-end gap-2 pt-3 border-t border-white/[0.08]">
+        <button type="button" onclick="closeModal('modal-student')" class="px-4 py-2 border border-white/10 rounded-xl text-xs font-semibold text-slate-400 hover:text-white">Batal</button>
+        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20">Simpan Siswa</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Impor Siswa Massal (Paste dari Excel) -->
+<div id="modal-batch-student" class="fixed inset-0 bg-[#0A090E]/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+  <div class="rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-white/10 bg-[#181722] text-white space-y-4">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+      <h4 class="font-extrabold text-white text-base">Impor Cepat Daftar Siswa</h4>
+      <button onclick="closeModal('modal-batch-student')" class="p-1 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+    <form onsubmit="handleBatchImportStudents(event)" class="space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Pilih Kelas Tujuan</label>
+        <select id="batch-student-class" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none" required>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Tempelkan Daftar Siswa (1 Baris per Siswa)</label>
+        <p class="text-[11px] text-slate-400 mb-2">Bisa langsung copy-paste dari kolom nama di Excel / Word. Format fleksibel: <code>Nama Siswa</code> atau <code>Nama Siswa, L/P</code></p>
+        <textarea id="batch-student-text" rows="8" placeholder="Achmad Maulana&#10;Annisa Putri Rahayu, P&#10;Bagas Pratama, L" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs font-mono text-white placeholder:text-slate-500 focus:border-amber-400 outline-none leading-relaxed" required></textarea>
+      </div>
+      <div class="flex justify-end gap-2 pt-3 border-t border-white/[0.08]">
+        <button type="button" onclick="closeModal('modal-batch-student')" class="px-4 py-2 border border-white/10 rounded-xl text-xs font-semibold text-slate-400 hover:text-white">Batal</button>
+        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20">Impor Sekarang</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Tambah/Edit Mapel -->
+<div id="modal-subject" class="fixed inset-0 bg-[#0A090E]/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+  <div class="rounded-3xl max-w-md w-full p-6 shadow-2xl border border-white/10 bg-[#181722] text-white space-y-4">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+      <h4 class="font-extrabold text-white text-base" id="modal-subject-title">Tambah Mata Pelajaran</h4>
+      <button onclick="closeModal('modal-subject')" class="p-1 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+    <form onsubmit="handleSaveSubject(event)" class="space-y-4">
+      <input type="hidden" id="form-subject-id">
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Nama Mata Pelajaran</label>
+        <input type="text" id="form-subject-name" placeholder="Contoh: Biologi / Matematika" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Tingkat Kelas</label>
+        <input type="text" id="form-subject-grade" placeholder="10 / 11 / 12" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none">
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Bobot Formatif (%)</label>
+          <input type="number" id="form-subject-wformative" value="40" min="0" max="100" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none" required>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Bobot Sumatif (%)</label>
+          <input type="number" id="form-subject-wsummative" value="60" min="0" max="100" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none" required>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-3 border-t border-white/[0.08]">
+        <button type="button" onclick="closeModal('modal-subject')" class="px-4 py-2 border border-white/10 rounded-xl text-xs font-semibold text-slate-400 hover:text-white">Batal</button>
+        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20">Simpan Mapel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function switchMasterTab(tabName) {
+    document.querySelectorAll('.master-content').forEach(c => c.classList.add('hidden'));
+    document.querySelectorAll('.master-tab-btn').forEach(b => {
+      b.classList.remove('bg-[#7CC4FA]', 'text-slate-950', 'font-extrabold', 'shadow-md', 'shadow-sky-500/20');
+      b.classList.add('text-slate-400', 'hover:text-white');
+    });
+
+    const target = document.getElementById(`master-tab-${tabName}`);
+    const btn = document.getElementById(`tab-btn-${tabName}`);
+    if (target) target.classList.remove('hidden');
+    if (btn) {
+      btn.classList.add('bg-[#7CC4FA]', 'text-slate-950', 'font-extrabold', 'shadow-md', 'shadow-sky-500/20');
+      btn.classList.remove('text-slate-400', 'hover:text-white');
+    }
+
+    if (tabName === 'classes') loadClassesTable();
+    if (tabName === 'students') loadStudentsTable();
+    if (tabName === 'subjects') loadSubjectsTable();
+    if (tabName === 'config') populateConfigForm();
+  }
+
+  function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.add('hidden');
+  }
+
+  function openClassModal(cls = null) {
+    document.getElementById('form-class-id').value = cls ? cls.classId : '';
+    document.getElementById('form-class-name').value = cls ? cls.className : '';
+    document.getElementById('form-class-grade').value = cls ? cls.gradeLevel : '10';
+    document.getElementById('form-class-phase').value = cls ? cls.majorPhase : 'Fase E';
+    document.getElementById('modal-class-title').textContent = cls ? 'Edit Kelas' : 'Tambah Kelas Baru';
+    document.getElementById('modal-class').classList.remove('hidden');
+    lucide.createIcons();
+  }
+
+  function openStudentModal(std = null) {
+    populateClassSelects();
+    document.getElementById('form-student-id').value = std ? std.studentId : '';
+    document.getElementById('form-student-name').value = std ? std.studentName : '';
+    document.getElementById('form-student-nis').value = std ? std.nis : '';
+    document.getElementById('form-student-gender').value = std ? std.gender : 'L';
+    if (std && std.classId) {
+      document.getElementById('form-student-class').value = std.classId;
+    }
+    document.getElementById('modal-student-title').textContent = std ? 'Edit Siswa' : 'Tambah Siswa Baru';
+    document.getElementById('modal-student').classList.remove('hidden');
+    lucide.createIcons();
+  }
+
+  function openBatchStudentModal() {
+    populateClassSelects();
+    document.getElementById('batch-student-text').value = '';
+    document.getElementById('modal-batch-student').classList.remove('hidden');
+    lucide.createIcons();
+  }
+
+  function openSubjectModal(sbj = null) {
+    document.getElementById('form-subject-id').value = sbj ? sbj.subjectId : '';
+    document.getElementById('form-subject-name').value = sbj ? sbj.subjectName : '';
+    document.getElementById('form-subject-grade').value = sbj ? sbj.gradeLevel : '10';
+    document.getElementById('form-subject-wformative').value = sbj ? sbj.weightFormative : 40;
+    document.getElementById('form-subject-wsummative').value = sbj ? sbj.weightSummative : 60;
+    document.getElementById('modal-subject-title').textContent = sbj ? 'Edit Mata Pelajaran' : 'Tambah Mata Pelajaran';
+    document.getElementById('modal-subject').classList.remove('hidden');
+    lucide.createIcons();
+  }
+
+  function populateClassSelects() {
+    const selects = ['student-filter-class', 'form-student-class', 'batch-student-class'];
+    selects.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const currentVal = el.value;
+      let html = id === 'student-filter-class' ? '<option value="">Semua Kelas</option>' : '<option value="" disabled selected>Pilih Rombel / Kelas...</option>';
+      AppState.classes.forEach(c => {
+        html += `<option value="${c.classId}">${c.className} (${c.gradeLevel})</option>`;
+      });
+      el.innerHTML = html;
+      if (currentVal) el.value = currentVal;
+    });
+  }
+
+  function populateConfigForm() {
+    for (const key in AppState.config) {
+      const input = document.getElementById(`cfg-${key}`);
+      if (input) input.value = AppState.config[key];
+    }
+  }
+
+  async function handleSaveConfig(e) {
+    e.preventDefault();
+    const configMap = {
+      SCHOOL_NAME: document.getElementById('cfg-SCHOOL_NAME').value,
+      SCHOOL_NPSN: document.getElementById('cfg-SCHOOL_NPSN').value,
+      TEACHER_NAME: document.getElementById('cfg-TEACHER_NAME').value,
+      TEACHER_NIP: document.getElementById('cfg-TEACHER_NIP').value,
+      HEADMASTER_NAME: document.getElementById('cfg-HEADMASTER_NAME').value,
+      HEADMASTER_NIP: document.getElementById('cfg-HEADMASTER_NIP').value,
+      CURRICULUM_MODE: document.getElementById('cfg-CURRICULUM_MODE').value,
+      ACADEMIC_YEAR: document.getElementById('cfg-ACADEMIC_YEAR').value,
+      SEMESTER: document.getElementById('cfg-SEMESTER').value
+    };
+
+    try {
+      setLoading(true, 'Menyimpan profil sekolah...');
+      const res = await runServer('saveConfig', configMap);
+      if (res && res.success) {
+        AppState.config = { ...AppState.config, ...configMap };
+        updateHeaderInfo();
+        showToast('Profil sekolah dan kurikulum berhasil disimpan!', 'success');
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function loadClassesTable() {
+    try {
+      const res = await runServer('getClasses');
+      AppState.classes = res.data || [];
+      populateClassSelects();
+      const tbody = document.getElementById('master-classes-tbody');
+      if (!tbody) return;
+
+      if (AppState.classes.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500 text-xs">Belum ada kelas yang didaftarkan.</td></tr>`;
+      } else {
+        tbody.innerHTML = AppState.classes.map(c => `
+          <tr class="hover:bg-white/[0.02] border-b border-white/[0.04] transition">
+            <td class="py-3 px-4 font-bold text-white">${c.className}</td>
+            <td class="py-3 px-4 text-slate-400">Tingkat ${c.gradeLevel}</td>
+            <td class="py-3 px-4 text-slate-400">${c.majorPhase || '-'}</td>
+            <td class="py-3 px-4 text-slate-400">${c.academicYear}</td>
+            <td class="py-3 px-4 text-right space-x-2">
+              <button onclick='openClassModal(${JSON.stringify(c)})' class="text-amber-400 hover:text-amber-300 text-xs font-bold">Edit</button>
+              <button onclick="handleDeleteClass('${c.classId}')" class="text-rose-400 hover:text-rose-300 text-xs font-bold">Hapus</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+    } catch (err) {
+      showToast('Gagal memuat kelas: ' + err.message, 'error');
+    }
+  }
+
+  async function handleSaveClass(e) {
+    e.preventDefault();
+    const classData = {
+      classId: document.getElementById('form-class-id').value,
+      className: document.getElementById('form-class-name').value,
+      gradeLevel: document.getElementById('form-class-grade').value,
+      majorPhase: document.getElementById('form-class-phase').value,
+      academicYear: AppState.config.ACADEMIC_YEAR || '2026/2027'
+    };
+
+    try {
+      setLoading(true, 'Menyimpan kelas...');
+      const res = await runServer('saveClass', classData);
+      if (res && res.success) {
+        closeModal('modal-class');
+        showToast('Kelas berhasil disimpan', 'success');
+        await loadClassesTable();
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDeleteClass(classId) {
+    if (!confirm('Apakah Anda yakin ingin menghapus kelas ini?')) return;
+    try {
+      setLoading(true, 'Menghapus kelas...');
+      const res = await runServer('deleteClass', classId);
+      if (res && res.success) {
+        showToast('Kelas berhasil dihapus', 'success');
+        await loadClassesTable();
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function loadStudentsTable() {
+    const classFilter = document.getElementById('student-filter-class').value;
+    try {
+      const res = await runServer('getStudents', classFilter || null);
+      AppState.students = res.data || [];
+      const tbody = document.getElementById('master-students-tbody');
+      const badge = document.getElementById('student-count-badge');
+      if (badge) badge.textContent = `Total: ${AppState.students.length} siswa`;
+      if (!tbody) return;
+
+      if (AppState.students.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500 text-xs">Belum ada siswa di kelas ini.</td></tr>`;
+      } else {
+        const classMap = {};
+        AppState.classes.forEach(c => classMap[c.classId] = c.className);
+
+        tbody.innerHTML = AppState.students.map((s, idx) => `
+          <tr class="hover:bg-white/[0.02] border-b border-white/[0.04] transition">
+            <td class="py-3 px-4 text-slate-500 text-xs">${idx + 1}</td>
+            <td class="py-3 px-4 text-slate-400 font-mono text-xs">${s.nis || '-'}</td>
+            <td class="py-3 px-4 font-bold text-white">${s.studentName}</td>
+            <td class="py-3 px-4">
+              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${s.gender === 'P' ? 'bg-pink-500/20 text-pink-300 border border-pink-500/30' : 'bg-sky-500/20 text-sky-300 border border-sky-500/30'}">
+                ${s.gender}
+              </span>
+            </td>
+            <td class="py-3 px-4 text-slate-300 text-xs">${classMap[s.classId] || s.classId}</td>
+            <td class="py-3 px-4 text-right space-x-2">
+              <button onclick='openStudentModal(${JSON.stringify(s)})' class="text-amber-400 hover:text-amber-300 text-xs font-bold">Edit</button>
+              <button onclick="handleDeleteStudent('${s.studentId}')" class="text-rose-400 hover:text-rose-300 text-xs font-bold">Hapus</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+    } catch (err) {
+      showToast('Gagal memuat siswa: ' + err.message, 'error');
+    }
+  }
+
+  async function handleSaveStudent(e) {
+    e.preventDefault();
+    const studentData = {
+      studentId: document.getElementById('form-student-id').value,
+      studentName: document.getElementById('form-student-name').value,
+      nis: document.getElementById('form-student-nis').value,
+      gender: document.getElementById('form-student-gender').value,
+      classId: document.getElementById('form-student-class').value
+    };
+
+    try {
+      setLoading(true, 'Menyimpan data siswa...');
+      const res = await runServer('saveStudent', studentData);
+      if (res && res.success) {
+        closeModal('modal-student');
+        showToast('Data siswa berhasil disimpan', 'success');
+        await loadStudentsTable();
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleBatchImportStudents(e) {
+    e.preventDefault();
+    const classId = document.getElementById('batch-student-class').value;
+    const text = document.getElementById('batch-student-text').value;
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+    if (lines.length === 0) {
+      showToast('Daftar nama tidak boleh kosong', 'warning');
+      return;
+    }
+
+    try {
+      setLoading(true, `Mengimpor ${lines.length} siswa...`);
+      const res = await runServer('saveBatchStudents', classId, lines);
+      if (res && res.success) {
+        closeModal('modal-batch-student');
+        showToast(res.message || 'Siswa berhasil diimpor', 'success');
+        document.getElementById('student-filter-class').value = classId;
+        await loadStudentsTable();
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDeleteStudent(studentId) {
+    if (!confirm('Hapus data siswa ini?')) return;
+    try {
+      setLoading(true, 'Menghapus data siswa...');
+      const res = await runServer('deleteStudent', studentId);
+      if (res && res.success) {
+        showToast('Siswa berhasil dihapus', 'success');
+        await loadStudentsTable();
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function loadSubjectsTable() {
+    try {
+      const res = await runServer('getSubjects');
+      AppState.subjects = res.data || [];
+      const tbody = document.getElementById('master-subjects-tbody');
+      if (!tbody) return;
+
+      if (AppState.subjects.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500 text-xs">Belum ada mata pelajaran.</td></tr>`;
+      } else {
+        tbody.innerHTML = AppState.subjects.map(s => `
+          <tr class="hover:bg-white/[0.02] border-b border-white/[0.04] transition">
+            <td class="py-3 px-4 font-bold text-white">${s.subjectName}</td>
+            <td class="py-3 px-4 text-slate-400">Tingkat ${s.gradeLevel}</td>
+            <td class="py-3 px-4 text-amber-300 font-bold">${s.weightFormative}%</td>
+            <td class="py-3 px-4 text-sky-300 font-bold">${s.weightSummative}%</td>
+            <td class="py-3 px-4 text-right space-x-2">
+              <button onclick='openSubjectModal(${JSON.stringify(s)})' class="text-amber-400 hover:text-amber-300 text-xs font-bold">Edit</button>
+              <button onclick="handleDeleteSubject('${s.subjectId}')" class="text-rose-400 hover:text-rose-300 text-xs font-bold">Hapus</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+    } catch (err) {
+      showToast('Gagal memuat mata pelajaran: ' + err.message, 'error');
+    }
+  }
+
+  async function handleSaveSubject(e) {
+    e.preventDefault();
+    const subjectData = {
+      subjectId: document.getElementById('form-subject-id').value,
+      subjectName: document.getElementById('form-subject-name').value,
+      gradeLevel: document.getElementById('form-subject-grade').value,
+      weightFormative: document.getElementById('form-subject-wformative').value,
+      weightSummative: document.getElementById('form-subject-wsummative').value
+    };
+
+    try {
+      setLoading(true, 'Menyimpan mata pelajaran...');
+      const res = await runServer('saveSubject', subjectData);
+      if (res && res.success) {
+        closeModal('modal-subject');
+        showToast('Mata pelajaran berhasil disimpan', 'success');
+        await loadSubjectsTable();
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDeleteSubject(subjectId) {
+    if (!confirm('Hapus mata pelajaran ini?')) return;
+    try {
+      setLoading(true, 'Menghapus mata pelajaran...');
+      const res = await runServer('deleteSubject', subjectId);
+      if (res && res.success) {
+        showToast('Mata pelajaran berhasil dihapus', 'success');
+        await loadSubjectsTable();
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function loadMasterView() {
+    populateConfigForm();
+    loadClassesTable();
+  }
+</script>

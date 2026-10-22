@@ -1,0 +1,196 @@
+<!-- View: Halaman Login (Login Page) -->
+<div id="view-login" class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-[#0D0C10]">
+  
+  <!-- Ambient Sunset Peach & Cyan Glow -->
+  <div class="absolute -top-32 -right-32 w-96 h-96 bg-amber-500/15 rounded-full blur-[100px] pointer-events-none"></div>
+  <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-blue-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+  <div class="max-w-md w-full rounded-3xl border border-white/10 bg-[#17161D]/90 backdrop-blur-2xl shadow-2xl p-8 sm:p-10 space-y-6 relative z-10">
+    
+    <!-- Top Accent Glow Line -->
+    <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-80"></div>
+
+    <!-- Header Branding -->
+    <div class="text-center space-y-2 pt-1">
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 via-orange-500/20 to-amber-600/10 border border-amber-500/30 text-amber-300 flex items-center justify-center font-black text-2xl mx-auto shadow-lg shadow-amber-500/10">
+        <i data-lucide="graduation-cap" class="w-7 h-7"></i>
+      </div>
+      <div>
+        <h2 class="text-2xl font-black text-white tracking-tight">SiAGU</h2>
+        <p class="text-[11px] font-bold text-amber-400 uppercase tracking-widest">Sistem Administrasi Guru Terpadu</p>
+      </div>
+      <p class="text-xs text-slate-400 max-w-xs mx-auto leading-relaxed">
+        Silakan masuk dengan akun terdaftar untuk mengakses administrasi dan supervisi sekolah.
+      </p>
+    </div>
+
+    <!-- Role Quick Selector Tab -->
+    <div class="flex p-1 bg-[#121117] rounded-2xl text-xs font-bold gap-1 border border-white/[0.08]">
+      <button type="button" onclick="setLoginRoleTab('guru')" id="login-tab-guru" class="flex-1 py-2 rounded-xl transition bg-gradient-to-r from-sky-400 to-blue-500 text-slate-950 font-bold shadow-md shadow-sky-500/20 flex items-center justify-center gap-1.5">
+        <i data-lucide="user" class="w-4 h-4"></i>
+        <span>Portal Guru</span>
+      </button>
+      <button type="button" onclick="setLoginRoleTab('headmaster')" id="login-tab-headmaster" class="flex-1 py-2 rounded-xl transition text-slate-400 hover:text-white flex items-center justify-center gap-1.5">
+        <i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i>
+        <span>Kepala Sekolah</span>
+      </button>
+    </div>
+
+    <!-- Form Login -->
+    <form id="form-login" onsubmit="handleFormLogin(event)" class="space-y-4">
+      
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1.5" id="label-login-username">
+          Username / NIP / Email Guru
+        </label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+            <i data-lucide="user" class="w-4 h-4"></i>
+          </span>
+          <input type="text" id="login-username" placeholder="Masukkan username atau NIP guru..." class="w-full pl-10 pr-3 py-2.5 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition" required>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1.5">
+          Password / PIN Akun
+        </label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+            <i data-lucide="lock" class="w-4 h-4"></i>
+          </span>
+          <input type="password" id="login-password" placeholder="Masukkan password..." class="w-full pl-10 pr-10 py-2.5 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition" required>
+          <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300">
+            <i data-lucide="eye" id="toggle-eye-icon" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between text-xs pt-1">
+        <label class="flex items-center gap-2 cursor-pointer text-slate-400 hover:text-slate-300">
+          <input type="checkbox" id="login-remember" checked class="rounded border-white/20 bg-[#201F29] text-amber-500 focus:ring-amber-400">
+          <span>Ingat sesi masuk</span>
+        </label>
+        <span class="text-slate-500 text-[11px]">Akun guru dari Kepala Sekolah</span>
+      </div>
+
+      <button type="submit" id="btn-submit-login" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-sm shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2 mt-2">
+        <i data-lucide="log-in" class="w-4 h-4"></i>
+        <span id="btn-login-text">Masuk ke Sistem</span>
+      </button>
+
+      <button type="button" onclick="cancelLoginAndReturn()" id="btn-return-app" class="hidden w-full text-center text-xs text-amber-400 hover:text-amber-300 font-bold py-1">
+        ← Kembali ke Dashboard Aplikasi
+      </button>
+
+    </form>
+
+    <!-- Quick Demo Credential Pills (Mempermudah Pengujian) -->
+    <div class="pt-4 border-t border-white/[0.08] space-y-2">
+      <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest text-center">Akun Default Siap Pakai:</p>
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <button type="button" onclick="fillQuickLogin('admin', 'kepsek123', 'headmaster')" class="p-2.5 bg-[#1F1E28] hover:bg-[#252431] border border-amber-500/20 rounded-xl text-left transition space-y-0.5">
+          <div class="flex items-center gap-1 font-bold text-amber-300">
+            <i data-lucide="shield" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span>Kepala Sekolah</span>
+          </div>
+          <p class="text-[10px] text-slate-400 font-mono">admin / kepsek123</p>
+        </button>
+
+        <button type="button" onclick="fillQuickLogin('guru_budi', 'guru123', 'guru')" class="p-2.5 bg-[#1F1E28] hover:bg-[#252431] border border-sky-500/20 rounded-xl text-left transition space-y-0.5">
+          <div class="flex items-center gap-1 font-bold text-sky-300">
+            <i data-lucide="user" class="w-3.5 h-3.5 text-sky-400"></i>
+            <span>Guru Pengampu</span>
+          </div>
+          <p class="text-[10px] text-slate-400 font-mono">guru_budi / guru123</p>
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer Copyright -->
+    <div class="text-center text-[11px] text-slate-500 pt-1">
+      <p>Serverless Google Apps Script • Terhubung ke Spreadsheet Sekolah</p>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  let activeLoginRole = 'guru';
+
+  function setLoginRoleTab(role) {
+    activeLoginRole = role;
+    const tabGuru = document.getElementById('login-tab-guru');
+    const tabKepsek = document.getElementById('login-tab-headmaster');
+    const labelUser = document.getElementById('label-login-username');
+    const inputUser = document.getElementById('login-username');
+
+    if (role === 'headmaster') {
+      tabKepsek.className = 'flex-1 py-2 rounded-xl transition bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold shadow-md shadow-amber-500/20 flex items-center justify-center gap-1.5';
+      tabGuru.className = 'flex-1 py-2 rounded-xl transition text-slate-400 hover:text-white flex items-center justify-center gap-1.5';
+      labelUser.textContent = 'Username / NIP Kepala Sekolah';
+      inputUser.placeholder = 'admin atau NIP Kepala Sekolah...';
+    } else {
+      tabGuru.className = 'flex-1 py-2 rounded-xl transition bg-gradient-to-r from-sky-400 to-blue-500 text-slate-950 font-bold shadow-md shadow-sky-500/20 flex items-center justify-center gap-1.5';
+      tabKepsek.className = 'flex-1 py-2 rounded-xl transition text-slate-400 hover:text-white flex items-center justify-center gap-1.5';
+      labelUser.textContent = 'Username / NIP / Email Guru';
+      inputUser.placeholder = 'Masukkan username atau NIP guru...';
+    }
+  }
+
+  function togglePasswordVisibility() {
+    const input = document.getElementById('login-password');
+    const icon = document.getElementById('toggle-eye-icon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.setAttribute('data-lucide', 'eye-off');
+    } else {
+      input.type = 'password';
+      icon.setAttribute('data-lucide', 'eye');
+    }
+    lucide.createIcons();
+  }
+
+  function fillQuickLogin(u, p, role) {
+    setLoginRoleTab(role);
+    document.getElementById('login-username').value = u;
+    document.getElementById('login-password').value = p;
+  }
+
+  async function handleFormLogin(e) {
+    e.preventDefault();
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value.trim();
+
+    if (!username || !password) {
+      showToast('Username dan password wajib diisi', 'warning');
+      return;
+    }
+
+    try {
+      setLoading(true, 'Memverifikasi akun...');
+      const res = await runServer('loginUser', username, password);
+
+      if (res && res.success && res.data) {
+        const userData = res.data.user;
+        const token = res.data.token;
+
+        // Simpan sesi login ke localStorage
+        localStorage.setItem('siagu_auth_user', JSON.stringify(userData));
+        localStorage.setItem('siagu_auth_token', token);
+
+        showToast(`Selamat datang, ${userData.name}!`, 'success');
+
+        // Beralih ke antarmuka aplikasi utama
+        applyAuthenticatedUser(userData);
+      } else {
+        showToast(res ? res.error : 'Login gagal', 'error');
+      }
+    } catch (err) {
+      showToast('Gagal masuk: ' + err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+</script>

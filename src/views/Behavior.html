@@ -1,0 +1,268 @@
+<!-- View: Catatan Sikap & Karakter Siswa -->
+<div id="view-behavior" class="view-panel space-y-6 hidden">
+
+  <!-- Header Section -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h2 class="text-xl sm:text-2xl font-extrabold text-white">Catatan Sikap & Karakter (P3)</h2>
+      <p class="text-xs text-slate-400">Jurnal anekdot pembiasaan karakter, dimensi Profil Pelajar Pancasila, dan bimbingan siswa.</p>
+    </div>
+
+    <button onclick="openBehaviorModal()" class="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition inline-flex items-center gap-2 self-start sm:self-auto">
+      <i data-lucide="plus" class="w-4 h-4"></i>
+      <span>Catat Insiden / Sikap Baru</span>
+    </button>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+    <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+      <div class="flex items-center gap-2">
+        <label class="text-xs font-bold text-slate-300">Kelas:</label>
+        <select id="bhv-filter-class" onchange="loadBehaviorNotesList()" class="px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs font-semibold text-white focus:border-amber-400 outline-none">
+          <option value="">Semua Kelas</option>
+        </select>
+      </div>
+    </div>
+
+    <span id="bhv-count-badge" class="text-xs font-semibold text-slate-400 self-end sm:self-auto">
+      Total: 0 catatan
+    </span>
+  </div>
+
+  <!-- Timeline Catatan Sikap Container -->
+  <div id="behavior-list-container" class="space-y-4">
+    <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 p-12 text-center text-slate-500 text-xs">
+      Memuat catatan sikap siswa...
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal Tambah/Edit Catatan Sikap -->
+<div id="modal-behavior" class="fixed inset-0 bg-[#0A090E]/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+  <div class="rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-white/10 bg-[#181722] text-white space-y-4">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+      <h4 class="font-extrabold text-white text-base" id="modal-behavior-title">Catat Sikap & Perilaku Siswa</h4>
+      <button onclick="closeModal('modal-behavior')" class="p-1 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <form onsubmit="handleSaveBehavior(event)" class="space-y-4">
+      <input type="hidden" id="form-bhv-id">
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Kelas</label>
+          <select id="form-bhv-class" onchange="populateBehaviorStudentsByClass()" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none" required>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Nama Siswa</label>
+          <select id="form-bhv-student" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none" required>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Tanggal Peristiwa</label>
+          <input type="date" id="form-bhv-date" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none" required>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Dimensi Karakter / Sikap</label>
+          <select id="form-bhv-dimension" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none">
+            <option value="Gotong Royong">Gotong Royong</option>
+            <option value="Mandiri">Mandiri</option>
+            <option value="Bernalar Kritis">Bernalar Kritis</option>
+            <option value="Kreatif">Kreatif</option>
+            <option value="Beriman & Bertakwa">Beriman & Bertakwa</option>
+            <option value="Berkebinekaan Global">Berkebinekaan Global</option>
+            <option value="Sikap Spiritual (K13)">Sikap Spiritual (K13)</option>
+            <option value="Sikap Sosial (K13)">Sikap Sosial (K13)</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Uraian Kejadian / Perilaku (Positif / Pembinaan)</label>
+        <textarea id="form-bhv-description" rows="3" placeholder="Contoh: Mengambil inisiatif merapikan alat laboratorium biologi setelah praktikum selesai..." class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required></textarea>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Tindak Lanjut / Apresiasi / Bimbingan Guru</label>
+        <textarea id="form-bhv-followup" rows="2" placeholder="Contoh: Diberikan apresiasi lisan dan dicatat sebagai poin keaktifan..." class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:border-amber-400 outline-none"></textarea>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-3 border-t border-white/[0.08]">
+        <button type="button" onclick="closeModal('modal-behavior')" class="px-4 py-2 border border-white/10 rounded-xl text-xs font-semibold text-slate-400 hover:text-white">Batal</button>
+        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20">Simpan Catatan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function loadBehaviorView() {
+    populateBehaviorClassSelect();
+    loadBehaviorNotesList();
+  }
+
+  function populateBehaviorClassSelect() {
+    const filterClass = document.getElementById('bhv-filter-class');
+    const formClass = document.getElementById('form-bhv-class');
+
+    if (filterClass) {
+      let fHtml = '<option value="">Semua Kelas</option>';
+      AppState.classes.forEach(c => fHtml += `<option value="${c.classId}">${c.className}</option>`);
+      filterClass.innerHTML = fHtml;
+    }
+
+    if (formClass) {
+      let cHtml = '<option value="" disabled selected>Pilih Rombel Kelas...</option>';
+      AppState.classes.forEach(c => cHtml += `<option value="${c.classId}">${c.className}</option>`);
+      formClass.innerHTML = cHtml;
+    }
+  }
+
+  async function populateBehaviorStudentsByClass() {
+    const classId = document.getElementById('form-bhv-class').value;
+    const studentSelect = document.getElementById('form-bhv-student');
+    if (!classId || !studentSelect) return;
+
+    try {
+      const res = await runServer('getStudents', classId);
+      const students = res.data || [];
+      let html = '<option value="" disabled selected>Pilih Siswa...</option>';
+      students.forEach(s => html += `<option value="${s.studentId}">${s.studentName}</option>`);
+      studentSelect.innerHTML = html;
+    } catch (err) {
+      showToast('Gagal memuat siswa: ' + err.message, 'error');
+    }
+  }
+
+  async function loadBehaviorNotesList() {
+    const classId = document.getElementById('bhv-filter-class').value;
+    try {
+      setLoading(true, 'Memuat catatan sikap...');
+      const res = await runServer('getBehaviorNotes', classId || null);
+      const notes = res.data || [];
+      renderBehaviorCards(notes);
+    } catch (err) {
+      showToast('Gagal memuat catatan: ' + err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function renderBehaviorCards(list) {
+    const container = document.getElementById('behavior-list-container');
+    const badge = document.getElementById('bhv-count-badge');
+    if (badge) badge.textContent = `Total: ${list.length} catatan`;
+    if (!container) return;
+
+    if (list.length === 0) {
+      container.innerHTML = `
+        <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 p-12 text-center space-y-3">
+          <div class="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center justify-center mx-auto">
+            <i data-lucide="heart-handshake" class="w-6 h-6"></i>
+          </div>
+          <p class="text-sm font-bold text-white">Belum ada catatan sikap / karakter</p>
+          <p class="text-xs text-slate-400">Gunakan fitur ini untuk merekam perkembangan Profil Pelajar Pancasila atau catatan pembinaan siswa.</p>
+        </div>
+      `;
+      lucide.createIcons();
+      return;
+    }
+
+    container.innerHTML = list.map(b => `
+      <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg p-5 hover:border-amber-500/30 transition space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/[0.06] pb-3">
+          <div class="flex items-center gap-2.5">
+            <span class="px-3 py-1 rounded-xl text-xs font-extrabold bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-sm">
+              ${b.studentName}
+            </span>
+            <span class="px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-sky-500/15 text-sky-300 border border-sky-500/30">
+              ${b.dimension}
+            </span>
+          </div>
+          <span class="text-xs text-slate-400 font-medium">${b.date}</span>
+        </div>
+
+        <div>
+          <p class="text-xs text-slate-200 leading-relaxed font-medium">${b.description}</p>
+        </div>
+
+        ${b.followUp ? `
+          <div class="p-3 bg-[#1F1E28] rounded-xl text-xs text-slate-300 border-l-2 border-amber-400">
+            <span class="font-bold text-amber-300">Tindak Lanjut / Arahan:</span> ${b.followUp}
+          </div>
+        ` : ''}
+
+        <div class="flex items-center justify-end gap-3 pt-1 text-xs border-t border-white/[0.04]">
+          <button onclick="handleDeleteBehavior('${b.behaviorId}')" class="text-rose-400 hover:text-rose-300 font-bold inline-flex items-center gap-1 transition">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <span>Hapus</span>
+          </button>
+        </div>
+      </div>
+    `).join('');
+
+    lucide.createIcons();
+  }
+
+  function openBehaviorModal() {
+    populateBehaviorClassSelect();
+    const todayStr = new Date().toISOString().split('T')[0];
+    document.getElementById('form-bhv-id').value = '';
+    document.getElementById('form-bhv-date').value = todayStr;
+    document.getElementById('form-bhv-description').value = '';
+    document.getElementById('form-bhv-followup').value = '';
+    document.getElementById('modal-behavior').classList.remove('hidden');
+    lucide.createIcons();
+  }
+
+  async function handleSaveBehavior(e) {
+    e.preventDefault();
+    const noteData = {
+      behaviorId: document.getElementById('form-bhv-id').value,
+      classId: document.getElementById('form-bhv-class').value,
+      studentId: document.getElementById('form-bhv-student').value,
+      date: document.getElementById('form-bhv-date').value,
+      dimension: document.getElementById('form-bhv-dimension').value,
+      description: document.getElementById('form-bhv-description').value,
+      followUp: document.getElementById('form-bhv-followup').value
+    };
+
+    try {
+      setLoading(true, 'Menyimpan catatan sikap...');
+      const res = await runServer('saveBehaviorNote', noteData);
+      if (res && res.success) {
+        closeModal('modal-behavior');
+        showToast('Catatan sikap berhasil disimpan', 'success');
+        await loadBehaviorNotesList();
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDeleteBehavior(behaviorId) {
+    if (!confirm('Hapus catatan sikap ini?')) return;
+    try {
+      setLoading(true, 'Menghapus catatan...');
+      const res = await runServer('deleteBehaviorNote', behaviorId);
+      if (res && res.success) {
+        showToast('Catatan berhasil dihapus', 'success');
+        await loadBehaviorNotesList();
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+</script>

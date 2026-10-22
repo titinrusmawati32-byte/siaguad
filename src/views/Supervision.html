@@ -1,0 +1,843 @@
+<!-- View: Monitoring & Supervisi Kepala Sekolah / Admin -->
+<div id="view-supervision" class="view-panel space-y-6 hidden">
+
+  <!-- Header Section -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 mb-1">
+        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-amber-400"></i>
+        <span>Portal Khusus Kepala Sekolah / Admin Supervisi</span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-extrabold text-white">Monitoring & Supervisi Administrasi Guru</h2>
+      <p class="text-xs text-slate-400">Pantau kepatuhan administrasi, berikan telaah pembinaan, dan setujui perangkat ajar seluruh guru.</p>
+    </div>
+
+    <!-- Tab Navigation Pills -->
+    <div class="inline-flex p-1 bg-[#121117] border border-white/10 rounded-2xl text-xs font-bold gap-1 self-start sm:self-auto overflow-x-auto max-w-full">
+      <button onclick="switchSupervisionTab('monitoring')" id="spv-btn-monitoring" class="spv-tab-btn px-3.5 py-2 rounded-xl transition bg-[#7CC4FA] text-slate-950 font-extrabold shadow-md shadow-sky-500/20">
+        Progres Guru
+      </button>
+      <button onclick="switchSupervisionTab('teachers')" id="spv-btn-teachers" class="spv-tab-btn px-3.5 py-2 rounded-xl transition text-slate-400 hover:text-white">
+        Daftar Guru
+      </button>
+      <button onclick="switchSupervisionTab('recap')" id="spv-btn-recap" class="spv-tab-btn px-3.5 py-2 rounded-xl transition text-slate-400 hover:text-white">
+        Laporan Supervisi Dinas
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI CARDS KEPALA SEKOLAH (4 Signature Gradients) -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+    
+    <!-- KPI 1: Golden Olive / Bronze (Total Guru) -->
+    <div class="rounded-2xl p-5 border border-amber-500/25 bg-gradient-to-br from-[#3D3728] via-[#262116] to-[#17140E] shadow-lg backdrop-blur-xl transition hover:scale-[1.01]">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold text-amber-200/80 uppercase tracking-wider">Total Guru</p>
+        <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-300 flex items-center justify-center">
+          <i data-lucide="user-check" class="w-4 h-4"></i>
+        </div>
+      </div>
+      <div class="mt-4 flex items-baseline justify-between">
+        <h3 id="spv-stat-total-teachers" class="text-3xl font-extrabold text-white tracking-tight">-</h3>
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+          Pendidik
+        </span>
+      </div>
+      <p class="text-[11px] text-amber-200/60 mt-1">Terdaftar di sekolah</p>
+    </div>
+
+    <!-- KPI 2: Emerald / Teal Cobalt (Sudah Disetujui) -->
+    <div class="rounded-2xl p-5 border border-emerald-500/25 bg-gradient-to-br from-[#1E3A34] via-[#162724] to-[#0E1B19] shadow-lg backdrop-blur-xl transition hover:scale-[1.01]">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold text-emerald-200/80 uppercase tracking-wider">Sudah Disetujui</p>
+        <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 flex items-center justify-center">
+          <i data-lucide="check-circle" class="w-4 h-4"></i>
+        </div>
+      </div>
+      <div class="mt-4 flex items-baseline justify-between">
+        <h3 id="spv-stat-approved" class="text-3xl font-extrabold text-white tracking-tight">-</h3>
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          Tuntas
+        </span>
+      </div>
+      <p class="text-[11px] text-emerald-200/60 mt-1">Administrasi terverifikasi</p>
+    </div>
+
+    <!-- KPI 3: Deep Berry / Magenta (Perlu Telaah) -->
+    <div class="rounded-2xl p-5 border border-pink-500/25 bg-gradient-to-br from-[#53243B] via-[#381626] to-[#220D17] shadow-lg backdrop-blur-xl transition hover:scale-[1.01]">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold text-pink-200/80 uppercase tracking-wider">Perlu Telaah</p>
+        <div class="w-9 h-9 rounded-xl bg-pink-500/20 border border-pink-500/30 text-pink-300 flex items-center justify-center">
+          <i data-lucide="clock" class="w-4 h-4"></i>
+        </div>
+      </div>
+      <div class="mt-4 flex items-baseline justify-between">
+        <h3 id="spv-stat-pending" class="text-3xl font-extrabold text-white tracking-tight">-</h3>
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/30">
+          Menunggu
+        </span>
+      </div>
+      <p class="text-[11px] text-pink-200/60 mt-1">Belum disupervisi</p>
+    </div>
+
+    <!-- KPI 4: Sunset Terracotta / Amber (Rata Kepatuhan) -->
+    <div class="rounded-2xl p-5 border border-orange-500/25 bg-gradient-to-br from-[#8C3E1F] via-[#5C2611] to-[#361407] shadow-lg backdrop-blur-xl transition hover:scale-[1.01]">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold text-orange-200/80 uppercase tracking-wider">Rata Kepatuhan</p>
+        <div class="w-9 h-9 rounded-xl bg-orange-500/20 border border-orange-500/30 text-orange-300 flex items-center justify-center">
+          <i data-lucide="percent" class="w-4 h-4"></i>
+        </div>
+      </div>
+      <div class="mt-4 flex items-baseline justify-between">
+        <h3 id="spv-stat-avg-completeness" class="text-3xl font-extrabold text-white tracking-tight">-%</h3>
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-500/20 text-orange-300 border border-orange-500/30">
+          Skor Sekolah
+        </span>
+      </div>
+      <p class="text-[11px] text-orange-200/60 mt-1">Kelengkapan keseluruhan</p>
+    </div>
+
+  </div>
+
+  <!-- TAB 1: MONITORING PROGRES GURU -->
+  <div id="spv-panel-monitoring" class="spv-content space-y-4">
+    <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg overflow-hidden">
+      <div class="p-5 border-b border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white/[0.01]">
+        <div>
+          <h3 class="font-extrabold text-white text-base">Tabel Pemantauan Administrasi Pengajaran</h3>
+          <p class="text-xs text-slate-400">Periksa keterisian Modul Ajar, Jurnal Harian, Presensi, dan Penilaian per guru.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="text" id="spv-search-teacher" oninput="filterMonitoringTable()" placeholder="Cari nama guru / mapel..." class="px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none w-56 transition">
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-white/[0.02] text-slate-400 text-xs uppercase font-semibold border-b border-white/[0.06]">
+            <tr>
+              <th class="py-3 px-4 w-10 text-center">No</th>
+              <th class="py-3 px-4">Nama Guru & Mapel</th>
+              <th class="py-3 px-3 text-center">Modul Ajar</th>
+              <th class="py-3 px-3 text-center">Jurnal</th>
+              <th class="py-3 px-3 text-center">Presensi</th>
+              <th class="py-3 px-3 text-center">Nilai</th>
+              <th class="py-3 px-4 w-36 text-center">Progres</th>
+              <th class="py-3 px-3 text-center">Status Telaah</th>
+              <th class="py-3 px-4 text-right">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="spv-monitoring-tbody" class="divide-y divide-white/[0.05]">
+            <tr><td colspan="9" class="py-8 text-center text-slate-500 text-xs">Memuat data pemantauan administrasi guru...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: DAFTAR GURU -->
+  <div id="spv-panel-teachers" class="spv-content space-y-4 hidden">
+    <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg p-6 space-y-6">
+      <div class="flex items-center justify-between border-b border-white/[0.08] pb-4">
+        <div>
+          <h3 class="font-extrabold text-white text-base">Data Master Guru Sekolah</h3>
+          <p class="text-xs text-slate-400">Kelola daftar seluruh tenaga pendidik yang di-supervisi.</p>
+        </div>
+        <button onclick="openTeacherModal()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20 transition inline-flex items-center gap-1.5">
+          <i data-lucide="user-plus" class="w-4 h-4"></i>
+          <span>Tambah Guru Baru</span>
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-white/[0.02] text-slate-400 text-xs uppercase font-semibold border-b border-white/[0.06]">
+            <tr>
+              <th class="py-3 px-4">Nama Lengkap & NIP</th>
+              <th class="py-3 px-4">Mata Pelajaran</th>
+              <th class="py-3 px-4">Akun Login Guru (Username & PIN)</th>
+              <th class="py-3 px-4 text-center">Status</th>
+              <th class="py-3 px-4 text-right">Aksi & Kredensial</th>
+            </tr>
+          </thead>
+          <tbody id="spv-teachers-tbody" class="divide-y divide-white/[0.05]">
+            <tr><td colspan="5" class="py-6 text-center text-slate-500 text-xs">Memuat daftar guru...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: REKAP LAPORAN SUPERVISI DINAS (SIAP CETAK) -->
+  <div id="spv-panel-recap" class="spv-content space-y-4 hidden">
+    <div class="flex justify-end no-print">
+      <button onclick="window.print()" class="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-lg shadow-amber-500/20 transition inline-flex items-center gap-2">
+        <i data-lucide="printer" class="w-4 h-4"></i>
+        <span>Cetak Laporan Supervisi Sekolah (A4)</span>
+      </button>
+    </div>
+
+    <div class="bg-white text-slate-900 rounded-3xl border border-slate-200/80 shadow-2xl p-8 sm:p-12 print-card space-y-6">
+      
+      <!-- KOP RESMI LAPORAN SUPERVISI -->
+      <div class="border-b-2 border-slate-900 pb-3 text-center space-y-0.5">
+        <h3 id="spv-recap-school-name" class="text-xl sm:text-2xl font-black uppercase tracking-wide text-slate-900">SMA NEGERI 1 INDONESIA</h3>
+        <p class="text-xs text-slate-700 font-medium">NPSN: <span id="spv-recap-npsn">20104050</span> • Laporan Supervisi Akademik & Manajerial Guru</p>
+      </div>
+
+      <div class="text-center space-y-1">
+        <h4 class="text-base sm:text-lg font-extrabold uppercase underline underline-offset-4 text-slate-900">
+          REKAPITULASI HASIL SUPERVISI ADMINISTRASI GURU
+        </h4>
+        <p class="text-xs text-slate-600">
+          Tahun Ajaran <span id="spv-recap-academic-year">2026/2027</span> • Semester <span id="spv-recap-semester">Ganjil</span>
+        </p>
+      </div>
+
+      <div id="spv-recap-table-container" class="overflow-x-auto">
+        <p class="text-center py-6 text-xs text-slate-400">Menyiapkan rekapitulasi nilai supervisi...</p>
+      </div>
+
+      <!-- PENGESAHAN KEPALA SEKOLAH & PENGAWAS -->
+      <div class="pt-8 grid grid-cols-2 text-xs text-slate-900 break-inside-avoid">
+        <div class="text-center space-y-16">
+          <p>Mengetahui,<br><span class="font-semibold">Pengawas Pembina Sekolah</span></p>
+          <div>
+            <p class="font-bold underline text-sm">Drs. H. Ahmad Sudrajat, M.Pd.</p>
+            <p class="text-[11px]">NIP. 19680712 199403 1 002</p>
+          </div>
+        </div>
+
+        <div class="text-center space-y-16">
+          <p><span id="spv-recap-date">Nusantara, 22 Oktober 2026</span><br><span class="font-semibold">Kepala Satuan Pendidikan</span></p>
+          <div>
+            <p id="spv-recap-headmaster" class="font-bold underline text-sm">-</p>
+            <p class="text-[11px]">NIP. <span id="spv-recap-headmaster-nip">-</span></p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal Form Telaah & Supervisi Kepala Sekolah -->
+<div id="modal-supervise-teacher" class="fixed inset-0 bg-[#0A090E]/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4 overflow-y-auto">
+  <div class="rounded-3xl max-w-xl w-full p-6 sm:p-7 shadow-2xl border border-white/10 bg-[#181722] text-white space-y-4 my-8">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+      <div>
+        <h4 class="font-extrabold text-white text-base">Lembar Telaah Supervisi Guru</h4>
+        <p class="text-xs text-slate-400" id="modal-spv-teacher-info">Guru: -</p>
+      </div>
+      <button onclick="closeModal('modal-supervise-teacher')" class="p-1 text-slate-400 hover:text-white transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <form onsubmit="handleSaveTeacherSupervision(event)" class="space-y-4">
+      <input type="hidden" id="spv-form-teacher-id">
+
+      <!-- 4 Indikator Penilaian Supervisi -->
+      <div class="space-y-3 bg-[#201F2B] p-4 rounded-2xl border border-white/10">
+        <p class="text-xs font-extrabold text-amber-300 uppercase tracking-widest">Skor Aspek Administrasi (0 - 100)</p>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">1. Perangkat Ajar / Modul</label>
+            <input type="number" id="spv-score-dev" min="0" max="100" value="90" oninput="calculateSupervisionScore()" class="w-full px-3 py-2 bg-[#17161E] border border-white/10 rounded-xl text-sm font-bold text-amber-300 focus:border-amber-400 outline-none" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">2. Jurnal Mengajar Harian</label>
+            <input type="number" id="spv-score-jrn" min="0" max="100" value="88" oninput="calculateSupervisionScore()" class="w-full px-3 py-2 bg-[#17161E] border border-white/10 rounded-xl text-sm font-bold text-amber-300 focus:border-amber-400 outline-none" required>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">3. Presensi & Kehadiran</label>
+            <input type="number" id="spv-score-att" min="0" max="100" value="92" oninput="calculateSupervisionScore()" class="w-full px-3 py-2 bg-[#17161E] border border-white/10 rounded-xl text-sm font-bold text-amber-300 focus:border-amber-400 outline-none" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">4. Penilaian & Leger</label>
+            <input type="number" id="spv-score-asm" min="0" max="100" value="85" oninput="calculateSupervisionScore()" class="w-full px-3 py-2 bg-[#17161E] border border-white/10 rounded-xl text-sm font-bold text-amber-300 focus:border-amber-400 outline-none" required>
+          </div>
+        </div>
+
+        <!-- Live Score & Predicate -->
+        <div class="pt-2 border-t border-white/10 flex items-center justify-between text-xs">
+          <span class="font-bold text-slate-300">Rata-rata Nilai Supervisi:</span>
+          <div class="flex items-center gap-2">
+            <span id="spv-live-score" class="font-black text-lg text-amber-300">89</span>
+            <span id="spv-live-predicate" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Baik</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Catatan Rekomendasi Kepala Sekolah -->
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Catatan Pembinaan / Rekomendasi Kepala Sekolah</label>
+        <textarea id="spv-feedback" rows="3" placeholder="Contoh: Administrasi pembelajaran sangat teratur dan lengkap. Pertahankan diferensiasi pembelajaran pada kegiatan inti modul ajar..." class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none" required></textarea>
+      </div>
+
+      <!-- Status Persetujuan -->
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Keputusan Status Supervisi</label>
+        <select id="spv-status-approval" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm font-bold text-white focus:border-amber-400 outline-none">
+          <option value="Disetujui" class="bg-[#181722] text-emerald-400">Disetujui (Lengkap & Terverifikasi)</option>
+          <option value="Perlu Perbaikan" class="bg-[#181722] text-rose-400">Perlu Perbaikan (Ada berkas yang belum tuntas)</option>
+          <option value="Dalam Peninjauan" class="bg-[#181722] text-amber-400">Dalam Peninjauan</option>
+        </select>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-3 border-t border-white/[0.08]">
+        <button type="button" onclick="closeModal('modal-supervise-teacher')" class="px-4 py-2 border border-white/10 rounded-xl text-xs font-semibold text-slate-400 hover:text-white">Batal</button>
+        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20 inline-flex items-center gap-1.5">
+          <i data-lucide="check" class="w-4 h-4"></i>
+          <span>Tanda Tangani & Simpan Hasil Supervisi</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Tambah Guru -->
+<div id="modal-teacher" class="fixed inset-0 bg-[#0A090E]/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+  <div class="rounded-3xl max-w-md w-full p-6 shadow-2xl border border-white/10 bg-[#181722] text-white space-y-4">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+      <h4 class="font-extrabold text-white text-base" id="modal-teacher-title">Tambah Tenaga Pendidik</h4>
+      <button onclick="closeModal('modal-teacher')" class="p-1 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+    <form onsubmit="handleSaveTeacher(event)" class="space-y-4">
+      <input type="hidden" id="form-teacher-id">
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Nama Lengkap Guru (dengan Gelar)</label>
+        <input type="text" id="form-teacher-name" placeholder="Nama Guru, S.Pd." class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">NIP / NUPTK</label>
+          <input type="text" id="form-teacher-nip" placeholder="1985..." class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Mata Pelajaran</label>
+          <input type="text" id="form-teacher-subject" placeholder="Matematika / Biologi" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required>
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Email Belajar.id / Google</label>
+        <input type="email" id="form-teacher-email" placeholder="nama@guru.sma.belajar.id" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none">
+      </div>
+      <div class="flex justify-end gap-2 pt-3 border-t border-white/[0.08]">
+        <button type="button" onclick="closeModal('modal-teacher')" class="px-4 py-2 border border-white/10 rounded-xl text-xs font-semibold text-slate-400 hover:text-white">Batal</button>
+        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20">Simpan Guru</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Generate / Reset Akun Guru -->
+<div id="modal-generate-account" class="fixed inset-0 bg-[#0A090E]/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+  <div class="rounded-3xl max-w-md w-full p-6 shadow-2xl border border-white/10 bg-[#181722] text-white space-y-4">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+      <div>
+        <h4 class="font-extrabold text-white text-base">Generate Akun Login Guru</h4>
+        <p class="text-xs text-slate-400" id="gen-teacher-title-info">Guru: -</p>
+      </div>
+      <button onclick="closeModal('modal-generate-account')" class="p-1 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <form onsubmit="handleSaveGenerateAccount(event)" class="space-y-4">
+      <input type="hidden" id="gen-teacher-id">
+
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Username Login</label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+            <i data-lucide="user" class="w-4 h-4"></i>
+          </span>
+          <input type="text" id="gen-username" class="w-full pl-9 pr-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs font-mono font-bold text-amber-300 outline-none focus:border-amber-400" required>
+        </div>
+        <p class="text-[10px] text-slate-500 mt-1">Username unik untuk guru bersangkutan masuk ke sistem SiAGU.</p>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Password / PIN Keamanan</label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+            <i data-lucide="key" class="w-4 h-4"></i>
+          </span>
+          <input type="text" id="gen-password" class="w-full pl-9 pr-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs font-mono font-bold text-sky-300 outline-none focus:border-amber-400" required>
+        </div>
+        <p class="text-[10px] text-slate-500 mt-1">Password bawaan atau PIN 6 karakter acak.</p>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-3 border-t border-white/[0.08]">
+        <button type="button" onclick="closeModal('modal-generate-account')" class="px-4 py-2 border border-white/10 rounded-xl text-xs font-semibold text-slate-400 hover:text-white">Batal</button>
+        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20">Simpan & Aktifkan Akun</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Slip Akun Guru Siap Kirim -->
+<div id="modal-account-slip" class="fixed inset-0 bg-[#0A090E]/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+  <div class="rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-white/10 bg-[#181722] text-white space-y-4">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+      <h4 class="font-extrabold text-white text-base">Kartu Akses Login Guru</h4>
+      <button onclick="closeModal('modal-account-slip')" class="p-1 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <!-- Tampilan Kartu Kredensial -->
+    <div class="p-4 bg-[#201F2B] border border-amber-500/20 rounded-2xl space-y-3 text-xs">
+      <div class="border-b border-white/[0.08] pb-2">
+        <h5 class="font-extrabold text-amber-300 text-sm" id="slip-teacher-name">Nama Guru</h5>
+        <p class="text-[11px] text-sky-300 font-semibold" id="slip-teacher-subject">Mata Pelajaran</p>
+        <p class="text-[10px] text-slate-400">NIP: <span id="slip-teacher-nip">-</span></p>
+      </div>
+
+      <div class="space-y-2">
+        <div class="flex justify-between items-center bg-[#17161E] p-2 rounded-xl border border-white/[0.06]">
+          <span class="text-slate-400 font-medium">Username:</span>
+          <span class="font-mono font-bold text-amber-300 text-xs" id="slip-username">-</span>
+        </div>
+        <div class="flex justify-between items-center bg-[#17161E] p-2 rounded-xl border border-white/[0.06]">
+          <span class="text-slate-400 font-medium">Password/PIN:</span>
+          <span class="font-mono font-bold text-sky-300 text-xs" id="slip-password">-</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-2 pt-2 border-t border-white/[0.08]">
+      <button type="button" onclick="closeModal('modal-account-slip')" class="px-3.5 py-2 border border-white/10 rounded-xl text-xs font-semibold text-slate-400 hover:text-white">Tutup</button>
+      <button type="button" onclick="copyAccountSlipText()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20 inline-flex items-center gap-1.5">
+        <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+        <span>Salin Info WhatsApp</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let rawMonitoringList = [];
+
+  function switchSupervisionTab(tab) {
+    document.querySelectorAll('.spv-content').forEach(c => c.classList.add('hidden'));
+    document.querySelectorAll('.spv-tab-btn').forEach(b => {
+      b.classList.remove('bg-[#7CC4FA]', 'text-slate-950', 'font-extrabold', 'shadow-md', 'shadow-sky-500/20');
+      b.classList.add('text-slate-400', 'hover:text-white');
+    });
+
+    const panel = document.getElementById(`spv-panel-${tab}`);
+    const btn = document.getElementById(`spv-btn-${tab}`);
+    if (panel) panel.classList.remove('hidden');
+    if (btn) {
+      btn.classList.add('bg-[#7CC4FA]', 'text-slate-950', 'font-extrabold', 'shadow-md', 'shadow-sky-500/20');
+      btn.classList.remove('text-slate-400', 'hover:text-white');
+    }
+
+    if (tab === 'monitoring') loadSupervisionView();
+    if (tab === 'teachers') loadTeachersTable();
+    if (tab === 'recap') loadSupervisionRecapReport();
+  }
+
+  async function loadSupervisionView() {
+    try {
+      setLoading(true, 'Memuat data monitoring kepala sekolah...');
+      const res = await runServer('getMonitoringDashboardData');
+      const data = res.data || {};
+
+      // Update KPI
+      document.getElementById('spv-stat-total-teachers').textContent = data.totalTeachers || 0;
+      document.getElementById('spv-stat-approved').textContent = data.approvedCount || 0;
+      document.getElementById('spv-stat-pending').textContent = data.pendingCount || 0;
+      document.getElementById('spv-stat-avg-completeness').textContent = (data.avgCompleteness || 0) + '%';
+
+      rawMonitoringList = data.teacherProgress || [];
+      renderMonitoringTable(rawMonitoringList);
+    } catch (err) {
+      showToast('Gagal memuat monitoring: ' + err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function renderMonitoringTable(list) {
+    const tbody = document.getElementById('spv-monitoring-tbody');
+    if (!tbody) return;
+
+    if (list.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-500 text-xs">Belum ada data guru terdaftar.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = list.map((item, idx) => {
+      const spv = item.supervision || {};
+      const statusBadge = spv.statusApproval === 'Disetujui'
+        ? `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Disetujui</span>`
+        : (spv.statusApproval === 'Perlu Perbaikan'
+          ? `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">Perlu Perbaikan</span>`
+          : `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/10 text-slate-400 border border-white/10">Belum Disupervisi</span>`);
+
+      return `
+        <tr class="hover:bg-white/[0.02] border-b border-white/[0.04] transition">
+          <td class="py-3 px-4 text-center text-slate-500 text-xs">${idx + 1}</td>
+          <td class="py-3 px-4">
+            <div class="font-extrabold text-white">${item.teacherName}</div>
+            <div class="text-[11px] text-amber-300 font-semibold">${item.subjectName} • NIP: ${item.nip || '-'}</div>
+          </td>
+          <td class="py-3 px-3 text-center">
+            ${item.hasDocument 
+              ? `<span class="text-emerald-400 font-bold text-xs"><i data-lucide="check" class="w-4 h-4 inline"></i> Ada</span>`
+              : `<span class="text-slate-500 text-xs font-medium">Belum</span>`}
+          </td>
+          <td class="py-3 px-3 text-center font-bold text-slate-300">${item.journalCount} sesi</td>
+          <td class="py-3 px-3 text-center font-bold text-slate-300">${item.attendanceCount}</td>
+          <td class="py-3 px-3 text-center font-bold text-slate-300">${item.assessmentCount > 0 ? 'Terisi' : 'Belum'}</td>
+          <td class="py-3 px-4 text-center">
+            <div class="flex items-center gap-2">
+              <div class="flex-1 bg-white/10 rounded-full h-2 overflow-hidden">
+                <div class="bg-gradient-to-r from-amber-500 to-amber-400 h-2 rounded-full transition-all duration-300" style="width: ${item.completenessRate}%"></div>
+              </div>
+              <span class="text-xs font-bold text-slate-300">${item.completenessRate}%</span>
+            </div>
+          </td>
+          <td class="py-3 px-3 text-center">${statusBadge}</td>
+          <td class="py-3 px-4 text-right">
+            <button onclick='openSuperviseModal(${JSON.stringify(item)})' class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 rounded-xl text-xs font-extrabold shadow-sm transition inline-flex items-center gap-1">
+              <i data-lucide="clipboard-signature" class="w-3.5 h-3.5"></i>
+              <span>Telaah</span>
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    lucide.createIcons();
+  }
+
+  function filterMonitoringTable() {
+    const q = (document.getElementById('spv-search-teacher').value || '').toLowerCase();
+    const filtered = rawMonitoringList.filter(t => 
+      t.teacherName.toLowerCase().includes(q) ||
+      t.subjectName.toLowerCase().includes(q) ||
+      (t.nip && t.nip.includes(q))
+    );
+    renderMonitoringTable(filtered);
+  }
+
+  function openSuperviseModal(item) {
+    document.getElementById('spv-form-teacher-id').value = item.teacherId;
+    document.getElementById('modal-spv-teacher-info').textContent = `Guru: ${item.teacherName} (${item.subjectName}) • NIP: ${item.nip || '-'}`;
+
+    const spv = item.supervision || {};
+    document.getElementById('spv-score-dev').value = spv.scoreDevice || 90;
+    document.getElementById('spv-score-jrn').value = spv.scoreJournal || 88;
+    document.getElementById('spv-score-att').value = spv.scoreAttendance || 92;
+    document.getElementById('spv-score-asm').value = spv.scoreAssessment || 85;
+    document.getElementById('spv-feedback').value = spv.feedback || '';
+    document.getElementById('spv-status-approval').value = spv.statusApproval || 'Disetujui';
+
+    calculateSupervisionScore();
+    document.getElementById('modal-supervise-teacher').classList.remove('hidden');
+    lucide.createIcons();
+  }
+
+  function calculateSupervisionScore() {
+    const s1 = Number(document.getElementById('spv-score-dev').value) || 0;
+    const s2 = Number(document.getElementById('spv-score-jrn').value) || 0;
+    const s3 = Number(document.getElementById('spv-score-att').value) || 0;
+    const s4 = Number(document.getElementById('spv-score-asm').value) || 0;
+
+    const avg = Math.round((s1 + s2 + s3 + s4) / 4);
+    let pred = 'Kurang';
+    if (avg >= 91) pred = 'Amat Baik';
+    else if (avg >= 81) pred = 'Baik';
+    else if (avg >= 71) pred = 'Cukup';
+
+    document.getElementById('spv-live-score').textContent = avg;
+    const predEl = document.getElementById('spv-live-predicate');
+    predEl.textContent = pred;
+    predEl.className = `px-2.5 py-0.5 rounded-full text-[11px] font-bold ${avg >= 81 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : (avg >= 71 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30')}`;
+  }
+
+  async function handleSaveTeacherSupervision(e) {
+    e.preventDefault();
+    const payload = {
+      teacherId: document.getElementById('spv-form-teacher-id').value,
+      semester: AppState.config.SEMESTER || 'Ganjil',
+      scoreDevice: document.getElementById('spv-score-dev').value,
+      scoreJournal: document.getElementById('spv-score-jrn').value,
+      scoreAttendance: document.getElementById('spv-score-att').value,
+      scoreAssessment: document.getElementById('spv-score-asm').value,
+      feedback: document.getElementById('spv-feedback').value,
+      statusApproval: document.getElementById('spv-status-approval').value
+    };
+
+    try {
+      setLoading(true, 'Menyimpan hasil telaah supervisi...');
+      const res = await runServer('saveTeacherSupervision', payload);
+      if (res && res.success) {
+        closeModal('modal-supervise-teacher');
+        showToast('Hasil telaah supervisi berhasil disimpan!', 'success');
+        await loadSupervisionView();
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function loadTeachersTable() {
+    try {
+      setLoading(true, 'Memuat akun dan data guru...');
+      const res = await runServer('getTeacherAccountsList');
+      const teachers = res.data || [];
+      const tbody = document.getElementById('spv-teachers-tbody');
+      if (!tbody) return;
+
+      if (teachers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500 text-xs">Belum ada guru terdaftar.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = teachers.map(t => {
+        const hasAcc = t.hasAccount && t.username !== '-';
+        return `
+          <tr class="hover:bg-white/[0.02] border-b border-white/[0.04] transition">
+            <td class="py-3 px-4">
+              <div class="font-extrabold text-white">${t.teacherName}</div>
+              <div class="text-[11px] text-slate-400">NIP: ${t.nip || '-'}</div>
+            </td>
+            <td class="py-3 px-4 font-bold text-sky-300">${t.subjectName}</td>
+            <td class="py-3 px-4">
+              ${hasAcc 
+                ? `<div class="font-mono text-xs text-white font-bold bg-white/5 border border-white/10 px-2.5 py-1 rounded-xl inline-block">
+                    <span class="text-amber-300">${t.username}</span> <span class="text-slate-500">/</span> <span class="text-sky-300">${t.password}</span>
+                   </div>`
+                : `<span class="text-amber-300 bg-amber-500/15 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-[11px] font-bold">Belum Ada Akun</span>`
+              }
+            </td>
+            <td class="py-3 px-4 text-center">
+              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">${t.status}</span>
+            </td>
+            <td class="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
+              <button onclick='openGenerateAccountModal(${JSON.stringify(t)})' class="px-2.5 py-1 bg-white/5 hover:bg-white/10 text-amber-300 border border-white/10 rounded-lg text-xs font-bold transition inline-flex items-center gap-1">
+                <i data-lucide="key" class="w-3.5 h-3.5"></i>
+                <span>${hasAcc ? 'Reset PIN' : 'Buat Akun'}</span>
+              </button>
+              ${hasAcc ? `
+                <button onclick='openAccountSlipModal(${JSON.stringify(t)})' class="p-1.5 bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 rounded-lg text-xs font-semibold transition" title="Lihat & Salin Slip Akun">
+                  <i data-lucide="share-2" class="w-3.5 h-3.5 inline"></i>
+                </button>
+              ` : ''}
+              <button onclick='openTeacherModal(${JSON.stringify(t)})' class="text-amber-400 hover:text-amber-300 text-xs font-bold px-1.5 py-1">Edit</button>
+              <button onclick="handleDeleteTeacher('${t.teacherId}')" class="text-rose-400 hover:text-rose-300 text-xs font-bold px-1.5 py-1">Hapus</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      lucide.createIcons();
+    } catch (err) {
+      showToast('Gagal memuat guru: ' + err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function openGenerateAccountModal(t) {
+    document.getElementById('gen-teacher-id').value = t.teacherId;
+    document.getElementById('gen-teacher-title-info').textContent = `Guru: ${t.teacherName} (${t.subjectName})`;
+
+    // Generate saran username & password
+    const cleanName = t.teacherName.replace(/[^a-zA-Z]/g, '').toLowerCase().substring(0, 8);
+    document.getElementById('gen-username').value = (t.username && t.username !== '-') ? t.username : 'guru_' + cleanName;
+    
+    // 6 digit PIN acak
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let pin = '';
+    for (let k = 0; k < 6; k++) pin += chars.charAt(Math.floor(Math.random() * chars.length));
+    document.getElementById('gen-password').value = pin;
+
+    document.getElementById('modal-generate-account').classList.remove('hidden');
+    lucide.createIcons();
+  }
+
+  async function handleSaveGenerateAccount(e) {
+    e.preventDefault();
+    const teacherId = document.getElementById('gen-teacher-id').value;
+    const username = document.getElementById('gen-username').value.trim();
+    const password = document.getElementById('gen-password').value.trim();
+
+    try {
+      setLoading(true, 'Menyimpan kredensial akun guru...');
+      const res = await runServer('generateTeacherCredentials', teacherId, username, password);
+      if (res && res.success) {
+        closeModal('modal-generate-account');
+        showToast('Akun guru berhasil dibuat!', 'success');
+        await loadTeachersTable();
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function openAccountSlipModal(t) {
+    document.getElementById('slip-teacher-name').textContent = t.teacherName;
+    document.getElementById('slip-teacher-nip').textContent = t.nip || '-';
+    document.getElementById('slip-teacher-subject').textContent = t.subjectName;
+    document.getElementById('slip-username').textContent = t.username;
+    document.getElementById('slip-password').textContent = t.password;
+    document.getElementById('modal-account-slip').classList.remove('hidden');
+    lucide.createIcons();
+  }
+
+  function copyAccountSlipText() {
+    const name = document.getElementById('slip-teacher-name').textContent;
+    const nip = document.getElementById('slip-teacher-nip').textContent;
+    const user = document.getElementById('slip-username').textContent;
+    const pass = document.getElementById('slip-password').textContent;
+    const school = AppState.config.SCHOOL_NAME || 'Sekolah';
+
+    const text = `*INFORMASI AKUN SIAGU*\nSatuan Pendidikan: ${school}\n\nKepada Yth. *${name}*\nNIP: ${nip}\n\nBerikut akun login Anda di aplikasi SiAGU:\n👤 Username: *${user}*\n🔑 Password/PIN: *${pass}*\n\nSilakan masuk dan lakukan pengisian administrasi mengajar. Terima kasih.`;
+
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('Slip akun berhasil disalin ke clipboard!', 'success');
+    }).catch(() => {
+      showToast('Gagal menyalin slip', 'error');
+    });
+  }
+
+  function openTeacherModal(t = null) {
+    document.getElementById('form-teacher-id').value = t ? t.teacherId : '';
+    document.getElementById('form-teacher-name').value = t ? t.teacherName : '';
+    document.getElementById('form-teacher-nip').value = t ? t.nip : '';
+    document.getElementById('form-teacher-subject').value = t ? t.subjectName : '';
+    document.getElementById('form-teacher-email').value = t ? t.email : '';
+    document.getElementById('modal-teacher-title').textContent = t ? 'Edit Data Guru' : 'Tambah Guru Baru';
+    document.getElementById('modal-teacher').classList.remove('hidden');
+    lucide.createIcons();
+  }
+
+  async function handleSaveTeacher(e) {
+    e.preventDefault();
+    const payload = {
+      teacherId: document.getElementById('form-teacher-id').value,
+      teacherName: document.getElementById('form-teacher-name').value,
+      nip: document.getElementById('form-teacher-nip').value,
+      subjectName: document.getElementById('form-teacher-subject').value,
+      email: document.getElementById('form-teacher-email').value
+    };
+
+    try {
+      setLoading(true, 'Menyimpan guru...');
+      const res = await runServer('saveTeacher', payload);
+      if (res && res.success) {
+        closeModal('modal-teacher');
+        showToast('Data guru berhasil disimpan', 'success');
+        await loadTeachersTable();
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDeleteTeacher(teacherId) {
+    if (!confirm('Hapus guru ini dari daftar supervisi?')) return;
+    try {
+      setLoading(true, 'Menghapus guru...');
+      const res = await runServer('deleteTeacher', teacherId);
+      if (res && res.success) {
+        showToast('Guru berhasil dihapus', 'success');
+        await loadTeachersTable();
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function loadSupervisionRecapReport() {
+    try {
+      setLoading(true, 'Menyiapkan laporan dinas...');
+      const res = await runServer('getSupervisionRecapReport');
+      const data = res.data || {};
+      const hdr = data.header || {};
+      const summary = data.summary || {};
+      const list = summary.teacherProgress || [];
+
+      document.getElementById('spv-recap-school-name').textContent = hdr.schoolName || 'SMA NEGERI 1 INDONESIA';
+      document.getElementById('spv-recap-npsn').textContent = hdr.schoolNpsn || '-';
+      document.getElementById('spv-recap-academic-year').textContent = hdr.academicYear || '2026/2027';
+      document.getElementById('spv-recap-semester').textContent = hdr.semester || 'Ganjil';
+      document.getElementById('spv-recap-headmaster').textContent = hdr.headmasterName || 'Kepala Sekolah';
+      document.getElementById('spv-recap-headmaster-nip').textContent = hdr.headmasterNip || '-';
+      document.getElementById('spv-recap-date').textContent = `${hdr.schoolName ? 'Sekolah' : 'Nusantara'}, ${hdr.printDate || '22 Oktober 2026'}`;
+
+      const container = document.getElementById('spv-recap-table-container');
+      if (list.length === 0) {
+        container.innerHTML = `<p class="text-center py-6 text-xs text-slate-400">Belum ada data supervisi.</p>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <table class="w-full text-left text-xs border-collapse border border-slate-300">
+          <thead>
+            <tr class="bg-slate-100 border-b border-slate-300 font-bold text-slate-900">
+              <th class="border border-slate-300 py-2.5 px-2 w-10 text-center">No</th>
+              <th class="border border-slate-300 py-2.5 px-3">Nama Guru & NIP</th>
+              <th class="border border-slate-300 py-2.5 px-2.5">Mata Pelajaran</th>
+              <th class="border border-slate-300 py-2.5 px-2 text-center w-16">Perangkat</th>
+              <th class="border border-slate-300 py-2.5 px-2 text-center w-16">Jurnal</th>
+              <th class="border border-slate-300 py-2.5 px-2 text-center w-16">Presensi</th>
+              <th class="border border-slate-300 py-2.5 px-2 text-center w-16">Nilai</th>
+              <th class="border border-slate-300 py-2.5 px-2 text-center w-16 bg-slate-200/50 font-extrabold">Skor Akhir</th>
+              <th class="border border-slate-300 py-2.5 px-2 text-center w-24">Predikat</th>
+              <th class="border border-slate-300 py-2.5 px-3">Catatan Pembinaan Kepala Sekolah</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${list.map((t, idx) => {
+              const spv = t.supervision || {};
+              return `
+                <tr class="border-b border-slate-200">
+                  <td class="border border-slate-300 py-2 px-2 text-center text-slate-500">${idx + 1}</td>
+                  <td class="border border-slate-300 py-2 px-3">
+                    <div class="font-bold text-slate-900">${t.teacherName}</div>
+                    <div class="text-[10px] text-slate-500">NIP: ${t.nip || '-'}</div>
+                  </td>
+                  <td class="border border-slate-300 py-2 px-2.5 font-medium text-slate-800">${t.subjectName}</td>
+                  <td class="border border-slate-300 py-2 px-2 text-center">${spv.scoreDevice || '-'}</td>
+                  <td class="border border-slate-300 py-2 px-2 text-center">${spv.scoreJournal || '-'}</td>
+                  <td class="border border-slate-300 py-2 px-2 text-center">${spv.scoreAttendance || '-'}</td>
+                  <td class="border border-slate-300 py-2 px-2 text-center">${spv.scoreAssessment || '-'}</td>
+                  <td class="border border-slate-300 py-2 px-2 text-center font-extrabold text-sm ${spv.finalScore >= 80 ? 'text-teal-900' : 'text-slate-800'} bg-slate-100/50">
+                    ${spv.finalScore || '-'}
+                  </td>
+                  <td class="border border-slate-300 py-2 px-2 text-center font-bold text-[11px]">${spv.predicate || '-'}</td>
+                  <td class="border border-slate-300 py-2 px-3 text-[11px] text-slate-700 leading-snug">${spv.feedback || '-'}</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      `;
+    } catch (err) {
+      showToast('Gagal memuat rekap supervisi: ' + err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+</script>

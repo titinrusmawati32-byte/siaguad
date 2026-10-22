@@ -1,0 +1,149 @@
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif']
+        },
+        colors: {
+          canvas: {
+            DEFAULT: '#0D0C10',
+            surface: '#17161D',
+            sidebar: '#121117',
+            card: '#1B1A22',
+            input: '#22202B',
+            border: 'rgba(255, 255, 255, 0.08)'
+          },
+          accent: {
+            pill: '#7CC4FA',
+            amber: '#F59E0B',
+            sunset: '#FB923C',
+            rose: '#F472B6',
+            indigo: '#818CF8'
+          }
+        }
+      }
+    }
+  };
+</script>
+
+<!-- Google Font: Plus Jakarta Sans -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+<!-- Lucide Icons CDN -->
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<!-- JsBarcode CDN untuk Pembuatan Barcode Siswa Otomatis -->
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
+<!-- Html5Qrcode CDN untuk Pemindaian Barcode & QR Code via Kamera Guru -->
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+<style>
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background-color: #0D0C10;
+    color: #F8FAFC;
+    background-image: 
+      radial-gradient(ellipse 80% 55% at 85% -5%, rgba(245, 158, 66, 0.22), transparent 70%),
+      radial-gradient(ellipse 50% 45% at 5% 95%, rgba(59, 130, 246, 0.07), transparent 60%);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+  }
+
+  /* Custom Sleek Dark Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #121117;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2E2C38;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #454252;
+  }
+
+  /* Active Sidebar Navigation Pill (Sesuai Referensi Gambar) */
+  .nav-active {
+    background-color: #7CC4FA !important;
+    color: #0B1320 !important;
+    font-weight: 800 !important;
+    border-radius: 1rem !important;
+    box-shadow: 0 10px 25px -5px rgba(124, 196, 250, 0.25) !important;
+  }
+  .nav-active i, .nav-active svg {
+    color: #0B1320 !important;
+    stroke: #0B1320 !important;
+  }
+
+  /* Glassmorphism Card Utility */
+  .glass-card {
+    background: rgba(23, 22, 29, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* Print Styles - Cetak A4 Standar Dinas (Hitam Putih Bersih) */
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+    .print-only {
+      display: block !important;
+    }
+    body {
+      background: #FFFFFF !important;
+      color: #000000 !important;
+      background-image: none !important;
+    }
+    .print-card {
+      box-shadow: none !important;
+      border: 1px solid #000000 !important;
+      background: #FFFFFF !important;
+      color: #000000 !important;
+    }
+    .print-card table {
+      border: 1px solid #000000 !important;
+      color: #000000 !important;
+    }
+    .print-card th, .print-card td {
+      border: 1px solid #000000 !important;
+      color: #000000 !important;
+    }
+    .student-barcode-card {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+      border: 1px dashed #333333 !important;
+      background: #FFFFFF !important;
+      color: #000000 !important;
+    }
+    .student-barcode-card svg, .student-barcode-card canvas {
+      display: block !important;
+      margin: 0 auto !important;
+    }
+    @page {
+      size: A4;
+      margin: 1cm;
+    }
+  }
+
+  /* Smooth Transitions */
+  .view-panel {
+    animation: fadeIn 0.2s ease-out forwards;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>

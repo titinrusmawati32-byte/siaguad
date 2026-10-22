@@ -1,0 +1,1286 @@
+<!-- View: Presensi & Absensi Siswa -->
+<div id="view-attendance" class="view-panel space-y-6 hidden">
+
+  <!-- Header Section -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h2 class="text-xl sm:text-2xl font-extrabold text-white">Presensi & Kehadiran Siswa</h2>
+      <p class="text-xs text-slate-400">Pencatatan cepat kehadiran tatap muka (Manual & Barcode Kamera) serta rekapitulasi.</p>
+    </div>
+
+    <!-- Action & Tab Bar -->
+    <div class="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+      <!-- Tombol Buka Modal Cetak Barcode Siswa -->
+      <button onclick="openPrintBarcodeModal()" type="button" class="px-3.5 py-2 bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 text-amber-300 font-bold border border-amber-500/30 rounded-2xl text-xs transition inline-flex items-center gap-1.5 shadow-sm">
+        <i data-lucide="printer" class="w-4 h-4"></i>
+        <span>Cetak Barcode Siswa</span>
+      </button>
+
+      <!-- Tab Navigation Pills -->
+      <div class="inline-flex p-1 bg-[#121117] border border-white/10 rounded-2xl text-xs font-bold gap-1">
+        <button onclick="switchAttendanceTab('input')" id="att-btn-input" class="att-tab-btn px-3 py-2 rounded-xl transition bg-[#7CC4FA] text-slate-950 font-extrabold shadow-md shadow-sky-500/20 flex items-center gap-1.5">
+          <i data-lucide="check-square" class="w-3.5 h-3.5"></i>
+          <span>Presensi Manual</span>
+        </button>
+        <button onclick="switchAttendanceTab('scan')" id="att-btn-scan" class="att-tab-btn px-3 py-2 rounded-xl transition text-slate-400 hover:text-white flex items-center gap-1.5">
+          <i data-lucide="scan-barcode" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span>Scan Barcode Kamera</span>
+        </button>
+        <button onclick="switchAttendanceTab('rekap')" id="att-btn-rekap" class="att-tab-btn px-3 py-2 rounded-xl transition text-slate-400 hover:text-white flex items-center gap-1.5">
+          <i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i>
+          <span>Rekapitulasi</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 1: INPUT PRESENSI MANUAL -->
+  <div id="att-panel-input" class="att-content space-y-6">
+
+    <!-- Filter Bar Sesi Pertemuan -->
+    <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg p-5 space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Pilih Kelas / Rombel</label>
+          <select id="att-input-class" onchange="syncClassSelection(this.value); loadAttendanceSession()" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs font-semibold text-white focus:border-amber-400 outline-none">
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Tanggal Presensi</label>
+          <input type="date" id="att-input-date" onchange="syncDateSelection(this.value); loadAttendanceSession()" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs font-semibold text-white focus:border-amber-400 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Mata Pelajaran</label>
+          <select id="att-input-subject" onchange="syncSubjectSelection(this.value); loadAttendanceSession()" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs font-semibold text-white focus:border-amber-400 outline-none">
+          </select>
+        </div>
+      </div>
+
+      <!-- Live Counter Bar & Quick 1-Click Action -->
+      <div class="pt-3 border-t border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        
+        <!-- Live Counters -->
+        <div class="flex items-center gap-2.5 text-xs">
+          <div class="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/15 text-emerald-300 font-bold rounded-xl border border-emerald-500/30">
+            <span>Hadir:</span>
+            <span id="counter-hadir" class="font-black text-sm">0</span>
+          </div>
+          <div class="flex items-center gap-1.5 px-3 py-1 bg-amber-500/15 text-amber-300 font-bold rounded-xl border border-amber-500/30">
+            <span>Sakit:</span>
+            <span id="counter-sakit" class="font-black text-sm">0</span>
+          </div>
+          <div class="flex items-center gap-1.5 px-3 py-1 bg-sky-500/15 text-sky-300 font-bold rounded-xl border border-sky-500/30">
+            <span>Izin:</span>
+            <span id="counter-izin" class="font-black text-sm">0</span>
+          </div>
+          <div class="flex items-center gap-1.5 px-3 py-1 bg-rose-500/15 text-rose-300 font-bold rounded-xl border border-rose-500/30">
+            <span>Alpa:</span>
+            <span id="counter-alpa" class="font-black text-sm">0</span>
+          </div>
+        </div>
+
+        <!-- Tombol Pintas: Hadir Semua & Simpan -->
+        <div class="flex items-center gap-2">
+          <button onclick="setAllPresent()" type="button" class="px-3.5 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-bold rounded-xl text-xs transition inline-flex items-center gap-1.5">
+            <i data-lucide="check-check" class="w-4 h-4"></i>
+            <span>Hadir Semua (1-Klik)</span>
+          </button>
+          <button onclick="handleSaveAttendance()" type="button" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20 transition inline-flex items-center gap-1.5">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            <span>Simpan Presensi</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Tabel Daftar Siswa untuk Presensi Manual -->
+    <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-white/[0.02] text-slate-400 text-xs uppercase font-semibold border-b border-white/[0.06]">
+            <tr>
+              <th class="py-3 px-4 w-12 text-center">No</th>
+              <th class="py-3 px-4">Nama Siswa</th>
+              <th class="py-3 px-4 w-20 text-center">L/P</th>
+              <th class="py-3 px-4 w-72 text-center">Status Kehadiran</th>
+              <th class="py-3 px-4">Keterangan / Catatan</th>
+            </tr>
+          </thead>
+          <tbody id="att-students-tbody" class="divide-y divide-white/[0.05]">
+            <tr>
+              <td colspan="5" class="py-8 text-center text-slate-500 text-xs">
+                Silakan pilih kelas dan tanggal untuk memuat daftar siswa.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TAB 2: PRESENSI SCAN BARCODE (KAMERA GURU) -->
+  <div id="att-panel-scan" class="att-content space-y-6 hidden">
+    
+    <!-- Top Filter Bar Sesi Scan -->
+    <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg p-5">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Kelas Target Presensi</label>
+          <select id="scan-select-class" onchange="syncClassSelection(this.value); loadAttendanceSession()" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs font-semibold text-white focus:border-amber-400 outline-none">
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Tanggal Hari Ini</label>
+          <input type="date" id="scan-select-date" onchange="syncDateSelection(this.value); loadAttendanceSession()" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs font-semibold text-white focus:border-amber-400 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Mata Pelajaran</label>
+          <select id="scan-select-subject" onchange="syncSubjectSelection(this.value); loadAttendanceSession()" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs font-semibold text-white focus:border-amber-400 outline-none">
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scanner Layout Grid: Kiri Kamera Viewfinder, Kanan Status & Riwayat Scan -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Viewfinder Kamera (7 Kolom) -->
+      <div class="lg:col-span-7 rounded-3xl border border-white/[0.08] bg-[#16151D]/95 backdrop-blur-2xl shadow-xl p-5 space-y-4">
+        
+        <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center">
+              <i data-lucide="camera" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h3 class="font-extrabold text-white text-sm">Kamera Pemindai Barcode / QR</h3>
+              <p class="text-[11px] text-slate-400">Arahkan kamera ke kartu barcode / NIS siswa.</p>
+            </div>
+          </div>
+
+          <div id="scanner-status-indicator" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-800 text-slate-400 border border-white/10 flex items-center gap-1.5">
+            <div class="w-2 h-2 rounded-full bg-slate-500"></div>
+            <span>Kamera Siap</span>
+          </div>
+        </div>
+
+        <!-- Camera Controls -->
+        <div class="flex flex-col sm:flex-row items-center gap-3">
+          <div class="w-full sm:flex-1">
+            <select id="scan-camera-devices" onchange="onCameraDeviceChanged()" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs text-white focus:border-amber-400 outline-none">
+              <option value="">Deteksi Kamera...</option>
+            </select>
+          </div>
+
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <button id="btn-toggle-camera-facing" onclick="toggleCameraFacing()" type="button" class="px-3 py-2 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 rounded-xl text-xs font-bold transition flex items-center gap-1.5" title="Beralih Kamera Depan / Belakang">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-amber-400"></i>
+              <span id="label-camera-facing">Kamera Depan</span>
+            </button>
+            <button id="btn-start-camera" onclick="startBarcodeScanner()" type="button" class="flex-1 sm:flex-none px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold rounded-xl text-xs shadow-md shadow-emerald-500/20 transition flex items-center justify-center gap-1.5">
+              <i data-lucide="video" class="w-3.5 h-3.5"></i>
+              <span>Nyalakan Kamera</span>
+            </button>
+            <button id="btn-stop-camera" onclick="stopBarcodeScanner()" type="button" class="hidden flex-1 sm:flex-none px-4 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5">
+              <i data-lucide="video-off" class="w-3.5 h-3.5"></i>
+              <span>Matikan Kamera</span>
+            </button>
+            <!-- Tombol Alternatif 100% Anti-Gagal: Ambil Foto Barcode Siswa (Tanpa Masalah Izin Iframe) -->
+            <button id="btn-capture-photo" onclick="document.getElementById('barcode-file-input').click()" type="button" class="px-3.5 py-2 bg-gradient-to-r from-sky-500/20 to-blue-500/20 hover:from-sky-500/30 hover:to-blue-500/30 text-sky-300 border border-sky-500/30 rounded-xl text-xs font-bold transition flex items-center gap-1.5" title="Buka Kamera HP / Foto Barcode Langsung (Tanpa Izin Streaming)">
+              <i data-lucide="camera" class="w-3.5 h-3.5 text-sky-400"></i>
+              <span>Foto Barcode</span>
+            </button>
+            <input type="file" id="barcode-file-input" accept="image/*" capture="environment" class="hidden" onchange="handleBarcodeFileUpload(event)">
+          </div>
+        </div>
+
+        <!-- Panduan Bantuan jika Kamera Ditolak / NotAllowedError Permission Denied -->
+        <div id="camera-error-guidance" class="hidden rounded-2xl bg-amber-500/10 border border-amber-500/30 p-4 text-xs text-amber-200 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 font-black text-amber-300 text-sm">
+              <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400"></i>
+              <span>Izin Kamera Ditolak Browser (NotAllowedError: Permission denied)</span>
+            </div>
+            <button onclick="document.getElementById('camera-error-guidance').classList.add('hidden')" class="text-slate-400 hover:text-white p-1">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <p class="text-xs text-slate-300">
+            Peramban Google Chrome atau Windows memblokir akses video langsung pada domain Google Apps Script. Lakukan langkah berikut untuk membukanya:
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px]">
+            <div class="bg-black/40 border border-amber-500/20 rounded-xl p-3 space-y-1.5">
+              <div class="font-bold text-amber-300 flex items-center gap-1.5">
+                <span class="w-4 h-4 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center text-[10px] font-black">1</span>
+                <span>Di Google Chrome (Address Bar)</span>
+              </div>
+              <ol class="list-decimal list-inside text-slate-300 space-y-1">
+                <li>Klik ikon <b>Setelan Situs / Ikon Gembok</b> di sebelah kiri URL <code class="text-amber-200">script.google.com</code>.</li>
+                <li>Pilih <b>Setelan situs (Site settings)</b>.</li>
+                <li>Pada opsi <b>Kamera (Camera)</b>, ubah dari <i>Blokir</i> menjadi <b class="text-emerald-400">Izinkan (Allow)</b>.</li>
+                <li>Tekan tombol <b>F5 (Refresh / Muat Ulang)</b> pada halaman ini.</li>
+              </ol>
+            </div>
+
+            <div class="bg-black/40 border border-amber-500/20 rounded-xl p-3 space-y-1.5">
+              <div class="font-bold text-amber-300 flex items-center gap-1.5">
+                <span class="w-4 h-4 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center text-[10px] font-black">2</span>
+                <span>Di Windows 10 / 11 (Privasi Kamera)</span>
+              </div>
+              <ol class="list-decimal list-inside text-slate-300 space-y-1">
+                <li>Buka Windows Start $\rightarrow$ Cari <b>"Camera privacy settings"</b>.</li>
+                <li>Pastikan <b>"Camera access"</b> diaktifkan (ON).</li>
+                <li>Gulir ke bawah ke <b>"Let desktop apps access your camera"</b> $\rightarrow$ Pastikan <b>Google Chrome</b> aktif (ON).</li>
+                <li>Tutup aplikasi lain yang memakai webcam (Zoom/Meet/Teams).</li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="p-3 bg-sky-500/10 border border-sky-500/30 rounded-xl flex items-center justify-between gap-3 text-xs">
+            <div class="text-sky-200">
+              <b>Solusi Cepat Tanpa Perizinan:</b> Gunakan tombol <b class="text-sky-300">"Foto Barcode"</b> di atas atau ketik NIS / tembak dengan <b class="text-amber-300">Barcode Scanner Gun</b> di bawah.
+            </div>
+            <button onclick="document.getElementById('barcode-file-input').click()" type="button" class="whitespace-nowrap px-3 py-1.5 bg-sky-500 text-slate-950 font-black rounded-lg text-xs hover:bg-sky-400 transition">
+              Coba Foto Barcode
+            </button>
+          </div>
+        </div>
+
+        <!-- Container Frame Viewfinder -->
+        <div class="relative rounded-2xl overflow-hidden bg-[#0A090E] border border-white/10 min-h-[260px] sm:min-h-[300px] flex items-center justify-center">
+          
+          <div id="barcode-interactive-reader" class="w-full h-full min-h-[260px]"></div>
+
+          <!-- Placeholder saat kamera belum menyala -->
+          <div id="camera-placeholder" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center space-y-3 bg-[#0D0C12]">
+            <div class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 text-slate-500 flex items-center justify-center">
+              <i data-lucide="scan-line" class="w-7 h-7"></i>
+            </div>
+            <div>
+              <p class="text-sm font-bold text-white">Kamera Belum Aktif</p>
+              <p class="text-xs text-slate-400 max-w-xs mt-1">Klik tombol <b>"Nyalakan Kamera"</b> untuk memindai kartu barcode siswa.</p>
+            </div>
+          </div>
+
+          <!-- Overlay Laser Scan Animasi saat Kamera Aktif -->
+          <div id="camera-overlay-laser" class="hidden pointer-events-none absolute inset-0 border-2 border-amber-400/30 rounded-2xl overflow-hidden">
+            <div class="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent shadow-[0_0_15px_rgba(245,158,11,0.8)] animate-pulse" style="top: 50%;"></div>
+            <!-- Target Corners -->
+            <div class="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-amber-400"></div>
+            <div class="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-amber-400"></div>
+            <div class="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-amber-400"></div>
+            <div class="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-amber-400"></div>
+          </div>
+
+        </div>
+
+        <!-- Alternatif: Scan dengan Barcode Scanner Gun USB / Input NIS Siswa Cepat -->
+        <div class="rounded-2xl border border-white/[0.08] bg-[#121117] p-3.5 space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-slate-300 flex items-center gap-1.5">
+              <i data-lucide="scan" class="w-3.5 h-3.5 text-amber-400"></i>
+              <span>Opsi Alternatif: Barcode Scanner Gun / Input NIS Manual</span>
+            </span>
+            <span class="text-[10px] text-slate-500 font-medium">Otomatis Hadir</span>
+          </div>
+          <form onsubmit="handleManualBarcodeInput(event)" class="flex gap-2">
+            <input type="text" id="manual-barcode-input" placeholder="Tempelkan barcode gun USB atau ketik NIS siswa..." class="flex-1 px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:border-amber-400 outline-none">
+            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20 transition flex items-center gap-1">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i>
+              <span>Tandai Hadir</span>
+            </button>
+          </form>
+        </div>
+
+        <p class="text-[11px] text-slate-500 text-center">
+          Format didukung: Barcode Code128, Code39, EAN-13, QR Code. Pastikan barcode berada dalam bingkai.
+        </p>
+
+      </div>
+
+      <!-- Kanan: Status Feedback & Daftar Baru Masuk (5 Kolom) -->
+      <div class="lg:col-span-5 space-y-4">
+        
+        <!-- Kartu Notifikasi Siswa Terakhir Di-scan -->
+        <div id="scan-latest-card" class="rounded-3xl border border-white/[0.08] bg-[#16151D]/95 backdrop-blur-2xl shadow-xl p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-400">Hasil Pemindaian Terkini:</span>
+            <span id="scan-sound-toggle" onclick="toggleScanSound()" class="cursor-pointer text-[11px] font-bold text-amber-300 hover:underline flex items-center gap-1">
+              <i data-lucide="volume-2" class="w-3.5 h-3.5"></i>
+              <span id="scan-sound-label">Suara: Aktif</span>
+            </span>
+          </div>
+
+          <div id="scan-latest-content" class="py-4 text-center space-y-2">
+            <div class="w-10 h-10 rounded-full bg-white/5 border border-white/10 text-slate-500 flex items-center justify-center mx-auto">
+              <i data-lucide="user-check" class="w-5 h-5"></i>
+            </div>
+            <p class="text-xs font-semibold text-slate-400">Menunggu siswa menempelkan barcode...</p>
+          </div>
+        </div>
+
+        <!-- Live Session Counters Ringkas -->
+        <div class="rounded-3xl border border-white/[0.08] bg-[#16151D]/95 backdrop-blur-2xl p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-white text-xs">Akumulasi Sesi Ini</h4>
+            <button onclick="handleSaveAttendance()" type="button" class="text-[11px] font-bold text-amber-300 hover:text-amber-200 flex items-center gap-1">
+              <i data-lucide="save" class="w-3.5 h-3.5"></i>
+              <span>Simpan ke Database</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-4 gap-2 text-center">
+            <div class="p-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/25">
+              <div class="text-[10px] text-emerald-300 font-bold">Hadir</div>
+              <div id="scan-counter-hadir" class="text-base font-black text-emerald-400">0</div>
+            </div>
+            <div class="p-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/25">
+              <div class="text-[10px] text-amber-300 font-bold">Sakit</div>
+              <div id="scan-counter-sakit" class="text-base font-black text-amber-400">0</div>
+            </div>
+            <div class="p-2.5 rounded-2xl bg-sky-500/10 border border-sky-500/25">
+              <div class="text-[10px] text-sky-300 font-bold">Izin</div>
+              <div id="scan-counter-izin" class="text-base font-black text-sky-400">0</div>
+            </div>
+            <div class="p-2.5 rounded-2xl bg-rose-500/10 border border-rose-500/25">
+              <div class="text-[10px] text-rose-300 font-bold">Alpa</div>
+              <div id="scan-counter-alpa" class="text-base font-black text-rose-400">0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feed Riwayat Scan Masuk -->
+        <div class="rounded-3xl border border-white/[0.08] bg-[#16151D]/95 backdrop-blur-2xl p-5 space-y-3">
+          <div class="flex items-center justify-between border-b border-white/[0.08] pb-2">
+            <h4 class="font-bold text-white text-xs">Riwayat Scan Masuk Sesi Ini</h4>
+            <span id="scan-history-count" class="text-[10px] font-semibold text-slate-400">0 Siswa</span>
+          </div>
+
+          <div id="scan-history-feed" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+            <div class="py-6 text-center text-slate-500 text-xs">
+              Belum ada presensi yang di-scan pada sesi ini.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- TAB 3: REKAPITULASI KEHADIRAN KELAS -->
+  <div id="att-panel-rekap" class="att-content space-y-6 hidden">
+    
+    <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <label class="text-xs font-bold text-slate-300">Pilih Kelas:</label>
+        <select id="att-rekap-class" onchange="loadAttendanceSummaryTable()" class="px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs font-semibold text-white focus:border-amber-400 outline-none">
+        </select>
+      </div>
+
+      <button onclick="switchView('reports')" class="px-3.5 py-2 bg-white/5 hover:bg-white/10 text-amber-300 font-bold rounded-xl text-xs transition inline-flex items-center gap-1.5 border border-amber-500/30">
+        <i data-lucide="printer" class="w-4 h-4"></i>
+        <span>Cetak Lembar Rekap</span>
+      </button>
+    </div>
+
+    <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-white/[0.02] text-slate-400 text-xs uppercase font-semibold border-b border-white/[0.06]">
+            <tr>
+              <th class="py-3 px-4 w-12 text-center">No</th>
+              <th class="py-3 px-4">Nama Siswa</th>
+              <th class="py-3 px-3 text-center text-emerald-400 font-bold">Hadir (H)</th>
+              <th class="py-3 px-3 text-center text-amber-400 font-bold">Sakit (S)</th>
+              <th class="py-3 px-3 text-center text-sky-400 font-bold">Izin (I)</th>
+              <th class="py-3 px-3 text-center text-rose-400 font-bold">Alpa (A)</th>
+              <th class="py-3 px-3 text-center">Total Pertemuan</th>
+              <th class="py-3 px-4 text-center font-bold">Persentase</th>
+            </tr>
+          </thead>
+          <tbody id="att-rekap-tbody" class="divide-y divide-white/[0.05]">
+            <tr><td colspan="8" class="py-6 text-center text-slate-500 text-xs">Pilih kelas untuk melihat rekap kehadiran...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Modal Cetak Barcode Siswa (Print Friendly Modal) -->
+<div id="modal-print-barcodes" class="fixed inset-0 bg-[#0A090E]/85 backdrop-blur-md z-50 flex items-center justify-center hidden p-4 overflow-y-auto">
+  <div class="rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl border border-white/10 bg-[#181722] text-white space-y-6 my-6">
+    
+    <!-- Modal Header (no-print) -->
+    <div class="no-print flex items-center justify-between border-b border-white/[0.08] pb-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center">
+          <i data-lucide="barcode" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h4 class="font-extrabold text-white text-base">Cetak Kartu Barcode Presensi Siswa</h4>
+          <p class="text-xs text-slate-400">Format kartu siap cetak A4. Siswa dapat menempelkan barcode ke kamera saat presensi.</p>
+        </div>
+      </div>
+      <button onclick="closeModal('modal-print-barcodes')" class="p-1 text-slate-400 hover:text-white transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <!-- Controls Filter Kelas & Aksi Cetak (no-print) -->
+    <div class="no-print flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[#121117] border border-white/10">
+      <div class="flex items-center gap-3">
+        <label class="text-xs font-bold text-slate-300">Pilih Kelas:</label>
+        <select id="print-class-select" onchange="renderPrintableBarcodeCards()" class="px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs font-semibold text-white focus:border-amber-400 outline-none">
+        </select>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="window.print()" type="button" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20 transition flex items-center gap-1.5">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          <span>Cetak Sekarang (Print / PDF)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Container Grid Kartu Barcode yang Dicetak -->
+    <div class="overflow-y-auto max-h-[60vh] pr-2">
+      <div id="printable-barcode-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div class="col-span-full py-8 text-center text-slate-500 text-xs">
+          Memuat kartu barcode siswa...
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer (no-print) -->
+    <div class="no-print flex justify-end gap-2 pt-3 border-t border-white/[0.08]">
+      <button type="button" onclick="closeModal('modal-print-barcodes')" class="px-4 py-2 border border-white/10 rounded-xl text-xs font-semibold text-slate-400 hover:text-white">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let activeSessionStudents = [];
+  let html5QrScanner = null;
+  let isCameraScanning = false;
+  let scanSoundEnabled = true;
+  let lastScannedBarcode = '';
+  let lastScannedTimestamp = 0;
+  let recentScannedFeed = [];
+
+  function switchAttendanceTab(tab) {
+    document.querySelectorAll('.att-content').forEach(c => c.classList.add('hidden'));
+    document.querySelectorAll('.att-tab-btn').forEach(b => {
+      b.classList.remove('bg-[#7CC4FA]', 'text-slate-950', 'font-extrabold', 'shadow-md', 'shadow-sky-500/20');
+      b.classList.add('text-slate-400', 'hover:text-white');
+    });
+
+    const panel = document.getElementById(`att-panel-${tab}`);
+    const btn = document.getElementById(`att-btn-${tab}`);
+    if (panel) panel.classList.remove('hidden');
+    if (btn) {
+      btn.classList.add('bg-[#7CC4FA]', 'text-slate-950', 'font-extrabold', 'shadow-md', 'shadow-sky-500/20');
+      btn.classList.remove('text-slate-400', 'hover:text-white');
+    }
+
+    if (tab === 'rekap') {
+      loadAttendanceSummaryTable();
+    } else if (tab === 'scan') {
+      initCameraList();
+    }
+  }
+
+  function syncClassSelection(val) {
+    const el1 = document.getElementById('att-input-class');
+    const el2 = document.getElementById('scan-select-class');
+    if (el1 && el1.value !== val) el1.value = val;
+    if (el2 && el2.value !== val) el2.value = val;
+  }
+
+  function syncDateSelection(val) {
+    const el1 = document.getElementById('att-input-date');
+    const el2 = document.getElementById('scan-select-date');
+    if (el1 && el1.value !== val) el1.value = val;
+    if (el2 && el2.value !== val) el2.value = val;
+  }
+
+  function syncSubjectSelection(val) {
+    const el1 = document.getElementById('att-input-subject');
+    const el2 = document.getElementById('scan-select-subject');
+    if (el1 && el1.value !== val) el1.value = val;
+    if (el2 && el2.value !== val) el2.value = val;
+  }
+
+  function loadAttendanceView() {
+    populateAttendanceSelects();
+    const todayStr = new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById('att-input-date');
+    const scanDateInput = document.getElementById('scan-select-date');
+    if (dateInput && !dateInput.value) dateInput.value = todayStr;
+    if (scanDateInput && !scanDateInput.value) scanDateInput.value = todayStr;
+    
+    loadAttendanceSession();
+  }
+
+  function populateAttendanceSelects() {
+    const classInput = document.getElementById('att-input-class');
+    const classScan = document.getElementById('scan-select-class');
+    const classRekap = document.getElementById('att-rekap-class');
+    const classPrint = document.getElementById('print-class-select');
+    const subjectInput = document.getElementById('att-input-subject');
+    const subjectScan = document.getElementById('scan-select-subject');
+
+    let cHtml = '';
+    (AppState.classes || []).forEach(c => cHtml += `<option value="${c.classId}">${c.className}</option>`);
+
+    if (classInput) classInput.innerHTML = cHtml;
+    if (classScan) classScan.innerHTML = cHtml;
+    if (classRekap) classRekap.innerHTML = cHtml;
+    if (classPrint) classPrint.innerHTML = cHtml;
+
+    let sHtml = '';
+    (AppState.subjects || []).forEach(s => sHtml += `<option value="${s.subjectId}">${s.subjectName}</option>`);
+
+    if (subjectInput) subjectInput.innerHTML = sHtml;
+    if (subjectScan) subjectScan.innerHTML = sHtml;
+  }
+
+  async function loadAttendanceSession() {
+    const classId = document.getElementById('att-input-class').value || (AppState.classes[0] && AppState.classes[0].classId);
+    const date = document.getElementById('att-input-date').value;
+    const subjectId = document.getElementById('att-input-subject').value;
+
+    if (!classId || !date) return;
+
+    try {
+      const res = await runServer('getAttendanceSession', classId, date, subjectId);
+      activeSessionStudents = (res.data && res.data.students) ? res.data.students : [];
+      renderAttendanceTable();
+      updateAttendanceCounters();
+    } catch (err) {
+      showToast('Gagal memuat presensi: ' + err.message, 'error');
+    }
+  }
+
+  function renderAttendanceTable() {
+    const tbody = document.getElementById('att-students-tbody');
+    if (!tbody) return;
+
+    if (activeSessionStudents.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-500 text-xs">Belum ada siswa terdaftar di kelas ini.</td></tr>`;
+      updateAttendanceCounters();
+      return;
+    }
+
+    tbody.innerHTML = activeSessionStudents.map((s, idx) => `
+      <tr class="hover:bg-white/[0.02] border-b border-white/[0.04] transition" id="att-row-${s.studentId}">
+        <td class="py-3 px-4 text-center text-slate-500 text-xs">${idx + 1}</td>
+        <td class="py-3 px-4 font-bold text-white">
+          <div>${s.studentName}</div>
+          <div class="text-[11px] text-slate-400 font-normal">NIS: ${s.nis || '-'}</div>
+        </td>
+        <td class="py-3 px-4 text-center">
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${s.gender === 'P' ? 'bg-pink-500/20 text-pink-300 border border-pink-500/30' : 'bg-sky-500/20 text-sky-300 border border-sky-500/30'}">
+            ${s.gender}
+          </span>
+        </td>
+        <td class="py-3 px-4">
+          <div class="flex items-center justify-center gap-1.5 bg-[#121117] border border-white/10 p-1 rounded-xl">
+            <button type="button" onclick="setStudentStatus('${s.studentId}', 'H')" class="status-btn-${s.studentId} flex-1 py-1 px-2 rounded-lg font-bold text-xs transition ${s.status === 'H' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5'}">H</button>
+            <button type="button" onclick="setStudentStatus('${s.studentId}', 'S')" class="status-btn-${s.studentId} flex-1 py-1 px-2 rounded-lg font-bold text-xs transition ${s.status === 'S' ? 'bg-amber-500 text-slate-950 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5'}">S</button>
+            <button type="button" onclick="setStudentStatus('${s.studentId}', 'I')" class="status-btn-${s.studentId} flex-1 py-1 px-2 rounded-lg font-bold text-xs transition ${s.status === 'I' ? 'bg-sky-500 text-slate-950 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5'}">I</button>
+            <button type="button" onclick="setStudentStatus('${s.studentId}', 'A')" class="status-btn-${s.studentId} flex-1 py-1 px-2 rounded-lg font-bold text-xs transition ${s.status === 'A' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5'}">A</button>
+          </div>
+        </td>
+        <td class="py-3 px-4">
+          <input type="text" value="${s.notes || ''}" onchange="updateStudentNotes('${s.studentId}', this.value)" placeholder="Catatan opsional..." class="w-full px-3 py-1.5 text-xs bg-[#201F29] border border-white/10 rounded-xl text-white placeholder:text-slate-500 outline-none focus:border-amber-400">
+        </td>
+      </tr>
+    `).join('');
+
+    updateAttendanceCounters();
+  }
+
+  function setStudentStatus(studentId, status) {
+    const student = activeSessionStudents.find(s => s.studentId === studentId);
+    if (student) {
+      student.status = status;
+      renderAttendanceTable();
+    }
+  }
+
+  function updateStudentNotes(studentId, notes) {
+    const student = activeSessionStudents.find(s => s.studentId === studentId);
+    if (student) student.notes = notes;
+  }
+
+  function setAllPresent() {
+    activeSessionStudents.forEach(s => s.status = 'H');
+    renderAttendanceTable();
+    showToast('Seluruh siswa ditandai Hadir (H)', 'info');
+  }
+
+  function updateAttendanceCounters() {
+    let h = 0, s = 0, i = 0, a = 0;
+    activeSessionStudents.forEach(st => {
+      if (st.status === 'H') h++;
+      else if (st.status === 'S') s++;
+      else if (st.status === 'I') i++;
+      else if (st.status === 'A') a++;
+    });
+
+    const setCounter = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val;
+    };
+
+    setCounter('counter-hadir', h);
+    setCounter('counter-sakit', s);
+    setCounter('counter-izin', i);
+    setCounter('counter-alpa', a);
+
+    // Sync juga counter di panel scan
+    setCounter('scan-counter-hadir', h);
+    setCounter('scan-counter-sakit', s);
+    setCounter('scan-counter-izin', i);
+    setCounter('scan-counter-alpa', a);
+  }
+
+  async function handleSaveAttendance(silent = false) {
+    const classId = document.getElementById('att-input-class').value;
+    const date = document.getElementById('att-input-date').value;
+    const subjectId = document.getElementById('att-input-subject').value;
+
+    if (!classId || !date) {
+      if (!silent) showToast('Pilih kelas dan tanggal terlebih dahulu', 'warning');
+      return;
+    }
+
+    const payload = activeSessionStudents.map(s => ({
+      studentId: s.studentId,
+      status: s.status || 'H',
+      notes: s.notes || ''
+    }));
+
+    try {
+      if (!silent) setLoading(true, 'Menyimpan presensi...');
+      const res = await runServer('saveAttendanceBatch', classId, date, subjectId, payload);
+      if (res && res.success) {
+        if (!silent) showToast('Presensi kelas berhasil disimpan!', 'success');
+      }
+    } catch (err) {
+      if (!silent) showToast('Gagal simpan presensi: ' + err.message, 'error');
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  }
+
+  /* ========================================================
+     FITUR 2: PEMINDAI BARCODE VIA KAMERA GURU (Html5Qrcode)
+     ======================================================== */
+
+  let activeFacingMode = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent) ? 'environment' : 'user';
+
+  // Generator Bunyi Beep Menggunakan Web Audio API (Instan & Tanpa Latensi)
+  function playSuccessBeep() {
+    if (!scanSoundEnabled) return;
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, audioCtx.currentTime); // 880 Hz (A5 - nada notifikasi tegas & ramah)
+      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.15);
+    } catch (e) {
+      console.warn('AudioContext tidak didukung:', e);
+    }
+  }
+
+  function toggleScanSound() {
+    scanSoundEnabled = !scanSoundEnabled;
+    const label = document.getElementById('scan-sound-label');
+    if (label) label.textContent = scanSoundEnabled ? 'Suara: Aktif' : 'Suara: Mute';
+    showToast(scanSoundEnabled ? 'Suara scan diaktifkan' : 'Suara scan dimatikan', 'info');
+  }
+
+  function toggleCameraFacing() {
+    activeFacingMode = (activeFacingMode === 'user') ? 'environment' : 'user';
+    const label = document.getElementById('label-camera-facing');
+    if (label) {
+      label.textContent = (activeFacingMode === 'user') ? 'Kamera Depan' : 'Kamera Belakang';
+    }
+    showToast(`Beralih ke mode ${label ? label.textContent : activeFacingMode}`, 'info');
+
+    // Jika kamera sedang menyala, restart dengan mode baru
+    if (isCameraScanning) {
+      startBarcodeScanner();
+    }
+  }
+
+  function onCameraDeviceChanged() {
+    if (isCameraScanning) {
+      startBarcodeScanner();
+    }
+  }
+
+  async function initCameraList() {
+    const select = document.getElementById('scan-camera-devices');
+    const label = document.getElementById('label-camera-facing');
+    if (label) {
+      label.textContent = (activeFacingMode === 'user') ? 'Kamera Depan' : 'Kamera Belakang';
+    }
+    if (!select) return;
+
+    if (typeof Html5Qrcode === 'undefined') {
+      select.innerHTML = '<option value="">Memuat scanner...</option>';
+      return;
+    }
+
+    try {
+      const devices = await Html5Qrcode.getCameras();
+      if (devices && devices.length > 0) {
+        let optHtml = '';
+        devices.forEach((cam, i) => {
+          const isBack = cam.label.toLowerCase().includes('back') || cam.label.toLowerCase().includes('belakang') || cam.label.toLowerCase().includes('rear');
+          optHtml += `<option value="${cam.id}" ${isBack ? 'selected' : ''}>${cam.label || ('Kamera ' + (i+1))}</option>`;
+        });
+        select.innerHTML = optHtml;
+      } else {
+        select.innerHTML = '<option value="default">Kamera Bawaan Sistem</option>';
+      }
+    } catch (err) {
+      // Fallback jika enumerasi kamera memerlukan request stream terlebih dahulu
+      select.innerHTML = `
+        <option value="user" ${activeFacingMode === 'user' ? 'selected' : ''}>Kamera Depan / Webcam Laptop</option>
+        <option value="environment" ${activeFacingMode === 'environment' ? 'selected' : ''}>Kamera Belakang (HP/Tablet)</option>
+      `;
+    }
+  }
+
+  async function startBarcodeScanner() {
+    if (typeof Html5Qrcode === 'undefined') {
+      showToast('Library pemindai belum siap. Mohon periksa koneksi internet atau muat ulang halaman.', 'error');
+      return;
+    }
+
+    const placeholder = document.getElementById('camera-placeholder');
+    const overlay = document.getElementById('camera-overlay-laser');
+    const btnStart = document.getElementById('btn-start-camera');
+    const btnStop = document.getElementById('btn-stop-camera');
+    const statusIndicator = document.getElementById('scanner-status-indicator');
+    const errorGuide = document.getElementById('camera-error-guidance');
+    const select = document.getElementById('scan-camera-devices');
+    const selectedDeviceId = select ? select.value : '';
+
+    if (errorGuide) errorGuide.classList.add('hidden');
+
+    // 1. Bersihkan scanner lama jika ada untuk mencegah tabrakan instance
+    if (html5QrScanner) {
+      try {
+        if (isCameraScanning) await html5QrScanner.stop();
+      } catch (e) {}
+      try {
+        html5QrScanner.clear();
+      } catch (e) {}
+      html5QrScanner = null;
+    }
+    isCameraScanning = false;
+
+    // Bersihkan container DOM
+    const container = document.getElementById('barcode-interactive-reader');
+    if (container) container.innerHTML = '';
+
+    // 2. Daftar format yang didukung (wajib sertakan CODE_128 untuk barcode siswa)
+    let formats = undefined;
+    if (typeof Html5QrcodeSupportedFormats !== 'undefined') {
+      formats = [
+        Html5QrcodeSupportedFormats.CODE_128,
+        Html5QrcodeSupportedFormats.QR_CODE,
+        Html5QrcodeSupportedFormats.CODE_39,
+        Html5QrcodeSupportedFormats.EAN_13,
+        Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.UPC_A,
+        Html5QrcodeSupportedFormats.UPC_E,
+        Html5QrcodeSupportedFormats.CODABAR,
+        Html5QrcodeSupportedFormats.ITF
+      ];
+    }
+
+    try {
+      html5QrScanner = new Html5Qrcode("barcode-interactive-reader", {
+        formatsToSupport: formats,
+        verbose: false
+      });
+
+      // Konfigurasi area bidik dinamis responsif (Wajib objek atau integer, bukan function)
+      const config = {
+        fps: 15,
+        qrbox: { width: 260, height: 140 }
+      };
+
+      // 3. Deteksi kamera langsung dari peramban
+      let targetCamera = null;
+
+      // Jika user sudah memilih kamera dari dropdown
+      if (selectedDeviceId && selectedDeviceId !== 'user' && selectedDeviceId !== 'environment' && selectedDeviceId !== 'default') {
+        targetCamera = selectedDeviceId;
+      } else {
+        // Query kamera yang tersedia di perangkat
+        try {
+          const cams = await Html5Qrcode.getCameras();
+          if (cams && cams.length > 0) {
+            const backCam = cams.find(c => /back|belakang|rear|environment/i.test(c.label));
+            const frontCam = cams.find(c => /front|depan|user|integrated|webcam/i.test(c.label));
+            
+            if (activeFacingMode === 'environment' && backCam) {
+              targetCamera = backCam.id;
+            } else if (activeFacingMode === 'user' && frontCam) {
+              targetCamera = frontCam.id;
+            } else {
+              targetCamera = cams[0].id;
+            }
+          }
+        } catch (camListErr) {
+          console.warn('Gagal membaca label kamera:', camListErr);
+        }
+      }
+
+      // 4. Eksekusi kamera dengan Multi-Tier Fallback agar bebas kendala
+      let started = false;
+      let lastError = null;
+
+      // Tier 1: Menggunakan targetCamera (ID kamera terdeteksi dari hardware)
+      if (targetCamera) {
+        try {
+          await html5QrScanner.start(
+            targetCamera,
+            config,
+            onBarcodeScanSuccess,
+            onBarcodeScanFailure
+          );
+          started = true;
+        } catch (e1) {
+          console.warn('Gagal dengan ID kamera terdeteksi:', e1);
+          lastError = e1;
+        }
+      }
+
+      // Tier 2: Coba dengan constraint facingMode
+      if (!started) {
+        try {
+          await html5QrScanner.start(
+            { facingMode: activeFacingMode },
+            config,
+            onBarcodeScanSuccess,
+            onBarcodeScanFailure
+          );
+          started = true;
+        } catch (e2) {
+          console.warn(`Gagal dengan facingMode ${activeFacingMode}:`, e2);
+          lastError = e2;
+        }
+      }
+
+      // Tier 3: Coba facingMode sebaliknya ('user' <-> 'environment')
+      if (!started) {
+        const altMode = (activeFacingMode === 'environment') ? 'user' : 'environment';
+        try {
+          await html5QrScanner.start(
+            { facingMode: altMode },
+            config,
+            onBarcodeScanSuccess,
+            onBarcodeScanFailure
+          );
+          started = true;
+          activeFacingMode = altMode;
+          const label = document.getElementById('label-camera-facing');
+          if (label) label.textContent = (altMode === 'user') ? 'Kamera Depan' : 'Kamera Belakang';
+        } catch (e3) {
+          console.warn(`Gagal dengan altMode ${altMode}:`, e3);
+          lastError = e3;
+        }
+      }
+
+      // Tier 4: Fallback tanpa qrbox (scan full frame) dengan facingMode sederhana
+      if (!started) {
+        try {
+          await html5QrScanner.start(
+            { facingMode: "user" },
+            { fps: 15 },
+            onBarcodeScanSuccess,
+            onBarcodeScanFailure
+          );
+          started = true;
+        } catch (e4) {
+          console.error('Fallback tier 4 gagal:', e4);
+          throw (e4 || lastError);
+        }
+      }
+
+      // Berhasil aktif
+      isCameraScanning = true;
+      if (placeholder) placeholder.classList.add('hidden');
+      if (overlay) overlay.classList.remove('hidden');
+      if (btnStart) btnStart.classList.add('hidden');
+      if (btnStop) btnStop.classList.remove('hidden');
+
+      if (statusIndicator) {
+        statusIndicator.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5 animate-pulse';
+        statusIndicator.innerHTML = '<div class="w-2 h-2 rounded-full bg-emerald-400"></div><span>Kamera Memindai...</span>';
+      }
+
+      showToast('Kamera aktif! Arahkan ke kartu barcode siswa.', 'success');
+
+      // Refresh daftar kamera jika tadi belum ada label
+      setTimeout(initCameraList, 400);
+
+    } catch (err) {
+      console.error('Kamera error total:', err);
+      isCameraScanning = false;
+
+      if (statusIndicator) {
+        statusIndicator.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1.5';
+        statusIndicator.innerHTML = '<div class="w-2 h-2 rounded-full bg-rose-400"></div><span>Kamera Terkendala</span>';
+      }
+
+      if (errorGuide) {
+        errorGuide.classList.remove('hidden');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      }
+
+      const errString = (err && (err.message || err.name || String(err))) || '';
+      if (errString.toLowerCase().includes('notallowed') || errString.toLowerCase().includes('permission')) {
+        showToast('Izin kamera ditolak oleh browser/sistem. Silakan ikuti panduan unblock di bawah atau gunakan tombol Foto Barcode / Scanner Gun.', 'warning');
+      } else {
+        showToast('Kamera belum dapat dibuka: ' + errString, 'warning');
+      }
+    }
+  }
+
+  async function stopBarcodeScanner() {
+    if (html5QrScanner) {
+      try {
+        if (isCameraScanning) await html5QrScanner.stop();
+      } catch (e) {
+        console.warn('Gagal stop scanner:', e);
+      }
+      try {
+        html5QrScanner.clear();
+      } catch (e) {}
+      html5QrScanner = null;
+    }
+
+    isCameraScanning = false;
+    const placeholder = document.getElementById('camera-placeholder');
+    const overlay = document.getElementById('camera-overlay-laser');
+    const btnStart = document.getElementById('btn-start-camera');
+    const btnStop = document.getElementById('btn-stop-camera');
+    const statusIndicator = document.getElementById('scanner-status-indicator');
+
+    if (placeholder) placeholder.classList.remove('hidden');
+    if (overlay) overlay.classList.add('hidden');
+    if (btnStart) btnStart.classList.remove('hidden');
+    if (btnStop) btnStop.classList.add('hidden');
+
+    if (statusIndicator) {
+      statusIndicator.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-800 text-slate-400 border border-white/10 flex items-center gap-1.5';
+      statusIndicator.innerHTML = '<div class="w-2 h-2 rounded-full bg-slate-500"></div><span>Kamera Siap</span>';
+    }
+
+    showToast('Kamera pemindai dinonaktifkan.', 'info');
+  }
+
+  // Handler Scan Barcode via Ambil Foto / File (100% Anti-Gagal Tanpa Blokir Izin Iframe)
+  async function handleBarcodeFileUpload(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    showToast('Memindai gambar barcode siswa...', 'info');
+
+    try {
+      if (!html5QrScanner) {
+        let formats = undefined;
+        if (typeof Html5QrcodeSupportedFormats !== 'undefined') {
+          formats = [
+            Html5QrcodeSupportedFormats.CODE_128,
+            Html5QrcodeSupportedFormats.QR_CODE,
+            Html5QrcodeSupportedFormats.CODE_39,
+            Html5QrcodeSupportedFormats.EAN_13,
+            Html5QrcodeSupportedFormats.EAN_8,
+            Html5QrcodeSupportedFormats.UPC_A,
+            Html5QrcodeSupportedFormats.UPC_E,
+            Html5QrcodeSupportedFormats.CODABAR,
+            Html5QrcodeSupportedFormats.ITF
+          ];
+        }
+        html5QrScanner = new Html5Qrcode("barcode-interactive-reader", {
+          formatsToSupport: formats,
+          verbose: false
+        });
+      }
+
+      const decodedText = await html5QrScanner.scanFile(file, true);
+      if (decodedText) {
+        onBarcodeScanSuccess(decodedText, null);
+      }
+    } catch (err) {
+      console.warn('Scan file error:', err);
+      showToast('Barcode tidak terdeteksi dari foto. Pastikan barcode terlihat jelas, fokus, dan cukup cahaya.', 'warning');
+    } finally {
+      event.target.value = '';
+    }
+  }
+
+  // Handler Input Barcode Gun / Manual NIS
+  function handleManualBarcodeInput(e) {
+    e.preventDefault();
+    const input = document.getElementById('manual-barcode-input');
+    if (!input) return;
+    const code = input.value.trim();
+    if (!code) {
+      showToast('Masukkan barcode / NIS siswa terlebih dahulu', 'warning');
+      return;
+    }
+    onBarcodeScanSuccess(code, null);
+    input.value = '';
+  }
+
+  function onBarcodeScanSuccess(decodedText, decodedResult) {
+    const now = Date.now();
+    const cleanCode = decodedText.trim();
+
+    // Debounce: cegah barcode sama terbaca puluhan kali dalam 2.5 detik
+    if (cleanCode === lastScannedBarcode && (now - lastScannedTimestamp) < 2500) {
+      return;
+    }
+
+    lastScannedBarcode = cleanCode;
+    lastScannedTimestamp = now;
+
+    // Cari siswa berdasarkan NIS atau Student ID di daftar siswa kelas aktif (Case-insensitive & Trimmed)
+    const normalizedCode = cleanCode.toLowerCase();
+    const matchedStudent = activeSessionStudents.find(s => {
+      const sNis = (s.nis || '').toString().trim().toLowerCase();
+      const sId = (s.studentId || '').toString().trim().toLowerCase();
+      const sNisn = (s.nisn || '').toString().trim().toLowerCase();
+      return (sNis && sNis === normalizedCode) || 
+             (sId && sId === normalizedCode) || 
+             (sNisn && sNisn === normalizedCode) ||
+             (normalizedCode.includes(sNis) && sNis.length >= 3);
+    });
+
+    if (matchedStudent) {
+      // Tandai Hadir
+      matchedStudent.status = 'H';
+      playSuccessBeep();
+      renderAttendanceTable();
+      updateAttendanceCounters();
+
+      // Tampilkan notifikasi sukses di kartu sebelah kanan
+      const cardContent = document.getElementById('scan-latest-content');
+      const nowTimeStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      if (cardContent) {
+        cardContent.innerHTML = `
+          <div class="p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-left space-y-1.5 animate-pulse">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500 text-slate-950">HADIR</span>
+              <span class="text-[11px] text-emerald-300 font-semibold">${nowTimeStr}</span>
+            </div>
+            <div class="font-black text-white text-base">${matchedStudent.studentName}</div>
+            <div class="text-xs text-slate-300">NIS: ${matchedStudent.nis || '-'} • ${matchedStudent.gender === 'P' ? 'Perempuan' : 'Laki-laki'}</div>
+          </div>
+        `;
+      }
+
+      // Tambahkan ke feed riwayat scan masuk
+      addScanHistoryFeed(matchedStudent, nowTimeStr);
+
+      showToast(`Presensi ${matchedStudent.studentName} tercatat Hadir!`, 'success');
+
+      // Auto-save senyap di background
+      handleSaveAttendance(true);
+    } else {
+      // Barcode tidak terdaftar di kelas yang sedang aktif
+      const cardContent = document.getElementById('scan-latest-content');
+      if (cardContent) {
+        cardContent.innerHTML = `
+          <div class="p-3.5 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-left space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white">TIDAK DITEMUKAN</span>
+              <span class="text-[11px] text-rose-300 font-semibold">Kode: ${cleanCode}</span>
+            </div>
+            <div class="font-bold text-white text-sm">Siswa tidak terdaftar di kelas ini</div>
+            <div class="text-xs text-slate-400">Pastikan kelas terpilih di atas sesuai dengan rombel siswa.</div>
+          </div>
+        `;
+      }
+      showToast(`Barcode "${cleanCode}" tidak cocok dengan data siswa di kelas ini!`, 'warning');
+    }
+  }
+
+  function onBarcodeScanFailure(error) {
+    // Normal: frame kamera belum mendeteksi kode barcode
+  }
+
+  function addScanHistoryFeed(student, timeStr) {
+    recentScannedFeed.unshift({ student, timeStr });
+    if (recentScannedFeed.length > 20) recentScannedFeed.pop();
+
+    const container = document.getElementById('scan-history-feed');
+    const countBadge = document.getElementById('scan-history-count');
+
+    if (countBadge) countBadge.textContent = `${recentScannedFeed.length} Siswa`;
+    if (!container) return;
+
+    container.innerHTML = recentScannedFeed.map(item => `
+      <div class="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-300 font-black flex items-center justify-center text-[10px]">
+            H
+          </div>
+          <div>
+            <div class="font-bold text-white">${item.student.studentName}</div>
+            <div class="text-[10px] text-slate-400">NIS: ${item.student.nis || '-'}</div>
+          </div>
+        </div>
+        <span class="text-[10px] text-slate-400 font-semibold">${item.timeStr}</span>
+      </div>
+    `).join('');
+  }
+
+  /* ========================================================
+     FITUR 3: MODAL CETAK KARTU BARCODE SISWA PER KELAS
+     ======================================================== */
+
+  function openPrintBarcodeModal() {
+    populateAttendanceSelects();
+    const modal = document.getElementById('modal-print-barcodes');
+    if (modal) modal.classList.remove('hidden');
+    renderPrintableBarcodeCards();
+    lucide.createIcons();
+  }
+
+  async function renderPrintableBarcodeCards() {
+    const classId = document.getElementById('print-class-select').value;
+    const grid = document.getElementById('printable-barcode-grid');
+    if (!grid) return;
+
+    if (!classId) {
+      grid.innerHTML = '<div class="col-span-full py-8 text-center text-slate-500 text-xs">Pilih kelas untuk mencetak kartu.</div>';
+      return;
+    }
+
+    grid.innerHTML = `
+      <div class="col-span-full py-8 text-center text-slate-400 text-xs flex items-center justify-center gap-2">
+        <div class="w-4 h-4 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin"></div>
+        <span>Menyiapkan barcode siswa...</span>
+      </div>
+    `;
+
+    try {
+      const res = await runServer('getStudentsByClass', classId);
+      const students = res.data || [];
+
+      if (students.length === 0) {
+        grid.innerHTML = '<div class="col-span-full py-8 text-center text-slate-500 text-xs">Tidak ada data siswa di kelas ini.</div>';
+        return;
+      }
+
+      const schoolName = (AppState.config && AppState.config.SCHOOL_NAME) ? AppState.config.SCHOOL_NAME : 'SEKOLAH';
+      const selectedClassObj = (AppState.classes || []).find(c => c.classId === classId);
+      const className = selectedClassObj ? selectedClassObj.className : 'Kelas';
+
+      grid.innerHTML = students.map((s, idx) => `
+        <div class="student-barcode-card rounded-2xl border border-white/10 bg-[#16151D] p-4 text-center space-y-2 flex flex-col justify-between shadow-sm">
+          <div>
+            <div class="text-[10px] font-extrabold uppercase tracking-widest text-amber-400">${schoolName}</div>
+            <div class="font-extrabold text-white text-xs truncate mt-0.5">${s.studentName}</div>
+            <div class="text-[10px] text-slate-400 font-semibold">${className} • NIS: ${s.nis || '-'}</div>
+          </div>
+
+          <div class="py-1 bg-white rounded-xl p-2 flex items-center justify-center">
+            <svg id="barcode-svg-${idx}" class="barcode-item w-full max-h-16"></svg>
+          </div>
+
+          <div class="text-[9px] text-slate-400">Tempelkan barcode ke kamera guru</div>
+        </div>
+      `).join('');
+
+      // Render barcode ke tiap elemen SVG menggunakan JsBarcode
+      if (typeof JsBarcode !== 'undefined') {
+        students.forEach((s, idx) => {
+          const barcodeValue = s.nis || s.studentId || `SISWA-${idx+1}`;
+          try {
+            JsBarcode(`#barcode-svg-${idx}`, barcodeValue, {
+              format: "CODE128",
+              width: 1.5,
+              height: 40,
+              displayValue: true,
+              fontSize: 10,
+              margin: 2,
+              lineColor: "#000000"
+            });
+          } catch (barcodeErr) {
+            console.warn('Gagal render barcode:', barcodeErr);
+          }
+        });
+      }
+
+    } catch (err) {
+      grid.innerHTML = `<div class="col-span-full py-8 text-center text-rose-400 text-xs">Gagal memuat siswa: ${err.message}</div>`;
+    }
+  }
+
+  async function loadAttendanceSummaryTable() {
+    const classId = document.getElementById('att-rekap-class').value;
+    if (!classId) return;
+
+    try {
+      const res = await runServer('getAttendanceSummary', classId);
+      const list = res.data || [];
+      const tbody = document.getElementById('att-rekap-tbody');
+      if (!tbody) return;
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500 text-xs">Belum ada data kehadiran di kelas ini.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map((r, idx) => `
+        <tr class="hover:bg-white/[0.02] border-b border-white/[0.04] transition">
+          <td class="py-3 px-4 text-center text-slate-500 text-xs">${idx + 1}</td>
+          <td class="py-3 px-4 font-bold text-white">${r.studentName}</td>
+          <td class="py-3 px-3 text-center text-emerald-400 font-bold">${r.hadir}</td>
+          <td class="py-3 px-3 text-center text-amber-400 font-bold">${r.sakit}</td>
+          <td class="py-3 px-3 text-center text-sky-400 font-bold">${r.izin}</td>
+          <td class="py-3 px-3 text-center text-rose-400 font-bold">${r.alpa}</td>
+          <td class="py-3 px-3 text-center text-slate-300 font-medium">${r.totalPertemuan}</td>
+          <td class="py-3 px-4 text-center">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold ${r.persentase >= 85 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : (r.persentase >= 75 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30')}">
+              ${r.persentase}%
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      showToast('Gagal memuat rekap: ' + err.message, 'error');
+    }
+  }
+</script>

@@ -1,0 +1,255 @@
+<!-- View: Dashboard -->
+<div id="view-dashboard" class="view-panel space-y-6">
+
+  <!-- Welcome Banner -->
+  <div class="relative overflow-hidden rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-white/[0.08] bg-gradient-to-r from-[#251E16]/80 via-[#181720]/90 to-[#121118]/90 backdrop-blur-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+    <!-- Ambient Inner Glow Accent -->
+    <div class="absolute -top-12 -right-12 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="space-y-2 relative z-10">
+      <div class="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/15 border border-amber-500/30 rounded-full text-xs font-semibold text-amber-300">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
+        <span>Tahun Ajaran <span id="dash-academic-year">2026/2027</span> • Semester <span id="dash-semester">Ganjil</span></span>
+      </div>
+      <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+        Selamat Datang, <span id="dash-teacher-name" class="text-transparent bg-clip-text bg-gradient-to-r from-white via-amber-100 to-amber-300">Bapak/Ibu Guru</span>!
+      </h2>
+      <p class="text-slate-400 text-xs sm:text-sm max-w-2xl leading-relaxed">
+        Kelola seluruh administrasi mengajar, presensi, penilaian, hingga laporan supervisi sekolah secara rapi, cepat, dan otomatis.
+      </p>
+    </div>
+
+    <!-- Quick Actions Group -->
+    <div class="flex flex-wrap items-center gap-2.5 relative z-10">
+      <button onclick="switchView('journal')" class="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 rounded-xl text-xs sm:text-sm font-bold shadow-lg shadow-amber-500/20 transition inline-flex items-center gap-2">
+        <i data-lucide="book-open" class="w-4 h-4"></i>
+        <span>Isi Jurnal</span>
+      </button>
+      <button onclick="switchView('attendance')" class="px-4 py-2.5 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs sm:text-sm font-semibold transition inline-flex items-center gap-2 border border-white/10 backdrop-blur-md">
+        <i data-lucide="clipboard-check" class="w-4 h-4 text-sky-400"></i>
+        <span>Presensi</span>
+      </button>
+      <button onclick="switchView('assessment')" class="px-4 py-2.5 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs sm:text-sm font-semibold transition inline-flex items-center gap-2 border border-white/10 backdrop-blur-md">
+        <i data-lucide="award" class="w-4 h-4 text-emerald-400"></i>
+        <span>Nilai</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI Cards Grid: 4 Signature Gradients (Sesuai Desain Referensi) -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+    
+    <!-- KPI 1: Golden Olive / Bronze (Total Siswa) -->
+    <div class="relative overflow-hidden rounded-2xl p-5 border border-amber-500/25 bg-gradient-to-br from-[#3D3728] via-[#262116] to-[#17140E] shadow-lg backdrop-blur-xl transition hover:scale-[1.01] hover:border-amber-500/40">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold text-amber-200/80 uppercase tracking-wider">Total Siswa</p>
+        <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-300 flex items-center justify-center">
+          <i data-lucide="users" class="w-4 h-4"></i>
+        </div>
+      </div>
+      <div class="mt-4 flex items-baseline justify-between">
+        <h3 id="stat-total-students" class="text-3xl font-extrabold text-white tracking-tight">-</h3>
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+          Aktif
+        </span>
+      </div>
+      <p class="text-[11px] text-amber-200/60 mt-1">Terdaftar di seluruh kelas</p>
+    </div>
+
+    <!-- KPI 2: Royal Indigo / Soft Cobalt (Kelas Diampu) -->
+    <div class="relative overflow-hidden rounded-2xl p-5 border border-indigo-500/25 bg-gradient-to-br from-[#2D3960] via-[#1D2542] to-[#12172A] shadow-lg backdrop-blur-xl transition hover:scale-[1.01] hover:border-indigo-500/40">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold text-indigo-200/80 uppercase tracking-wider">Kelas Diampu</p>
+        <div class="w-9 h-9 rounded-xl bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 flex items-center justify-center">
+          <i data-lucide="layout-grid" class="w-4 h-4"></i>
+        </div>
+      </div>
+      <div class="mt-4 flex items-baseline justify-between">
+        <h3 id="stat-total-classes" class="text-3xl font-extrabold text-white tracking-tight">-</h3>
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+          Rombel
+        </span>
+      </div>
+      <p class="text-[11px] text-indigo-200/60 mt-1">Tahun ajaran berjalan</p>
+    </div>
+
+    <!-- KPI 3: Deep Berry / Rose Magenta (Jurnal Mengajar) -->
+    <div class="relative overflow-hidden rounded-2xl p-5 border border-pink-500/25 bg-gradient-to-br from-[#53243B] via-[#381626] to-[#220D17] shadow-lg backdrop-blur-xl transition hover:scale-[1.01] hover:border-pink-500/40">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold text-pink-200/80 uppercase tracking-wider">Jurnal Terisi</p>
+        <div class="w-9 h-9 rounded-xl bg-pink-500/20 border border-pink-500/30 text-pink-300 flex items-center justify-center">
+          <i data-lucide="calendar" class="w-4 h-4"></i>
+        </div>
+      </div>
+      <div class="mt-4 flex items-baseline justify-between">
+        <h3 id="stat-total-journals" class="text-3xl font-extrabold text-white tracking-tight">-</h3>
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/30">
+          Tercatat
+        </span>
+      </div>
+      <p class="text-[11px] text-pink-200/60 mt-1">Pertemuan tatap muka</p>
+    </div>
+
+    <!-- KPI 4: Warm Sunset Terracotta / Amber (Rata Kehadiran) -->
+    <div class="relative overflow-hidden rounded-2xl p-5 border border-orange-500/25 bg-gradient-to-br from-[#8C3E1F] via-[#5C2611] to-[#361407] shadow-lg backdrop-blur-xl transition hover:scale-[1.01] hover:border-orange-500/40">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold text-orange-200/80 uppercase tracking-wider">Rata Kehadiran</p>
+        <div class="w-9 h-9 rounded-xl bg-orange-500/20 border border-orange-500/30 text-orange-300 flex items-center justify-center">
+          <i data-lucide="check-check" class="w-4 h-4"></i>
+        </div>
+      </div>
+      <div class="mt-4 flex items-baseline justify-between">
+        <h3 id="stat-attendance-rate" class="text-3xl font-extrabold text-white tracking-tight">-</h3>
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-500/20 text-orange-300 border border-orange-500/30">
+          Presensi
+        </span>
+      </div>
+      <p class="text-[11px] text-orange-200/60 mt-1">Persentase hadir siswa</p>
+    </div>
+
+  </div>
+
+  <!-- Content Grid: Jurnal Terkini & Pintasan Administrasi -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Kolom Kiri: 5 Jurnal Terakhir (2 Kolom Lebar) -->
+    <div class="lg:col-span-2 rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg overflow-hidden flex flex-col justify-between">
+      <div>
+        <div class="p-5 border-b border-white/[0.08] flex items-center justify-between bg-white/[0.01]">
+          <div>
+            <h3 class="font-extrabold text-white text-base">Agenda Mengajar Terkini</h3>
+            <p class="text-xs text-slate-400">Catatan jurnal tatap muka kelas terakhir</p>
+          </div>
+          <button onclick="switchView('journal')" class="text-xs text-amber-400 font-bold hover:text-amber-300 inline-flex items-center gap-1 transition">
+            <span>Lihat Semua</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-white/[0.02] text-slate-400 text-xs uppercase font-semibold border-b border-white/[0.06]">
+              <tr>
+                <th class="py-3 px-4">Tanggal</th>
+                <th class="py-3 px-4">Kelas</th>
+                <th class="py-3 px-4">Mapel / Materi</th>
+                <th class="py-3 px-4">Status</th>
+              </tr>
+            </thead>
+            <tbody id="dash-recent-journals" class="divide-y divide-white/[0.05]">
+              <tr>
+                <td colspan="4" class="py-8 text-center text-slate-500 text-xs">
+                  Memuat data jurnal terkini...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kolom Kanan: Status Administrasi & Supervisi (1 Kolom) -->
+    <div class="rounded-2xl border border-white/[0.08] bg-[#16151D]/90 backdrop-blur-xl shadow-lg p-5 space-y-4 flex flex-col justify-between">
+      <div class="space-y-4">
+        <div>
+          <h3 class="font-extrabold text-white text-base">Kelengkapan Berkas</h3>
+          <p class="text-xs text-slate-400">Kesiapan supervisi pengawas sekolah</p>
+        </div>
+
+        <div class="space-y-2.5">
+          <div class="p-3 bg-[#1E1D27] border border-white/[0.06] rounded-xl flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="file-text" class="w-4 h-4 text-amber-400"></i>
+              <span class="font-medium text-slate-200">Jurnal Mengajar Harian</span>
+            </div>
+            <span class="px-2 py-0.5 bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded font-semibold text-[11px]">Siap Cetak</span>
+          </div>
+
+          <div class="p-3 bg-[#1E1D27] border border-white/[0.06] rounded-xl flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="user-check" class="w-4 h-4 text-sky-400"></i>
+              <span class="font-medium text-slate-200">Rekap Presensi Siswa</span>
+            </div>
+            <span class="px-2 py-0.5 bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded font-semibold text-[11px]">Siap Cetak</span>
+          </div>
+
+          <div class="p-3 bg-[#1E1D27] border border-white/[0.06] rounded-xl flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="award" class="w-4 h-4 text-pink-400"></i>
+              <span class="font-medium text-slate-200">Leger Nilai Formatif/Sumatif</span>
+            </div>
+            <span class="px-2 py-0.5 bg-sky-500/15 text-sky-300 border border-sky-500/30 rounded font-semibold text-[11px]">Tersedia</span>
+          </div>
+
+          <div class="p-3 bg-[#1E1D27] border border-white/[0.06] rounded-xl flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="folder-git-2" class="w-4 h-4 text-indigo-400"></i>
+              <span class="font-medium text-slate-200">Bank Modul Ajar / RPP</span>
+            </div>
+            <span class="px-2 py-0.5 bg-amber-500/15 text-amber-300 border border-amber-500/30 rounded font-semibold text-[11px]">Google Drive</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-white/[0.08]">
+        <button onclick="switchView('reports')" class="w-full py-2.5 px-4 bg-white/[0.06] hover:bg-white/[0.1] text-amber-300 border border-amber-500/30 font-bold rounded-xl text-xs transition flex items-center justify-center gap-2">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          <span>Buka Pusat Cetak Supervisi</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  /**
+   * Loader Data Tampilan Dashboard
+   */
+  async function loadDashboardView() {
+    // Update teks banner dari AppState.config
+    if (AppState.config) {
+      const yearEl = document.getElementById('dash-academic-year');
+      const semEl = document.getElementById('dash-semester');
+      const teacherEl = document.getElementById('dash-teacher-name');
+
+      if (yearEl && AppState.config.ACADEMIC_YEAR) yearEl.textContent = AppState.config.ACADEMIC_YEAR;
+      if (semEl && AppState.config.SEMESTER) semEl.textContent = AppState.config.SEMESTER;
+      if (teacherEl && AppState.config.TEACHER_NAME) teacherEl.textContent = AppState.config.TEACHER_NAME;
+    }
+
+    try {
+      const res = await runServer('getDashboardStats');
+      if (res && res.data) {
+        document.getElementById('stat-total-students').textContent = res.data.totalStudents || 0;
+        document.getElementById('stat-total-classes').textContent = res.data.totalClasses || 0;
+        document.getElementById('stat-total-journals').textContent = res.data.totalJournals || 0;
+        document.getElementById('stat-attendance-rate').textContent = (res.data.attendanceRate || 100) + '%';
+
+        // Render recent journals
+        const tbody = document.getElementById('dash-recent-journals');
+        if (tbody) {
+          if (!res.data.recentJournals || res.data.recentJournals.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-500 text-xs">Belum ada jurnal yang tercatat. Silakan mulai isi jurnal pertama Anda!</td></tr>`;
+          } else {
+            tbody.innerHTML = res.data.recentJournals.map(j => `
+              <tr class="hover:bg-white/[0.02] border-b border-white/[0.04] transition">
+                <td class="py-3 px-4 font-medium text-slate-300 whitespace-nowrap">${j.date}</td>
+                <td class="py-3 px-4 font-bold text-amber-300">${j.className}</td>
+                <td class="py-3 px-4 text-slate-400 max-w-xs truncate" title="${j.topic}">${j.topic}</td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                    ${j.status || 'Terlaksana'}
+                  </span>
+                </td>
+              </tr>
+            `).join('');
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Gagal memuat statistik dashboard:', err);
+    }
+  }
+</script>
