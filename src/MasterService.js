@@ -4,29 +4,143 @@
  */
 
 // ==========================================
-// KELAS & ROMBEL
+// KELAS & ROMBEL (SD NEGERI SUMBEREJO 04)
 // ==========================================
 
 function getClasses() {
   try {
     const ss = getDatabaseSpreadsheet();
-    const sheet = ss.getSheetByName('_CLASSES');
-    if (!sheet || sheet.getLastRow() <= 1) return successResponse([]);
+    let sheet = ss.getSheetByName('_CLASSES');
+    if (!sheet || sheet.getLastRow() <= 1) {
+      initDatabaseSchema();
+      sheet = ss.getSheetByName('_CLASSES');
+    }
 
-    const data = sheet.getDataRange().getValues();
     const classes = [];
-    for (let i = 1; i < data.length; i++) {
-      classes.push({
-        classId: data[i][0],
-        className: data[i][1],
-        gradeLevel: data[i][2],
-        majorPhase: data[i][3],
-        academicYear: data[i][4]
+    if (sheet && sheet.getLastRow() > 1) {
+      const data = sheet.getDataRange().getValues();
+      for (let i = 1; i < data.length; i++) {
+        if (!data[i][0] && !data[i][1]) continue;
+        classes.push({
+          classId: String(data[i][0]).trim(),
+          className: String(data[i][1]).trim(),
+          gradeLevel: String(data[i][2]).trim(),
+          majorPhase: String(data[i][3]).trim(),
+          academicYear: String(data[i][4] || '2026/2027').trim()
+        });
+      }
+    }
+
+    // Default rombel SD jika sheet masih kosong
+    if (classes.length === 0) {
+      const defaultClasses = [
+        ['CLS-1A', 'Kelas 1-A', '1', 'Fase A', '2026/2027'],
+        ['CLS-1B', 'Kelas 1-B', '1', 'Fase A', '2026/2027'],
+        ['CLS-2A', 'Kelas 2-A', '2', 'Fase A', '2026/2027'],
+        ['CLS-2B', 'Kelas 2-B', '2', 'Fase A', '2026/2027'],
+        ['CLS-3A', 'Kelas 3-A', '3', 'Fase B', '2026/2027'],
+        ['CLS-3B', 'Kelas 3-B', '3', 'Fase B', '2026/2027'],
+        ['CLS-4A', 'Kelas 4-A', '4', 'Fase B', '2026/2027'],
+        ['CLS-4B', 'Kelas 4-B', '4', 'Fase B', '2026/2027'],
+        ['CLS-5A', 'Kelas 5-A', '5', 'Fase C', '2026/2027'],
+        ['CLS-5B', 'Kelas 5-B', '5', 'Fase C', '2026/2027'],
+        ['CLS-6A', 'Kelas 6-A', '6', 'Fase C', '2026/2027'],
+        ['CLS-6B', 'Kelas 6-B', '6', 'Fase C', '2026/2027']
+      ];
+      if (sheet) {
+        sheet.getRange(2, 1, defaultClasses.length, 5).setValues(defaultClasses);
+      }
+      defaultClasses.forEach(c => {
+        classes.push({
+          classId: c[0],
+          className: c[1],
+          gradeLevel: c[2],
+          majorPhase: c[3],
+          academicYear: c[4]
+        });
       });
     }
+
     return successResponse(classes);
   } catch (err) {
     return errorResponse('Gagal mengambil data kelas: ' + err.message);
+  }
+}
+
+// ==========================================
+// KONFIGURASI PROFIL SEKOLAH & KURIKULUM
+// ==========================================
+
+function getConfig() {
+  try {
+    const ss = getDatabaseSpreadsheet();
+    let sheet = ss.getSheetByName('_CONFIG');
+    if (!sheet || sheet.getLastRow() <= 1) {
+      initDatabaseSchema();
+      sheet = ss.getSheetByName('_CONFIG');
+    }
+    const config = {};
+    if (sheet && sheet.getLastRow() > 1) {
+      const data = sheet.getDataRange().getValues();
+      for (let i = 1; i < data.length; i++) {
+        if (data[i][0]) {
+          config[String(data[i][0]).trim()] = String(data[i][1] !== undefined ? data[i][1] : '').trim();
+        }
+      }
+    }
+    return successResponse(config);
+  } catch (err) {
+    return errorResponse('Gagal mengambil konfigurasi: ' + err.message);
+  }
+}
+
+function saveConfig(configMap) {
+  const lock = LockService.getScriptLock();
+  lock.tryLock(15000);
+  try {
+    const ss = getDatabaseSpreadsheet();
+    let sheet = ss.getSheetByName('_CONFIG');
+    if (!sheet) {
+      initDatabaseSchema();
+      sheet = ss.getSheetByName('_CONFIG');
+    }
+    const data = sheet.getDataRange().getValues();
+    const existingKeys = {};
+    for (let i = 1; i < data.length; i++) {
+      existingKeys[data[i][0]] = i + 1;
+    }
+    for (const key in configMap) {
+      const val = configMap[key];
+      if (existingKeys[key]) {
+        sheet.getRange(existingKeys[key], 2).setValue(sanitizeForSheet(val));
+      } else {
+        sheet.appendRow([sanitizeForSheet(key), sanitizeForSheet(val), '']);
+      }
+    }
+    return successResponse(configMap, 'Konfigurasi berhasil disimpan');
+  } catch (err) {
+    return errorResponse('Gagal menyimpan konfigurasi: ' + err.message);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/**
+ * Payload Inisialisasi Aplikasi Terpadu (Single Request)
+ * Mengembalikan Config, Rombel Kelas SD, dan Daftar Mapel sekaligus
+ */
+function getInitialAppPayload() {
+  try {
+    const configRes = getConfig();
+    const classesRes = getClasses();
+    const subjectsRes = getSubjects();
+    return successResponse({
+      config: configRes.data || {},
+      classes: classesRes.data || [],
+      subjects: subjectsRes.data || []
+    });
+  } catch (err) {
+    return errorResponse('Gagal memuat konfigurasi awal: ' + err.message);
   }
 }
 

@@ -1457,14 +1457,81 @@
     lucide.createIcons();
   }
 
+  function autoSelectClassDropdown(selectEl) {
+    if (!selectEl) return;
+    const list = (AppState.classes && AppState.classes.length > 0) ? AppState.classes : (typeof DEFAULT_SD_CLASSES !== 'undefined' ? DEFAULT_SD_CLASSES : []);
+    const currentFilter = document.getElementById('student-filter-class')?.value;
+
+    // 1. Jika filter kelas di tabel saat ini sedang aktif memilih rombel tertentu
+    if (currentFilter && currentFilter !== '') {
+      selectEl.value = currentFilter;
+      return;
+    }
+
+    // 2. Cocokkan dengan penugasan akun guru yang sedang login (misal: "Guru Kelas 4-A" -> "CLS-4A")
+    if (AppState.currentUser) {
+      const subj = String(AppState.currentUser.subject_name || AppState.currentUser.title || '').toLowerCase();
+      const matched = list.find(c => {
+        const cName = c.className.toLowerCase();
+        return subj.includes(cName) || cName.includes(subj.replace('guru ', '').trim());
+      });
+      if (matched) {
+        selectEl.value = matched.classId;
+        return;
+      }
+    }
+
+    // 3. Fallback: pilih kelas pertama jika belum terpilih
+    if (list.length > 0 && !selectEl.value) {
+      selectEl.value = list[0].classId;
+    }
+  }
+
+  function populateClassSelects() {
+    const list = (AppState.classes && AppState.classes.length > 0) ? AppState.classes : (typeof DEFAULT_SD_CLASSES !== 'undefined' ? DEFAULT_SD_CLASSES : [
+      { classId: 'CLS-1A', className: 'Kelas 1-A', gradeLevel: '1' },
+      { classId: 'CLS-1B', className: 'Kelas 1-B', gradeLevel: '1' },
+      { classId: 'CLS-2A', className: 'Kelas 2-A', gradeLevel: '2' },
+      { classId: 'CLS-2B', className: 'Kelas 2-B', gradeLevel: '2' },
+      { classId: 'CLS-3A', className: 'Kelas 3-A', gradeLevel: '3' },
+      { classId: 'CLS-3B', className: 'Kelas 3-B', gradeLevel: '3' },
+      { classId: 'CLS-4A', className: 'Kelas 4-A', gradeLevel: '4' },
+      { classId: 'CLS-4B', className: 'Kelas 4-B', gradeLevel: '4' },
+      { classId: 'CLS-5A', className: 'Kelas 5-A', gradeLevel: '5' },
+      { classId: 'CLS-5B', className: 'Kelas 5-B', gradeLevel: '5' },
+      { classId: 'CLS-6A', className: 'Kelas 6-A', gradeLevel: '6' },
+      { classId: 'CLS-6B', className: 'Kelas 6-B', gradeLevel: '6' }
+    ]);
+    if (!AppState.classes || AppState.classes.length === 0) {
+      AppState.classes = list;
+    }
+
+    const selects = ['student-filter-class', 'form-student-class', 'batch-student-class', 'excel-student-target-class'];
+    selects.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const currentVal = el.value;
+      let html = id === 'student-filter-class' ? '<option value="">Semua Kelas</option>' : '<option value="" disabled selected>Pilih Rombel / Kelas...</option>';
+      list.forEach(c => {
+        html += `<option value="${c.classId}">${c.className} (${c.gradeLevel || c.grade || ''})</option>`;
+      });
+      el.innerHTML = html;
+      if (currentVal) el.value = currentVal;
+    });
+  }
+
   function openStudentModal(std = null) {
     populateClassSelects();
     document.getElementById('form-student-id').value = std ? std.studentId : '';
     document.getElementById('form-student-name').value = std ? std.studentName : '';
-    document.getElementById('form-student-nis').value = std ? std.nis : '';
+    document.getElementById('form-student-nis').value = std ? (std.nisn || std.nis || '') : '';
     document.getElementById('form-student-gender').value = std ? std.gender : 'L';
+    
+    const classSelect = document.getElementById('form-student-class');
     if (std && std.classId) {
-      document.getElementById('form-student-class').value = std.classId;
+      classSelect.value = std.classId;
+    } else {
+      autoSelectClassDropdown(classSelect);
     }
     document.getElementById('modal-student-title').textContent = std ? 'Edit Siswa' : 'Tambah Siswa Baru';
     document.getElementById('modal-student').classList.remove('hidden');
@@ -1474,34 +1541,10 @@
   function openBatchStudentModal() {
     populateClassSelects();
     document.getElementById('batch-student-text').value = '';
+    const classSelect = document.getElementById('batch-student-class');
+    autoSelectClassDropdown(classSelect);
     document.getElementById('modal-batch-student').classList.remove('hidden');
     lucide.createIcons();
-  }
-
-  function openSubjectModal(sbj = null) {
-    document.getElementById('form-subject-id').value = sbj ? sbj.subjectId : '';
-    document.getElementById('form-subject-name').value = sbj ? sbj.subjectName : '';
-    document.getElementById('form-subject-grade').value = sbj ? sbj.gradeLevel : '10';
-    document.getElementById('form-subject-wformative').value = sbj ? sbj.weightFormative : 40;
-    document.getElementById('form-subject-wsummative').value = sbj ? sbj.weightSummative : 60;
-    document.getElementById('modal-subject-title').textContent = sbj ? 'Edit Mata Pelajaran' : 'Tambah Mata Pelajaran';
-    document.getElementById('modal-subject').classList.remove('hidden');
-    lucide.createIcons();
-  }
-
-  function populateClassSelects() {
-    const selects = ['student-filter-class', 'form-student-class', 'batch-student-class', 'excel-student-target-class'];
-    selects.forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      const currentVal = el.value;
-      let html = id === 'student-filter-class' ? '<option value="">Semua Kelas</option>' : '<option value="" disabled selected>Pilih Rombel / Kelas...</option>';
-      AppState.classes.forEach(c => {
-        html += `<option value="${c.classId}">${c.className} (${c.gradeLevel})</option>`;
-      });
-      el.innerHTML = html;
-      if (currentVal) el.value = currentVal;
-    });
   }
 
   function populateConfigForm() {
@@ -1824,16 +1867,8 @@
   function openUploadStudentExcelModal() {
     populateClassSelects();
     
-    // Set default target kelas sesuai filter yang sedang aktif atau kelas guru
-    const currentFilter = document.getElementById('student-filter-class').value;
     const targetSelect = document.getElementById('excel-student-target-class');
-    if (targetSelect) {
-      if (currentFilter) {
-        targetSelect.value = currentFilter;
-      } else if (AppState.classes && AppState.classes.length > 0) {
-        targetSelect.value = AppState.classes[0].classId;
-      }
-    }
+    autoSelectClassDropdown(targetSelect);
 
     // Reset file input & preview
     const fileInput = document.getElementById('excel-student-file');
@@ -1983,6 +2018,7 @@
 
   function loadMasterView() {
     populateConfigForm();
+    populateClassSelects();
     loadClassesTable();
 
     // Sesuaikan hak akses peran: Guru vs Admin/Kepala Sekolah
@@ -1996,9 +2032,10 @@
       if (tabClasses) tabClasses.classList.add('hidden');
       if (tabSubjects) tabSubjects.classList.add('hidden');
       switchMasterTab('students');
-      setTimeout(() => {
-        autoSelectTeacherClass();
-      }, 150);
+      
+      const filterEl = document.getElementById('student-filter-class');
+      autoSelectClassDropdown(filterEl);
+      loadStudentsTable();
     } else {
       if (tabConfig) tabConfig.classList.remove('hidden');
       if (tabClasses) tabClasses.classList.remove('hidden');
@@ -6892,12 +6929,28 @@
    * SiAGU Client Runtime & State Management
    */
 
+  // Daftar Rombel Baku SD NEGERI SUMBEREJO 04 (Kelas 1-A s/d 6-B)
+  const DEFAULT_SD_CLASSES = [
+    { classId: 'CLS-1A', className: 'Kelas 1-A', gradeLevel: '1', majorPhase: 'Fase A', academicYear: '2026/2027' },
+    { classId: 'CLS-1B', className: 'Kelas 1-B', gradeLevel: '1', majorPhase: 'Fase A', academicYear: '2026/2027' },
+    { classId: 'CLS-2A', className: 'Kelas 2-A', gradeLevel: '2', majorPhase: 'Fase A', academicYear: '2026/2027' },
+    { classId: 'CLS-2B', className: 'Kelas 2-B', gradeLevel: '2', majorPhase: 'Fase A', academicYear: '2026/2027' },
+    { classId: 'CLS-3A', className: 'Kelas 3-A', gradeLevel: '3', majorPhase: 'Fase B', academicYear: '2026/2027' },
+    { classId: 'CLS-3B', className: 'Kelas 3-B', gradeLevel: '3', majorPhase: 'Fase B', academicYear: '2026/2027' },
+    { classId: 'CLS-4A', className: 'Kelas 4-A', gradeLevel: '4', majorPhase: 'Fase B', academicYear: '2026/2027' },
+    { classId: 'CLS-4B', className: 'Kelas 4-B', gradeLevel: '4', majorPhase: 'Fase B', academicYear: '2026/2027' },
+    { classId: 'CLS-5A', className: 'Kelas 5-A', gradeLevel: '5', majorPhase: 'Fase C', academicYear: '2026/2027' },
+    { classId: 'CLS-5B', className: 'Kelas 5-B', gradeLevel: '5', majorPhase: 'Fase C', academicYear: '2026/2027' },
+    { classId: 'CLS-6A', className: 'Kelas 6-A', gradeLevel: '6', majorPhase: 'Fase C', academicYear: '2026/2027' },
+    { classId: 'CLS-6B', className: 'Kelas 6-B', gradeLevel: '6', majorPhase: 'Fase C', academicYear: '2026/2027' }
+  ];
+
   const AppState = {
     currentView: 'dashboard',
     activeRole: 'teacher', // 'teacher' atau 'headmaster'
     currentUser: null,
     config: {},
-    classes: [],
+    classes: [...DEFAULT_SD_CLASSES], // Langsung terisi rombel SD, tidak pernah kosong
     subjects: [],
     students: [],
     cache: {
@@ -7454,8 +7507,15 @@
       const res = await runServer('getInitialAppPayload');
       if (res && res.data) {
         AppState.config = res.data.config || {};
-        AppState.classes = res.data.classes || [];
+        if (res.data.classes && res.data.classes.length > 0) {
+          AppState.classes = res.data.classes;
+        }
         AppState.subjects = res.data.subjects || [];
+
+        // Perbarui dropdown rombel kelas jika fungsi populate tersedia
+        if (typeof populateClassSelects === 'function') {
+          populateClassSelects();
+        }
 
         // Update teks profil guru & sekolah di header
         updateHeaderInfo();

@@ -3,12 +3,28 @@
    * SiAGU Client Runtime & State Management
    */
 
+  // Daftar Rombel Baku SD NEGERI SUMBEREJO 04 (Kelas 1-A s/d 6-B)
+  const DEFAULT_SD_CLASSES = [
+    { classId: 'CLS-1A', className: 'Kelas 1-A', gradeLevel: '1', majorPhase: 'Fase A', academicYear: '2026/2027' },
+    { classId: 'CLS-1B', className: 'Kelas 1-B', gradeLevel: '1', majorPhase: 'Fase A', academicYear: '2026/2027' },
+    { classId: 'CLS-2A', className: 'Kelas 2-A', gradeLevel: '2', majorPhase: 'Fase A', academicYear: '2026/2027' },
+    { classId: 'CLS-2B', className: 'Kelas 2-B', gradeLevel: '2', majorPhase: 'Fase A', academicYear: '2026/2027' },
+    { classId: 'CLS-3A', className: 'Kelas 3-A', gradeLevel: '3', majorPhase: 'Fase B', academicYear: '2026/2027' },
+    { classId: 'CLS-3B', className: 'Kelas 3-B', gradeLevel: '3', majorPhase: 'Fase B', academicYear: '2026/2027' },
+    { classId: 'CLS-4A', className: 'Kelas 4-A', gradeLevel: '4', majorPhase: 'Fase B', academicYear: '2026/2027' },
+    { classId: 'CLS-4B', className: 'Kelas 4-B', gradeLevel: '4', majorPhase: 'Fase B', academicYear: '2026/2027' },
+    { classId: 'CLS-5A', className: 'Kelas 5-A', gradeLevel: '5', majorPhase: 'Fase C', academicYear: '2026/2027' },
+    { classId: 'CLS-5B', className: 'Kelas 5-B', gradeLevel: '5', majorPhase: 'Fase C', academicYear: '2026/2027' },
+    { classId: 'CLS-6A', className: 'Kelas 6-A', gradeLevel: '6', majorPhase: 'Fase C', academicYear: '2026/2027' },
+    { classId: 'CLS-6B', className: 'Kelas 6-B', gradeLevel: '6', majorPhase: 'Fase C', academicYear: '2026/2027' }
+  ];
+
   const AppState = {
     currentView: 'dashboard',
     activeRole: 'teacher', // 'teacher' atau 'headmaster'
     currentUser: null,
     config: {},
-    classes: [],
+    classes: [...DEFAULT_SD_CLASSES], // Langsung terisi rombel SD, tidak pernah kosong
     subjects: [],
     students: [],
     cache: {
@@ -565,8 +581,15 @@
       const res = await runServer('getInitialAppPayload');
       if (res && res.data) {
         AppState.config = res.data.config || {};
-        AppState.classes = res.data.classes || [];
+        if (res.data.classes && res.data.classes.length > 0) {
+          AppState.classes = res.data.classes;
+        }
         AppState.subjects = res.data.subjects || [];
+
+        // Perbarui dropdown rombel kelas jika fungsi populate tersedia
+        if (typeof populateClassSelects === 'function') {
+          populateClassSelects();
+        }
 
         // Update teks profil guru & sekolah di header
         updateHeaderInfo();
