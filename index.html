@@ -3584,15 +3584,29 @@
     `;
 
     try {
-      const res = await runServer('getStudentsByClass', classId);
-      const students = res.data || [];
+      let res;
+      try {
+        res = await runServer('getStudents', classId);
+      } catch (e) {
+        res = await runServer('getStudentsByClass', classId);
+      }
+      let students = (res && res.data) ? res.data : [];
+
+      // Fallback lokal jika tersimpan di AppState.students
+      if ((!students || students.length === 0) && Array.isArray(AppState.students)) {
+        const target = classId.trim().toLowerCase();
+        students = AppState.students.filter(s => {
+          const sClass = String(s.classId || '').trim().toLowerCase();
+          return sClass === target || sClass.replace(/[\s\-_]/g, '') === target.replace(/[\s\-_]/g, '');
+        });
+      }
 
       if (students.length === 0) {
         grid.innerHTML = '<div class="col-span-full py-8 text-center text-slate-500 text-xs">Tidak ada data siswa di kelas ini.</div>';
         return;
       }
 
-      const schoolName = (AppState.config && AppState.config.SCHOOL_NAME) ? AppState.config.SCHOOL_NAME : 'SEKOLAH';
+      const schoolName = (AppState.config && AppState.config.SCHOOL_NAME) ? AppState.config.SCHOOL_NAME : 'SD NEGERI SUMBEREJO 04';
       const selectedClassObj = (AppState.classes || []).find(c => c.classId === classId);
       const className = selectedClassObj ? selectedClassObj.className : 'Kelas';
 
@@ -3601,7 +3615,7 @@
           <div>
             <div class="text-[10px] font-extrabold uppercase tracking-widest text-amber-400">${schoolName}</div>
             <div class="font-extrabold text-white text-xs truncate mt-0.5">${s.studentName}</div>
-            <div class="text-[10px] text-slate-400 font-semibold">${className} • NIS: ${s.nis || '-'}</div>
+            <div class="text-[10px] text-slate-400 font-semibold">${className} • NIS/NISN: ${s.nisn || s.nis || '-'}</div>
           </div>
 
           <div class="py-1 bg-white rounded-xl p-2 flex items-center justify-center">
@@ -3615,7 +3629,7 @@
       // Render barcode ke tiap elemen SVG menggunakan JsBarcode
       if (typeof JsBarcode !== 'undefined') {
         students.forEach((s, idx) => {
-          const barcodeValue = s.nis || s.studentId || `SISWA-${idx+1}`;
+          const barcodeValue = s.nisn || s.nis || s.studentId || `SISWA-${idx+1}`;
           try {
             JsBarcode(`#barcode-svg-${idx}`, barcodeValue, {
               format: "CODE128",

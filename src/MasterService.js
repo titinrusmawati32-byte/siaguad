@@ -219,10 +219,13 @@ function getStudents(classId = null) {
 
     const data = sheet.getDataRange().getValues();
     const students = [];
+    const target = classId ? String(classId).trim().toLowerCase() : null;
 
     for (let i = 1; i < data.length; i++) {
-      const studentClassId = data[i][5];
-      if (!classId || studentClassId === classId) {
+      const studentClassId = String(data[i][5] || '').trim();
+      if (!target || 
+          studentClassId.toLowerCase() === target || 
+          studentClassId.toLowerCase().replace(/[\s\-_]/g, '') === target.replace(/[\s\-_]/g, '')) {
         students.push({
           studentId: data[i][0],
           nis: data[i][1],
@@ -236,12 +239,19 @@ function getStudents(classId = null) {
     }
 
     // Urutkan alfabetis nama siswa
-    students.sort((a, b) => a.studentName.localeCompare(b.studentName));
+    students.sort((a, b) => String(a.studentName || '').localeCompare(String(b.studentName || '')));
 
     return successResponse(students);
   } catch (err) {
     return errorResponse('Gagal mengambil data siswa: ' + err.message);
   }
+}
+
+/**
+ * Alias getStudentsByClass untuk kompatibilitas cetak barcode presensi
+ */
+function getStudentsByClass(classId) {
+  return getStudents(classId);
 }
 
 function saveStudent(student) {
