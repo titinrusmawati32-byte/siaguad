@@ -143,10 +143,20 @@
           <h3 class="font-extrabold text-white text-base">Data Master Guru Sekolah</h3>
           <p class="text-xs text-slate-400">Kelola daftar seluruh tenaga pendidik yang di-supervisi.</p>
         </div>
-        <button onclick="openTeacherModal()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20 transition inline-flex items-center gap-1.5">
-          <i data-lucide="user-plus" class="w-4 h-4"></i>
-          <span>Tambah Guru Baru</span>
-        </button>
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="downloadTeacherExcelTemplate()" type="button" class="px-3 py-2 bg-white/5 hover:bg-white/10 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-bold transition inline-flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-400"></i>
+            <span>Template Guru</span>
+          </button>
+          <button onclick="openUploadTeacherExcelModal()" type="button" class="px-3 py-2 bg-white/5 hover:bg-white/10 text-sky-300 border border-sky-500/30 rounded-xl text-xs font-bold transition inline-flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="upload" class="w-4 h-4 text-sky-400"></i>
+            <span>Upload Excel</span>
+          </button>
+          <button onclick="openTeacherModal()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20 transition inline-flex items-center gap-1.5">
+            <i data-lucide="user-plus" class="w-4 h-4"></i>
+            <span>Tambah Guru Baru</span>
+          </button>
+        </div>
       </div>
 
       <div class="overflow-x-auto">
@@ -322,8 +332,23 @@
           <input type="text" id="form-teacher-nip" placeholder="1985..." class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none">
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-300 mb-1">Mata Pelajaran</label>
-          <input type="text" id="form-teacher-subject" placeholder="Matematika / Biologi" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Tugas / Guru Kelas yang Diampu</label>
+          <select id="form-teacher-subject" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none" required>
+            <option value="Guru Kelas 1-A">Guru Kelas 1-A (Fase A)</option>
+            <option value="Guru Kelas 1-B">Guru Kelas 1-B (Fase A)</option>
+            <option value="Guru Kelas 2-A">Guru Kelas 2-A (Fase A)</option>
+            <option value="Guru Kelas 2-B">Guru Kelas 2-B (Fase A)</option>
+            <option value="Guru Kelas 3-A">Guru Kelas 3-A (Fase B)</option>
+            <option value="Guru Kelas 3-B">Guru Kelas 3-B (Fase B)</option>
+            <option value="Guru Kelas 4-A">Guru Kelas 4-A (Fase B)</option>
+            <option value="Guru Kelas 4-B">Guru Kelas 4-B (Fase B)</option>
+            <option value="Guru Kelas 5-A">Guru Kelas 5-A (Fase C)</option>
+            <option value="Guru Kelas 5-B">Guru Kelas 5-B (Fase C)</option>
+            <option value="Guru Kelas 6-A">Guru Kelas 6-A (Fase C)</option>
+            <option value="Guru Kelas 6-B">Guru Kelas 6-B (Fase C)</option>
+            <option value="Guru Pendidikan Agama Islam (PAI)">Guru PAI (Pendidikan Agama Islam)</option>
+            <option value="Guru PJOK">Guru PJOK (Pendidikan Jasmani)</option>
+          </select>
         </div>
       </div>
       <div>
@@ -353,6 +378,27 @@
 
     <form onsubmit="handleSaveGenerateAccount(event)" class="space-y-4">
       <input type="hidden" id="gen-teacher-id">
+
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Tugas / Guru Kelas yang Diampu</label>
+        <select id="gen-teacher-subject" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs font-semibold text-white focus:border-amber-400 outline-none">
+          <option value="Guru Kelas 1-A">Guru Kelas 1-A (Fase A)</option>
+          <option value="Guru Kelas 1-B">Guru Kelas 1-B (Fase A)</option>
+          <option value="Guru Kelas 2-A">Guru Kelas 2-A (Fase A)</option>
+          <option value="Guru Kelas 2-B">Guru Kelas 2-B (Fase A)</option>
+          <option value="Guru Kelas 3-A">Guru Kelas 3-A (Fase B)</option>
+          <option value="Guru Kelas 3-B">Guru Kelas 3-B (Fase B)</option>
+          <option value="Guru Kelas 4-A">Guru Kelas 4-A (Fase B)</option>
+          <option value="Guru Kelas 4-B">Guru Kelas 4-B (Fase B)</option>
+          <option value="Guru Kelas 5-A">Guru Kelas 5-A (Fase C)</option>
+          <option value="Guru Kelas 5-B">Guru Kelas 5-B (Fase C)</option>
+          <option value="Guru Kelas 6-A">Guru Kelas 6-A (Fase C)</option>
+          <option value="Guru Kelas 6-B">Guru Kelas 6-B (Fase C)</option>
+          <option value="Guru Pendidikan Agama Islam (PAI)">Guru PAI (Pendidikan Agama Islam)</option>
+          <option value="Guru PJOK">Guru PJOK (Pendidikan Jasmani)</option>
+        </select>
+        <p class="text-[10px] text-slate-500 mt-1">Pilih penugasan guru kelas (1-A s/d 6-B) atau mapel agama/jasmani.</p>
+      </div>
 
       <div>
         <label class="block text-xs font-bold text-slate-300 mb-1">Username Login</label>
@@ -671,6 +717,12 @@
     const t = typeof tOrIdx === 'number' ? (window.teachersTableCache && window.teachersTableCache[tOrIdx] ? window.teachersTableCache[tOrIdx] : {}) : (tOrIdx || {});
     document.getElementById('gen-teacher-id').value = t.teacherId || '';
     document.getElementById('gen-teacher-title-info').textContent = `Guru: ${t.teacherName || '-'} (${t.subjectName || '-'})`;
+    
+    // Set pilihan kelas
+    const subjEl = document.getElementById('gen-teacher-subject');
+    if (subjEl && t.subjectName) {
+      subjEl.value = t.subjectName;
+    }
 
     // Generate saran username & password
     const cleanName = (t.teacherName || 'guru').replace(/[^a-zA-Z]/g, '').toLowerCase().substring(0, 8);
@@ -691,10 +743,11 @@
     const teacherId = document.getElementById('gen-teacher-id').value;
     const username = document.getElementById('gen-username').value.trim();
     const password = document.getElementById('gen-password').value.trim();
+    const subjectName = document.getElementById('gen-teacher-subject') ? document.getElementById('gen-teacher-subject').value : '';
 
     try {
       setLoading(true, 'Menyimpan kredensial akun guru...');
-      const res = await runServer('generateTeacherCredentials', teacherId, username, password);
+      const res = await runServer('generateTeacherCredentials', teacherId, username, password, subjectName);
       if (res && res.success) {
         closeModal('modal-generate-account');
         showToast('Akun guru berhasil dibuat!', 'success');

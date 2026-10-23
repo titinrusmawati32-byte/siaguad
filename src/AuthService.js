@@ -14,10 +14,12 @@ function ensureUsersSheet() {
   const headers = ['user_id', 'username', 'password', 'full_name', 'nip', 'role', 'subject_name', 'email', 'status', 'created_at'];
   const defaultAccounts = [
     ['USR-000', 'admin', 'kepsek123', 'Supriyadi, S.Pd., M.Pd.', '19720412 199803 1 005', 'kepsek', 'Kepala Sekolah', 'kepsek@sdnsumberejo04.sch.id', 'Aktif', '2026-10-22'],
-    ['USR-001', 'guru_siti', 'guru123', 'Siti Rahayu, S.Pd.', '19870815 201101 2 009', 'guru', 'Guru Kelas 4 (Fase B)', 'siti.rahayu@guru.sd.belajar.id', 'Aktif', '2026-10-22'],
-    ['USR-002', 'guru_ahmad', 'guru123', 'Ahmad Fauzi, S.Pd.I.', '19890321 201402 1 003', 'guru', 'Pendidikan Agama Islam (PAI)', 'ahmad.fauzi@guru.sd.belajar.id', 'Aktif', '2026-10-22'],
-    ['USR-003', 'guru_bambang', 'guru123', 'Bambang Irawan, S.Pd.', '19910510 201903 1 004', 'guru', 'PJOK (Pendidikan Jasmani)', 'bambang.irawan@guru.sd.belajar.id', 'Aktif', '2026-10-22'],
-    ['USR-004', 'guru_nurul', 'guru123', 'Nurul Annisa, S.Pd.', '19930405 202012 2 008', 'guru', 'Guru Kelas 1 (Fase A)', 'nurul.annisa@guru.sd.belajar.id', 'Aktif', '2026-10-22']
+    ['USR-001', 'guru_siti', 'guru123', 'Siti Rahayu, S.Pd.', '19870815 201101 2 009', 'guru', 'Guru Kelas 4-A', 'siti.rahayu@guru.sd.belajar.id', 'Aktif', '2026-10-22'],
+    ['USR-002', 'guru_ahmad', 'guru123', 'Ahmad Fauzi, S.Pd.', '19890321 201402 1 003', 'guru', 'Guru Kelas 1-A', 'ahmad.fauzi@guru.sd.belajar.id', 'Aktif', '2026-10-22'],
+    ['USR-003', 'guru_bambang', 'guru123', 'Bambang Irawan, S.Pd.', '19910510 201903 1 004', 'guru', 'Guru Kelas 2-A', 'bambang.irawan@guru.sd.belajar.id', 'Aktif', '2026-10-22'],
+    ['USR-004', 'guru_nurul', 'guru123', 'Nurul Annisa, S.Pd.', '19930405 202012 2 008', 'guru', 'Guru Kelas 3-A', 'nurul.annisa@guru.sd.belajar.id', 'Aktif', '2026-10-22'],
+    ['USR-005', 'guru_dewi', 'guru123', 'Dewi Sartika, S.Pd.', '19850612 201001 2 015', 'guru', 'Guru Kelas 5-A', 'dewi.sartika@guru.sd.belajar.id', 'Aktif', '2026-10-22'],
+    ['USR-006', 'guru_tri', 'guru123', 'Tri Wahyuni, S.Pd.', '19820405 200801 2 011', 'guru', 'Guru Kelas 6-A', 'tri.wahyuni@guru.sd.belajar.id', 'Aktif', '2026-10-22']
   ];
 
   if (!sheet) {
@@ -288,6 +290,98 @@ function deleteUserAccount(userId) {
     return errorResponse('Akun pengguna tidak ditemukan.');
   } catch (err) {
     return errorResponse('Gagal menghapus akun: ' + err.message);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/**
+ * Import Massal Guru dari File Excel / Array
+ * Menambahkan sekaligus ke _USERS dan _TEACHERS
+ */
+function saveBatchTeachers(teachersList) {
+  const lock = LockService.getScriptLock();
+  lock.tryLock(25000);
+  try {
+    const sheet = ensureUsersSheet();
+    const todayStr = Utilities.formatDate(new Date(), 'Asia/Jakarta', 'yyyy-MM-dd');
+    const uData = sheet.getDataRange().getValues();
+    const existingUsernames = new Set();
+    const existingNips = new Set();
+    for (let i = 1; i < uData.length; i++) {
+      if (uData[i][1]) existingUsernames.add(String(uData[i][1]).toLowerCase().trim());
+      if (uData[i][4]) existingNips.add(String(uData[i][4]).replace(/\s+/g, ''));
+    }
+
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const rowsToInsert = [];
+    const addedTeachers = [];
+
+    teachersList.forEach((t, idx) => {
+      const name = String(t.fullName || t.name || t.teacherName || '').trim();
+      if (!name) return;
+      const nip = String(t.nip || '-').trim();
+      const cleanNip = nip.replace(/\s+/g, '');
+      const subject = String(t.subjectName || t.subject || t.classAssigned || t.kelas || 'Guru Kelas').trim();
+      const email = String(t.email || '').trim();
+
+      // Check if duplicate NIP already exists
+      if (cleanNip && cleanNip !== '-' && existingNips.has(cleanNip)) {
+        return; // Lewati jika NIP sudah terdaftar
+      }
+
+      // Generate unique username
+      let baseUser = 'guru_' + name.replace(/[^a-zA-Z]/g, '').toLowerCase().substring(0, 8);
+      if (!baseUser || baseUser === 'guru_') baseUser = 'guru_' + (idx + 1);
+      let finalUser = baseUser;
+      let counter = 1;
+      while (existingUsernames.has(finalUser.toLowerCase())) {
+        finalUser = baseUser + counter;
+        counter++;
+      }
+      existingUsernames.add(finalUser.toLowerCase());
+
+      // Generate 6-char PIN
+      let pin = '';
+      for (let k = 0; k < 6; k++) pin += chars.charAt(Math.floor(Math.random() * chars.length));
+
+      const userId = 'USR-' + Utilities.getUuid().substring(0, 6).toUpperCase();
+      rowsToInsert.push([
+        sanitizeForSheet(userId),
+        sanitizeForSheet(finalUser),
+        sanitizeForSheet(pin),
+        sanitizeForSheet(name),
+        sanitizeForSheet(nip),
+        'guru',
+        sanitizeForSheet(subject),
+        sanitizeForSheet(email),
+        'Aktif',
+        todayStr
+      ]);
+
+      addedTeachers.push({
+        userId: userId,
+        teacherName: name,
+        nip: nip,
+        subjectName: subject,
+        username: finalUser,
+        password: pin
+      });
+
+      // Sinkronkan juga ke _TEACHERS
+      syncUserToTeachersSheet(userId, name, nip, subject, email, finalUser, pin, 'Aktif');
+    });
+
+    if (rowsToInsert.length > 0) {
+      sheet.getRange(sheet.getLastRow() + 1, 1, rowsToInsert.length, 10).setValues(rowsToInsert);
+    }
+
+    return successResponse({
+      totalAdded: rowsToInsert.length,
+      teachers: addedTeachers
+    }, `${rowsToInsert.length} data guru berhasil diimpor & akun login dibuat.`);
+  } catch (err) {
+    return errorResponse('Gagal mengimpor data guru: ' + err.message);
   } finally {
     lock.releaseLock();
   }

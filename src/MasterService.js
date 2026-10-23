@@ -173,40 +173,51 @@ function saveStudent(student) {
 }
 
 /**
- * Import Massal Siswa dari teks (1 baris per nama siswa)
+ * Import Massal Siswa dari File Excel atau Teks
  */
-function saveBatchStudents(classId, studentNamesList) {
+function saveBatchStudents(classId, studentList) {
   const lock = LockService.getScriptLock();
-  lock.tryLock(20000);
+  lock.tryLock(25000);
   try {
     const ss = getDatabaseSpreadsheet();
     const sheet = ss.getSheetByName('_STUDENTS');
     if (!sheet) throw new Error('Sheet _STUDENTS tidak ditemukan.');
 
     const rowsToInsert = [];
-    studentNamesList.forEach((line, idx) => {
-      const trimmed = line.trim();
-      if (trimmed) {
-        // Mendukung format "Nama" atau "Nama, L/P" atau "NIS, Nama, L/P"
-        const parts = trimmed.split(/[\t,;]/);
-        let name = parts[0].trim();
-        let gender = 'L';
-        let nis = '';
+    studentList.forEach((item, idx) => {
+      let name = '';
+      let nisn = '';
+      let gender = 'L';
 
-        if (parts.length === 2) {
+      if (typeof item === 'object' && item !== null) {
+        name = String(item.studentName || item.name || item.nama || item['Nama Lengkap'] || item['Nama Siswa'] || '').trim();
+        nisn = String(item.nisn || item.nis || item.NISN || item['NISN'] || '').trim();
+        gender = String(item.gender || item.jenisKelamin || item['Jenis Kelamin'] || 'L').toUpperCase().startsWith('P') ? 'P' : 'L';
+      } else if (typeof item === 'string') {
+        const trimmed = item.trim();
+        if (trimmed) {
+          const parts = trimmed.split(/[\t,;]/);
           name = parts[0].trim();
-          gender = parts[1].trim().toUpperCase() === 'P' ? 'P' : 'L';
-        } else if (parts.length >= 3) {
-          nis = parts[0].trim();
-          name = parts[1].trim();
-          gender = parts[2].trim().toUpperCase() === 'P' ? 'P' : 'L';
+          if (parts.length === 2) {
+            if (/^[0-9]+$/.test(parts[1].trim())) {
+              nisn = parts[1].trim();
+            } else {
+              gender = parts[1].trim().toUpperCase() === 'P' ? 'P' : 'L';
+            }
+          } else if (parts.length >= 3) {
+            nisn = parts[0].trim();
+            name = parts[1].trim();
+            gender = parts[2].trim().toUpperCase() === 'P' ? 'P' : 'L';
+          }
         }
+      }
 
+      if (name) {
         const studentId = 'STD-' + Utilities.getUuid().substring(0, 8).toUpperCase();
         rowsToInsert.push([
           sanitizeForSheet(studentId),
-          sanitizeForSheet(nis),
-          '',
+          sanitizeForSheet(nisn),
+          sanitizeForSheet(nisn),
           sanitizeForSheet(name),
           gender,
           sanitizeForSheet(classId),

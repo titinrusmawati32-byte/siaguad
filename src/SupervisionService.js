@@ -203,7 +203,7 @@ function getTeacherAccountsList() {
 /**
  * Membuat atau memperbarui kredensial akun guru (Username & Password)
  */
-function generateTeacherCredentials(teacherId, username, password) {
+function generateTeacherCredentials(teacherId, username, password, subjectName) {
   const lock = LockService.getScriptLock();
   lock.tryLock(20000);
   try {
@@ -236,7 +236,7 @@ function generateTeacherCredentials(teacherId, username, password) {
             nip: tData[i][1],
             teacherName: tData[i][2],
             email: tData[i][3],
-            subjectName: tData[i][4],
+            subjectName: subjectName || tData[i][4] || '-',
             phone: tData[i][5],
             status: tData[i][6] || 'Aktif'
           };
@@ -255,7 +255,7 @@ function generateTeacherCredentials(teacherId, username, password) {
             nip: uData[i][4],
             teacherName: uData[i][3],
             email: uData[i][7],
-            subjectName: uData[i][6],
+            subjectName: subjectName || uData[i][6] || '-',
             phone: '',
             status: uData[i][8] || 'Aktif'
           };
@@ -268,8 +268,13 @@ function generateTeacherCredentials(teacherId, username, password) {
       return errorResponse('Data guru dengan ID ' + teacherId + ' tidak ditemukan.');
     }
 
+    if (subjectName) {
+      teacherInfo.subjectName = subjectName;
+    }
+
     // 1. Simpan/Update ke sheet _TEACHERS
     if (teacherRowIdx > 0) {
+      tSheet.getRange(teacherRowIdx, 5).setValue(sanitizeForSheet(teacherInfo.subjectName));
       tSheet.getRange(teacherRowIdx, 8, 1, 3).setValues([[sanitizeForSheet(cleanUser), sanitizeForSheet(cleanPass), 'guru']]);
     } else if (tSheet) {
       tSheet.appendRow([
@@ -294,6 +299,7 @@ function generateTeacherCredentials(teacherId, username, password) {
     for (let i = 1; i < uData.length; i++) {
       if (uData[i][0] === teacherInfo.teacherId || (teacherInfo.nip && teacherInfo.nip !== '-' && String(uData[i][4]).replace(/\s+/g, '') === String(teacherInfo.nip).replace(/\s+/g, ''))) {
         uSheet.getRange(i + 1, 2, 1, 2).setValues([[sanitizeForSheet(cleanUser), sanitizeForSheet(cleanPass)]]);
+        uSheet.getRange(i + 1, 7).setValue(sanitizeForSheet(teacherInfo.subjectName));
         uUpdated = true;
         break;
       }
@@ -317,7 +323,8 @@ function generateTeacherCredentials(teacherId, username, password) {
     return successResponse({
       teacherId: teacherInfo.teacherId,
       username: cleanUser,
-      password: cleanPass
+      password: cleanPass,
+      subjectName: teacherInfo.subjectName
     }, 'Kredensial login untuk ' + teacherInfo.teacherName + ' berhasil dibuat.');
   } catch (err) {
     return errorResponse('Gagal membuat kredensial guru: ' + err.message);

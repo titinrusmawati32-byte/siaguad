@@ -228,25 +228,31 @@ function initDatabaseSchema() {
         name: '_CLASSES',
         headers: ['class_id', 'class_name', 'grade_level', 'major_phase', 'academic_year'],
         initialData: [
-          ['CLS-SD1', 'Kelas 1', '1', 'Fase A', '2026/2027'],
-          ['CLS-SD2', 'Kelas 2', '2', 'Fase A', '2026/2027'],
-          ['CLS-SD3', 'Kelas 3', '3', 'Fase B', '2026/2027'],
-          ['CLS-SD4', 'Kelas 4', '4', 'Fase B', '2026/2027'],
-          ['CLS-SD5', 'Kelas 5', '5', 'Fase C', '2026/2027'],
-          ['CLS-SD6', 'Kelas 6', '6', 'Fase C', '2026/2027']
+          ['CLS-1A', 'Kelas 1-A', '1', 'Fase A', '2026/2027'],
+          ['CLS-1B', 'Kelas 1-B', '1', 'Fase A', '2026/2027'],
+          ['CLS-2A', 'Kelas 2-A', '2', 'Fase A', '2026/2027'],
+          ['CLS-2B', 'Kelas 2-B', '2', 'Fase A', '2026/2027'],
+          ['CLS-3A', 'Kelas 3-A', '3', 'Fase B', '2026/2027'],
+          ['CLS-3B', 'Kelas 3-B', '3', 'Fase B', '2026/2027'],
+          ['CLS-4A', 'Kelas 4-A', '4', 'Fase B', '2026/2027'],
+          ['CLS-4B', 'Kelas 4-B', '4', 'Fase B', '2026/2027'],
+          ['CLS-5A', 'Kelas 5-A', '5', 'Fase C', '2026/2027'],
+          ['CLS-5B', 'Kelas 5-B', '5', 'Fase C', '2026/2027'],
+          ['CLS-6A', 'Kelas 6-A', '6', 'Fase C', '2026/2027'],
+          ['CLS-6B', 'Kelas 6-B', '6', 'Fase C', '2026/2027']
         ]
       },
       {
         name: '_STUDENTS',
         headers: ['student_id', 'nis', 'nisn', 'student_name', 'gender', 'class_id', 'parent_phone'],
         initialData: [
-          ['STD-001', '26001', '0081234561', 'Achmad Maulana', 'L', 'CLS-SD4', '081234567801'],
-          ['STD-002', '26002', '0081234562', 'Annisa Putri Rahayu', 'P', 'CLS-SD4', '081234567802'],
-          ['STD-003', '26003', '0081234563', 'Bagas Pratama', 'L', 'CLS-SD4', '081234567803'],
-          ['STD-004', '26004', '0081234564', 'Citra Dewi Lestari', 'P', 'CLS-SD4', '081234567804'],
-          ['STD-005', '26005', '0081234565', 'Dimas Satria Nugraha', 'L', 'CLS-SD4', '081234567805'],
-          ['STD-006', '26006', '0081234566', 'Farah Nabilah', 'P', 'CLS-SD1', '081234567806'],
-          ['STD-007', '26007', '0081234567', 'Gilang Ramadhan', 'L', 'CLS-SD1', '081234567807']
+          ['STD-001', '0081234561', '0081234561', 'Achmad Maulana', 'L', 'CLS-4A', '081234567801'],
+          ['STD-002', '0081234562', '0081234562', 'Annisa Putri Rahayu', 'P', 'CLS-4A', '081234567802'],
+          ['STD-003', '0081234563', '0081234563', 'Bagas Pratama', 'L', 'CLS-4A', '081234567803'],
+          ['STD-004', '0081234564', '0081234564', 'Citra Dewi Lestari', 'P', 'CLS-4A', '081234567804'],
+          ['STD-005', '0081234565', '0081234565', 'Dimas Satria Nugraha', 'L', 'CLS-4A', '081234567805'],
+          ['STD-006', '0081234566', '0081234566', 'Farah Nabilah', 'P', 'CLS-1A', '081234567806'],
+          ['STD-007', '0081234567', '0081234567', 'Gilang Ramadhan', 'L', 'CLS-1A', '081234567807']
         ]
       },
       {
@@ -272,7 +278,7 @@ function initDatabaseSchema() {
             'JRN-20261020-001',
             '2026-10-20',
             'Jam 1-3 (07.00 - 08.45)',
-            'CLS-SD4',
+            'CLS-4A',
             'SBJ-IPAS-SD',
             'TP 4.1: Mengidentifikasi bagian tubuh tumbuhan (akar, batang, daun, bunga) dan fungsinya bagi kehidupan.',
             'Observasi tanaman di lingkungan sekolah, eksplorasi bagian akar dan daun, serta diskusi kelompok membuat diagram fungsi tumbuhan.',
@@ -285,22 +291,22 @@ function initDatabaseSchema() {
         name: '_ATTENDANCE',
         headers: ['attendance_id', 'date', 'class_id', 'subject_id', 'student_id', 'status', 'notes'],
         initialData: [
-          ['ATT-20261020-001', '2026-10-20', 'CLS-SD4', 'SBJ-IPAS-SD', 'STD-001', 'H', 'Tepat waktu'],
-          ['ATT-20261020-002', '2026-10-20', 'CLS-SD4', 'SBJ-IPAS-SD', 'STD-002', 'H', 'Tepat waktu'],
-          ['ATT-20261020-003', '2026-10-20', 'CLS-SD4', 'SBJ-IPAS-SD', 'STD-003', 'S', 'Surat dokter terlampir'],
-          ['ATT-20261020-004', '2026-10-20', 'CLS-SD4', 'SBJ-IPAS-SD', 'STD-004', 'H', 'Tepat waktu'],
-          ['ATT-20261020-005', '2026-10-20', 'CLS-SD4', 'SBJ-IPAS-SD', 'STD-005', 'I', 'Izin urusan keluarga']
+          ['ATT-20261020-001', '2026-10-20', 'CLS-4A', 'SBJ-IPAS-SD', 'STD-001', 'H', 'Tepat waktu'],
+          ['ATT-20261020-002', '2026-10-20', 'CLS-4A', 'SBJ-IPAS-SD', 'STD-002', 'H', 'Tepat waktu'],
+          ['ATT-20261020-003', '2026-10-20', 'CLS-4A', 'SBJ-IPAS-SD', 'STD-003', 'S', 'Surat dokter terlampir'],
+          ['ATT-20261020-004', '2026-10-20', 'CLS-4A', 'SBJ-IPAS-SD', 'STD-004', 'H', 'Tepat waktu'],
+          ['ATT-20261020-005', '2026-10-20', 'CLS-4A', 'SBJ-IPAS-SD', 'STD-005', 'I', 'Izin urusan keluarga']
         ]
       },
       {
         name: '_ASSESSMENTS',
         headers: ['assessment_id', 'class_id', 'subject_id', 'student_id', 'type', 'score', 'date', 'notes'],
         initialData: [
-          ['ASM-001', 'CLS-SD4', 'SBJ-IPAS-SD', 'STD-001', 'Formatif_1', 88, '2026-10-15', 'Tugas Diagram Bagian Tumbuhan'],
-          ['ASM-002', 'CLS-SD4', 'SBJ-IPAS-SD', 'STD-002', 'Formatif_1', 92, '2026-10-15', 'Tugas Diagram Bagian Tumbuhan'],
-          ['ASM-003', 'CLS-SD4', 'SBJ-IPAS-SD', 'STD-003', 'Formatif_1', 75, '2026-10-15', 'Tugas Diagram Bagian Tumbuhan'],
-          ['ASM-004', 'CLS-SD4', 'SBJ-IPAS-SD', 'STD-004', 'Formatif_1', 95, '2026-10-15', 'Tugas Diagram Bagian Tumbuhan'],
-          ['ASM-005', 'CLS-SD4', 'SBJ-IPAS-SD', 'STD-005', 'Formatif_1', 80, '2026-10-15', 'Tugas Diagram Bagian Tumbuhan']
+          ['ASM-001', 'CLS-4A', 'SBJ-IPAS-SD', 'STD-001', 'Formatif_1', 88, '2026-10-15', 'Tugas Diagram Bagian Tumbuhan'],
+          ['ASM-002', 'CLS-4A', 'SBJ-IPAS-SD', 'STD-002', 'Formatif_1', 92, '2026-10-15', 'Tugas Diagram Bagian Tumbuhan'],
+          ['ASM-003', 'CLS-4A', 'SBJ-IPAS-SD', 'STD-003', 'Formatif_1', 75, '2026-10-15', 'Tugas Diagram Bagian Tumbuhan'],
+          ['ASM-004', 'CLS-4A', 'SBJ-IPAS-SD', 'STD-004', 'Formatif_1', 95, '2026-10-15', 'Tugas Diagram Bagian Tumbuhan'],
+          ['ASM-005', 'CLS-4A', 'SBJ-IPAS-SD', 'STD-005', 'Formatif_1', 80, '2026-10-15', 'Tugas Diagram Bagian Tumbuhan']
         ]
       },
       {
@@ -311,7 +317,7 @@ function initDatabaseSchema() {
             'BHV-001',
             '2026-10-20',
             'STD-001',
-            'CLS-SD4',
+            'CLS-4A',
             'Gotong Royong',
             'Membantu merapikan alat dan daun spesimen pengamatan bersama kelompok.',
             'Diberikan apresiasi di depan kelas sebagai teladan pembiasaan Profil Pelajar Pancasila.'
@@ -337,10 +343,12 @@ function initDatabaseSchema() {
         name: '_TEACHERS',
         headers: ['teacher_id', 'nip', 'teacher_name', 'email', 'subject_name', 'phone', 'status', 'username', 'password', 'role'],
         initialData: [
-          ['TCH-001', '19870815 201101 2 009', 'Siti Rahayu, S.Pd.', 'siti.rahayu@guru.sd.belajar.id', 'Guru Kelas 4 (Fase B)', '081234567890', 'Aktif', 'guru_siti', 'guru123', 'guru'],
-          ['TCH-002', '19890321 201402 1 003', 'Ahmad Fauzi, S.Pd.I.', 'ahmad.fauzi@guru.sd.belajar.id', 'Pendidikan Agama Islam (PAI)', '081234567891', 'Aktif', 'guru_ahmad', 'guru123', 'guru'],
-          ['TCH-003', '19910510 201903 1 004', 'Bambang Irawan, S.Pd.', 'bambang.irawan@guru.sd.belajar.id', 'PJOK (Pendidikan Jasmani)', '081234567892', 'Aktif', 'guru_bambang', 'guru123', 'guru'],
-          ['TCH-004', '19930405 202012 2 008', 'Nurul Annisa, S.Pd.', 'nurul.annisa@guru.sd.belajar.id', 'Guru Kelas 1 (Fase A)', '081234567893', 'Aktif', 'guru_nurul', 'guru123', 'guru']
+          ['TCH-001', '19870815 201101 2 009', 'Siti Rahayu, S.Pd.', 'siti.rahayu@guru.sd.belajar.id', 'Guru Kelas 4-A', '081234567890', 'Aktif', 'guru_siti', 'guru123', 'guru'],
+          ['TCH-002', '19890321 201402 1 003', 'Ahmad Fauzi, S.Pd.', 'ahmad.fauzi@guru.sd.belajar.id', 'Guru Kelas 1-A', '081234567891', 'Aktif', 'guru_ahmad', 'guru123', 'guru'],
+          ['TCH-003', '19910510 201903 1 004', 'Bambang Irawan, S.Pd.', 'bambang.irawan@guru.sd.belajar.id', 'Guru Kelas 2-A', '081234567892', 'Aktif', 'guru_bambang', 'guru123', 'guru'],
+          ['TCH-004', '19930405 202012 2 008', 'Nurul Annisa, S.Pd.', 'nurul.annisa@guru.sd.belajar.id', 'Guru Kelas 3-A', '081234567893', 'Aktif', 'guru_nurul', 'guru123', 'guru'],
+          ['TCH-005', '19850612 201001 2 015', 'Dewi Sartika, S.Pd.', 'dewi.sartika@guru.sd.belajar.id', 'Guru Kelas 5-A', '081234567894', 'Aktif', 'guru_dewi', 'guru123', 'guru'],
+          ['TCH-006', '19820405 200801 2 011', 'Tri Wahyuni, S.Pd.', 'tri.wahyuni@guru.sd.belajar.id', 'Guru Kelas 6-A', '081234567895', 'Aktif', 'guru_tri', 'guru123', 'guru']
         ]
       },
       {
@@ -368,10 +376,12 @@ function initDatabaseSchema() {
         headers: ['user_id', 'username', 'password', 'full_name', 'nip', 'role', 'subject_name', 'email', 'status', 'created_at'],
         initialData: [
           ['USR-000', 'admin', 'kepsek123', 'Supriyadi, S.Pd., M.Pd.', '19720412 199803 1 005', 'kepsek', 'Kepala Sekolah', 'kepsek@sdnsumberejo04.sch.id', 'Aktif', '2026-10-22'],
-          ['USR-001', 'guru_siti', 'guru123', 'Siti Rahayu, S.Pd.', '19870815 201101 2 009', 'guru', 'Guru Kelas 4 (Fase B)', 'siti.rahayu@guru.sd.belajar.id', 'Aktif', '2026-10-22'],
-          ['USR-002', 'guru_ahmad', 'guru123', 'Ahmad Fauzi, S.Pd.I.', '19890321 201402 1 003', 'guru', 'Pendidikan Agama Islam (PAI)', 'ahmad.fauzi@guru.sd.belajar.id', 'Aktif', '2026-10-22'],
-          ['USR-003', 'guru_bambang', 'guru123', 'Bambang Irawan, S.Pd.', '19910510 201903 1 004', 'guru', 'PJOK (Pendidikan Jasmani)', 'bambang.irawan@guru.sd.belajar.id', 'Aktif', '2026-10-22'],
-          ['USR-004', 'guru_nurul', 'guru123', 'Nurul Annisa, S.Pd.', '19930405 202012 2 008', 'guru', 'Guru Kelas 1 (Fase A)', 'nurul.annisa@guru.sd.belajar.id', 'Aktif', '2026-10-22']
+          ['USR-001', 'guru_siti', 'guru123', 'Siti Rahayu, S.Pd.', '19870815 201101 2 009', 'guru', 'Guru Kelas 4-A', 'siti.rahayu@guru.sd.belajar.id', 'Aktif', '2026-10-22'],
+          ['USR-002', 'guru_ahmad', 'guru123', 'Ahmad Fauzi, S.Pd.', '19890321 201402 1 003', 'guru', 'Guru Kelas 1-A', 'ahmad.fauzi@guru.sd.belajar.id', 'Aktif', '2026-10-22'],
+          ['USR-003', 'guru_bambang', 'guru123', 'Bambang Irawan, S.Pd.', '19910510 201903 1 004', 'guru', 'Guru Kelas 2-A', 'bambang.irawan@guru.sd.belajar.id', 'Aktif', '2026-10-22'],
+          ['USR-004', 'guru_nurul', 'guru123', 'Nurul Annisa, S.Pd.', '19930405 202012 2 008', 'guru', 'Guru Kelas 3-A', 'nurul.annisa@guru.sd.belajar.id', 'Aktif', '2026-10-22'],
+          ['USR-005', 'guru_dewi', 'guru123', 'Dewi Sartika, S.Pd.', '19850612 201001 2 015', 'guru', 'Guru Kelas 5-A', 'dewi.sartika@guru.sd.belajar.id', 'Aktif', '2026-10-22'],
+          ['USR-006', 'guru_tri', 'guru123', 'Tri Wahyuni, S.Pd.', '19820405 200801 2 011', 'guru', 'Guru Kelas 6-A', 'tri.wahyuni@guru.sd.belajar.id', 'Aktif', '2026-10-22']
         ]
       }
     ];

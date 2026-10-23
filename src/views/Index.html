@@ -147,13 +147,14 @@
             <span>Pusat Cetak Supervisi</span>
           </button>
 
-          <p class="px-3 pt-3 pb-1 text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Akses & Keamanan</p>
-
-          <!-- Menu Halaman Login / Ganti Akun -->
-          <button type="button" onclick="goToLoginPage()" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition text-left text-sky-400 hover:text-white hover:bg-sky-500/10">
-            <i data-lucide="key-round" class="w-4 h-4 flex-shrink-0"></i>
-            <span>Menu Login / Ganti Akun</span>
-          </button>
+          <!-- Bagian Akses & Keamanan (Hanya tampil untuk Admin/Kepala Sekolah) -->
+          <div id="sidebar-sec-access" class="hidden">
+            <p class="px-3 pt-3 pb-1 text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Akses & Keamanan</p>
+            <button type="button" onclick="goToLoginPage()" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition text-left text-sky-400 hover:text-white hover:bg-sky-500/10">
+              <i data-lucide="key-round" class="w-4 h-4 flex-shrink-0"></i>
+              <span>Menu Login / Ganti Akun</span>
+            </button>
+          </div>
         </nav>
 
         <!-- Sidebar Footer: Tombol Keluar Bergaya Card (Screen 1) -->
@@ -451,7 +452,7 @@
           </div>
         </div>
         <div class="pt-2 flex items-center gap-3">
-          <button onclick="closeProfileSheet(); goToLoginPage()" class="flex-1 py-3 px-3 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-sky-400 flex items-center justify-center gap-1.5 hover:bg-white/10 transition">
+          <button onclick="closeProfileSheet(); goToLoginPage()" id="sheet-btn-change-acc" class="flex-1 py-3 px-3 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-sky-400 flex items-center justify-center gap-1.5 hover:bg-white/10 transition hidden">
             <i data-lucide="key-round" class="w-4 h-4"></i>
             <span>Ganti Akun</span>
           </button>

@@ -12,10 +12,20 @@
       <p class="text-xs text-slate-400">Tambah akun guru baru, kelola password, dan bagikan kartu kredensial login kepada guru.</p>
     </div>
 
-    <button onclick="openCreateUserModal()" class="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition inline-flex items-center gap-2 self-start sm:self-auto">
-      <i data-lucide="user-plus" class="w-4 h-4"></i>
-      <span>Tambah Akun Guru Baru</span>
-    </button>
+    <div class="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+      <button onclick="downloadTeacherExcelTemplate()" type="button" class="px-3.5 py-2.5 bg-white/5 hover:bg-white/10 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-bold transition inline-flex items-center gap-1.5 shadow-sm">
+        <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-400"></i>
+        <span>Download Template Guru</span>
+      </button>
+      <button onclick="openUploadTeacherExcelModal()" type="button" class="px-3.5 py-2.5 bg-white/5 hover:bg-white/10 text-sky-300 border border-sky-500/30 rounded-xl text-xs font-bold transition inline-flex items-center gap-1.5 shadow-sm">
+        <i data-lucide="upload" class="w-4 h-4 text-sky-400"></i>
+        <span>Upload Excel Guru</span>
+      </button>
+      <button onclick="openCreateUserModal()" class="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition inline-flex items-center gap-2">
+        <i data-lucide="user-plus" class="w-4 h-4"></i>
+        <span>Tambah Guru</span>
+      </button>
+    </div>
   </div>
 
   <!-- KPI Statistik Pengguna (Gradient Glass Cards) -->
@@ -145,8 +155,23 @@
           <input type="text" id="usr-form-nip" placeholder="Nomor Induk Pegawai" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition">
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-300 mb-1">Mata Pelajaran yang Diampu</label>
-          <input type="text" id="usr-form-subject" placeholder="Contoh: Matematika" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition" required>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Tugas / Guru Kelas yang Diampu</label>
+          <select id="usr-form-subject" class="w-full px-3 py-2.5 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition" required>
+            <option value="Guru Kelas 1-A">Guru Kelas 1-A (Fase A)</option>
+            <option value="Guru Kelas 1-B">Guru Kelas 1-B (Fase A)</option>
+            <option value="Guru Kelas 2-A">Guru Kelas 2-A (Fase A)</option>
+            <option value="Guru Kelas 2-B">Guru Kelas 2-B (Fase A)</option>
+            <option value="Guru Kelas 3-A">Guru Kelas 3-A (Fase B)</option>
+            <option value="Guru Kelas 3-B">Guru Kelas 3-B (Fase B)</option>
+            <option value="Guru Kelas 4-A">Guru Kelas 4-A (Fase B)</option>
+            <option value="Guru Kelas 4-B">Guru Kelas 4-B (Fase B)</option>
+            <option value="Guru Kelas 5-A">Guru Kelas 5-A (Fase C)</option>
+            <option value="Guru Kelas 5-B">Guru Kelas 5-B (Fase C)</option>
+            <option value="Guru Kelas 6-A">Guru Kelas 6-A (Fase C)</option>
+            <option value="Guru Kelas 6-B">Guru Kelas 6-B (Fase C)</option>
+            <option value="Guru Pendidikan Agama Islam (PAI)">Guru PAI (Pendidikan Agama Islam)</option>
+            <option value="Guru PJOK">Guru PJOK (Pendidikan Jasmani)</option>
+          </select>
         </div>
       </div>
 
@@ -238,6 +263,78 @@
         <i data-lucide="copy" class="w-3.5 h-3.5"></i>
         <span>Salin ke WhatsApp</span>
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Upload Template Excel Guru -->
+<div id="modal-upload-teacher-excel" class="fixed inset-0 bg-[#0A090E]/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4 overflow-y-auto">
+  <div class="rounded-3xl max-w-xl w-full p-6 sm:p-7 shadow-2xl border border-white/10 bg-[#181722] text-white space-y-4 my-8">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+      <div>
+        <h4 class="font-extrabold text-white text-base">Upload Template Excel Data Guru</h4>
+        <p class="text-xs text-slate-400">Unggah berkas Excel (.xlsx / .xls) untuk mendaftarkan banyak guru sekaligus.</p>
+      </div>
+      <button onclick="closeModal('modal-upload-teacher-excel')" class="p-1 text-slate-400 hover:text-white transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <div class="space-y-4">
+      <!-- File Selector Dropzone -->
+      <div class="border-2 border-dashed border-white/15 hover:border-amber-400/50 rounded-2xl p-6 text-center transition bg-white/[0.02]">
+        <input type="file" id="excel-teacher-file" accept=".xlsx, .xls, .csv" onchange="handleTeacherExcelFileSelect(event)" class="hidden">
+        <label for="excel-teacher-file" class="cursor-pointer flex flex-col items-center gap-2">
+          <div class="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center justify-center">
+            <i data-lucide="file-spreadsheet" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <p class="text-xs font-bold text-white">Pilih File Excel Data Guru (.xlsx, .xls, .csv)</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Kolom: <code class="text-amber-300 font-bold">Nama Guru</code>, <code class="text-amber-300 font-bold">NIP</code>, <code class="text-amber-300 font-bold">Kelas Diampu</code></p>
+          </div>
+          <span class="px-3 py-1.5 bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30 rounded-xl text-xs font-bold mt-1 inline-flex items-center gap-1.5">
+            <i data-lucide="folder-search" class="w-3.5 h-3.5"></i>
+            <span>Cari Berkas di Komputer / HP</span>
+          </span>
+        </label>
+      </div>
+
+      <!-- Preview Table Container -->
+      <div id="teacher-excel-preview-wrap" class="hidden space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-bold text-white" id="teacher-excel-preview-count">Pratinjau Data Guru (0 terdeteksi):</span>
+          <span class="text-[11px] text-emerald-400 font-semibold">✓ Siap diimpor</span>
+        </div>
+        <div class="max-h-56 overflow-y-auto border border-white/10 rounded-xl bg-[#121117]">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-white/5 text-slate-300 border-b border-white/10 sticky top-0">
+              <tr>
+                <th class="py-2 px-3 w-8 text-center">No</th>
+                <th class="py-2 px-3">Nama Guru</th>
+                <th class="py-2 px-3">NIP</th>
+                <th class="py-2 px-3">Guru Kelas</th>
+              </tr>
+            </thead>
+            <tbody id="teacher-excel-preview-tbody" class="divide-y divide-white/5 text-slate-300">
+            </tbody>
+          </table>
+        </div>
+        <p class="text-[10px] text-slate-500 italic">* Username dan password/PIN 6 karakter akan dibuat otomatis untuk setiap guru.</p>
+      </div>
+
+      <div class="flex items-center justify-between pt-3 border-t border-white/[0.08]">
+        <button type="button" onclick="downloadTeacherExcelTemplate()" class="text-xs text-emerald-400 hover:text-emerald-300 font-bold inline-flex items-center gap-1">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span>Unduh Format Template</span>
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closeModal('modal-upload-teacher-excel')" class="px-4 py-2 border border-white/10 rounded-xl text-xs font-semibold text-slate-400 hover:text-white">Batal</button>
+          <button type="button" id="btn-submit-teacher-excel" onclick="handleSaveUploadedTeachers()" disabled class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 disabled:opacity-40 disabled:cursor-not-allowed text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20 inline-flex items-center gap-1.5">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            <span>Simpan & Buat Akun Guru</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -468,5 +565,155 @@
     }).catch(() => {
       showToast('Gagal menyalin slip', 'error');
     });
+  }
+
+  // ==========================================
+  // FITUR TEMPLATE & UPLOAD EXCEL GURU (ADMIN)
+  // ==========================================
+
+  let parsedTeachersExcelData = [];
+
+  function downloadTeacherExcelTemplate() {
+    try {
+      const templateData = [
+        { "Nama Guru": "Siti Rahayu, S.Pd.", "NIP": "19870815 201101 2 009", "Kelas Diampu": "Kelas 1-A" },
+        { "Nama Guru": "Ahmad Fauzi, S.Pd.", "NIP": "19890321 201402 1 003", "Kelas Diampu": "Kelas 1-B" },
+        { "Nama Guru": "Bambang Irawan, S.Pd.", "NIP": "19910510 201903 1 004", "Kelas Diampu": "Kelas 2-A" },
+        { "Nama Guru": "Nurul Annisa, S.Pd.", "NIP": "19930405 202012 2 008", "Kelas Diampu": "Kelas 2-B" },
+        { "Nama Guru": "Dewi Sartika, S.Pd.", "NIP": "19850612 201001 2 015", "Kelas Diampu": "Kelas 3-A" },
+        { "Nama Guru": "Tri Wahyuni, S.Pd.", "NIP": "19820405 200801 2 011", "Kelas Diampu": "Kelas 3-B" }
+      ];
+
+      if (typeof XLSX !== 'undefined') {
+        const ws = XLSX.utils.json_to_sheet(templateData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Daftar_Guru");
+        XLSX.writeFile(wb, "Template_Guru_SDN_Sumberejo_04.xlsx");
+        showToast("Template Excel Guru berhasil diunduh!", "success");
+      } else {
+        // Fallback CSV
+        let csvContent = "data:text/csv;charset=utf-8,Nama Guru,NIP,Kelas Diampu\n";
+        templateData.forEach(r => {
+          csvContent += `"${r['Nama Guru']}","${r['NIP']}","${r['Kelas Diampu']}"\n`;
+        });
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "Template_Guru_SDN_Sumberejo_04.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast("Template CSV Guru berhasil diunduh!", "success");
+      }
+    } catch (err) {
+      showToast("Gagal mengunduh template: " + err.message, "error");
+    }
+  }
+
+  function openUploadTeacherExcelModal() {
+    parsedTeachersExcelData = [];
+    const fileInput = document.getElementById('excel-teacher-file');
+    if (fileInput) fileInput.value = '';
+    const previewWrap = document.getElementById('teacher-excel-preview-wrap');
+    if (previewWrap) previewWrap.classList.add('hidden');
+    const submitBtn = document.getElementById('btn-submit-teacher-excel');
+    if (submitBtn) submitBtn.disabled = true;
+    document.getElementById('modal-upload-teacher-excel').classList.remove('hidden');
+    lucide.createIcons();
+  }
+
+  function handleTeacherExcelFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        let rows = [];
+        if (typeof XLSX !== 'undefined') {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          rows = XLSX.utils.sheet_to_json(firstSheet);
+        } else {
+          // Fallback text parser
+          const text = new TextDecoder().decode(e.target.result);
+          const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+          if (lines.length > 1) {
+            for (let i = 1; i < lines.length; i++) {
+              const cols = lines[i].split(',').map(c => c.replace(/^"|"$/g, '').trim());
+              if (cols[0]) {
+                rows.push({
+                  'Nama Guru': cols[0],
+                  'NIP': cols[1] || '-',
+                  'Kelas Diampu': cols[2] || 'Guru Kelas'
+                });
+              }
+            }
+          }
+        }
+
+        parsedTeachersExcelData = [];
+        rows.forEach(r => {
+          const name = r['Nama Guru'] || r['Nama Lengkap'] || r['Nama'] || r['nama'] || '';
+          const nip = r['NIP'] || r['nip'] || r['NUPTK'] || '-';
+          const kelas = r['Kelas Diampu'] || r['Guru Kelas'] || r['Kelas'] || r['Tugas'] || 'Guru Kelas';
+          if (String(name).trim()) {
+            parsedTeachersExcelData.push({
+              fullName: String(name).trim(),
+              nip: String(nip).trim(),
+              subjectName: String(kelas).trim().startsWith('Guru') ? String(kelas).trim() : 'Guru ' + String(kelas).trim(),
+              email: ''
+            });
+          }
+        });
+
+        if (parsedTeachersExcelData.length === 0) {
+          showToast('Tidak ada data guru yang valid pada file.', 'warning');
+          return;
+        }
+
+        const previewWrap = document.getElementById('teacher-excel-preview-wrap');
+        const previewCount = document.getElementById('teacher-excel-preview-count');
+        const previewTbody = document.getElementById('teacher-excel-preview-tbody');
+        const submitBtn = document.getElementById('btn-submit-teacher-excel');
+
+        previewCount.textContent = `Pratinjau Data Guru (${parsedTeachersExcelData.length} terdeteksi):`;
+        previewTbody.innerHTML = parsedTeachersExcelData.map((t, idx) => `
+          <tr class="hover:bg-white/[0.02]">
+            <td class="py-2 px-3 text-center text-slate-500">${idx + 1}</td>
+            <td class="py-2 px-3 font-bold text-white">${t.fullName}</td>
+            <td class="py-2 px-3 font-mono text-slate-400">${t.nip}</td>
+            <td class="py-2 px-3 text-amber-300 font-semibold">${t.subjectName}</td>
+          </tr>
+        `).join('');
+
+        previewWrap.classList.remove('hidden');
+        submitBtn.disabled = false;
+        showToast(`Berhasil membaca ${parsedTeachersExcelData.length} guru dari file!`, 'success');
+      } catch (err) {
+        showToast('Gagal membaca file Excel: ' + err.message, 'error');
+      }
+    };
+
+    reader.readAsArrayBuffer(file);
+  }
+
+  async function handleSaveUploadedTeachers() {
+    if (!parsedTeachersExcelData || parsedTeachersExcelData.length === 0) return;
+
+    try {
+      setLoading(true, `Mengimpor ${parsedTeachersExcelData.length} guru & membuat akun login...`);
+      const res = await runServer('saveBatchTeachers', parsedTeachersExcelData);
+      if (res && res.success) {
+        closeModal('modal-upload-teacher-excel');
+        showToast(res.message || `${parsedTeachersExcelData.length} guru berhasil didaftarkan!`, 'success');
+        await loadManageUsersView();
+      }
+    } catch (err) {
+      showToast('Gagal impor guru: ' + err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
   }
 </script>

@@ -628,6 +628,12 @@
       if (mobSpv) isKepsek ? mobSpv.classList.remove('hidden') : mobSpv.classList.add('hidden');
       if (mobUsers) isKepsek ? mobUsers.classList.remove('hidden') : mobUsers.classList.add('hidden');
 
+      // Menu Akses & Keamanan: Hanya tampil untuk Admin/Kepala Sekolah (Ditiadakan untuk Guru)
+      const secAccess = document.getElementById('sidebar-sec-access');
+      const sheetChangeAcc = document.getElementById('sheet-btn-change-acc');
+      if (secAccess) isKepsek ? secAccess.classList.remove('hidden') : secAccess.classList.add('hidden');
+      if (sheetChangeAcc) isKepsek ? sheetChangeAcc.classList.remove('hidden') : sheetChangeAcc.classList.add('hidden');
+
       if (avatarEl) {
         if (isKepsek) {
           avatarEl.className = 'w-9 h-9 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-950 font-black flex items-center justify-center text-xs shadow-md shadow-amber-500/20';

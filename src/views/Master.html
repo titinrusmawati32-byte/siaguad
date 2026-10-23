@@ -140,7 +140,15 @@
         <p class="text-xs text-slate-400">Kelola buku induk presensi dan penilaian siswa.</p>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="downloadStudentExcelTemplate()" type="button" class="px-3 py-2 bg-white/5 hover:bg-white/10 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-bold transition inline-flex items-center gap-1.5 shadow-sm">
+          <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-400"></i>
+          <span>Template Siswa</span>
+        </button>
+        <button onclick="openUploadStudentExcelModal()" type="button" class="px-3 py-2 bg-white/5 hover:bg-white/10 text-sky-300 border border-sky-500/30 rounded-xl text-xs font-bold transition inline-flex items-center gap-1.5 shadow-sm">
+          <i data-lucide="upload" class="w-4 h-4 text-sky-400"></i>
+          <span>Upload Excel Siswa</span>
+        </button>
         <button onclick="openBatchStudentModal()" class="px-3.5 py-2 bg-white/5 hover:bg-white/10 text-slate-300 font-bold rounded-xl text-xs transition inline-flex items-center gap-1.5 border border-white/10">
           <i data-lucide="file-up" class="w-4 h-4"></i>
           <span>Impor Cepat (Paste)</span>
@@ -166,7 +174,7 @@
         <thead class="bg-white/[0.02] text-slate-400 text-xs uppercase font-semibold border-b border-white/[0.06]">
           <tr>
             <th class="py-3 px-4">No</th>
-            <th class="py-3 px-4">NIS</th>
+            <th class="py-3 px-4">NISN / NIS</th>
             <th class="py-3 px-4">Nama Lengkap Siswa</th>
             <th class="py-3 px-4">L/P</th>
             <th class="py-3 px-4">Kelas</th>
@@ -322,6 +330,74 @@
   </div>
 </div>
 
+<!-- Modal Upload Template Excel Siswa -->
+<div id="modal-upload-student-excel" class="fixed inset-0 bg-[#0A090E]/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4 overflow-y-auto">
+  <div class="rounded-3xl max-w-xl w-full p-6 sm:p-7 shadow-2xl border border-white/10 bg-[#181722] text-white space-y-4 my-8">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+      <div>
+        <h4 class="font-extrabold text-white text-base">Upload Template Excel Data Siswa</h4>
+        <p class="text-xs text-slate-400">Unggah berkas Excel (.xlsx / .xls / .csv) berisi Nama Siswa & NISN.</p>
+      </div>
+      <button onclick="closeModal('modal-upload-student-excel')" class="p-1 text-slate-400 hover:text-white transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <div class="space-y-4">
+      <!-- Target Kelas Selector -->
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Pilih Kelas / Rombel Tujuan</label>
+        <select id="excel-student-target-class" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm font-semibold text-white focus:border-amber-400 outline-none" required>
+        </select>
+        <p class="text-[10px] text-slate-500 mt-1">Siswa yang diimpor akan dimasukkan ke rombel kelas ini.</p>
+      </div>
+
+      <!-- File Selector Dropzone -->
+      <div class="border-2 border-dashed border-white/15 hover:border-amber-400/50 rounded-2xl p-6 text-center transition bg-white/[0.02]">
+        <input type="file" id="excel-student-file" accept=".xlsx, .xls, .csv" onchange="handleStudentExcelFileSelect(event)" class="hidden">
+        <label for="excel-student-file" class="cursor-pointer flex flex-col items-center gap-2">
+          <div class="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center justify-center">
+            <i data-lucide="file-spreadsheet" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-white block">Pilih Berkas Excel Siswa</span>
+            <span class="text-[11px] text-slate-400">Format .xlsx, .xls, atau .csv (Cukup kolom: Nama Siswa, NISN)</span>
+          </div>
+          <span class="mt-2 px-3 py-1 bg-white/10 hover:bg-white/15 text-slate-200 rounded-lg text-xs font-semibold">Pilih Berkas</span>
+        </label>
+      </div>
+
+      <!-- Preview Parsed Students -->
+      <div id="excel-student-preview-section" class="hidden space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-slate-300">Hasil Pembacaan Data Siswa:</span>
+          <span id="excel-student-preview-count" class="text-xs font-mono font-bold text-amber-300">0 siswa</span>
+        </div>
+        <div class="max-h-48 overflow-y-auto border border-white/10 rounded-xl bg-[#121117]">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-white/5 text-slate-400 font-semibold sticky top-0">
+              <tr>
+                <th class="py-2 px-3 w-8">No</th>
+                <th class="py-2 px-3">Nama Siswa</th>
+                <th class="py-2 px-3">NISN</th>
+              </tr>
+            </thead>
+            <tbody id="excel-student-preview-tbody" class="divide-y divide-white/5"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-2 pt-3 border-t border-white/[0.08]">
+      <button type="button" onclick="closeModal('modal-upload-student-excel')" class="px-4 py-2 border border-white/10 rounded-xl text-xs font-semibold text-slate-400 hover:text-white">Batal</button>
+      <button type="button" id="btn-save-uploaded-students" onclick="handleSaveUploadedStudents()" disabled class="px-5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 disabled:opacity-40 disabled:cursor-not-allowed hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-md shadow-amber-500/20 inline-flex items-center gap-1.5 transition">
+        <i data-lucide="check" class="w-4 h-4"></i>
+        <span>Simpan Siswa ke Kelas</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal Tambah/Edit Mapel -->
 <div id="modal-subject" class="fixed inset-0 bg-[#0A090E]/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
   <div class="rounded-3xl max-w-md w-full p-6 shadow-2xl border border-white/10 bg-[#181722] text-white space-y-4">
@@ -429,7 +505,7 @@
   }
 
   function populateClassSelects() {
-    const selects = ['student-filter-class', 'form-student-class', 'batch-student-class'];
+    const selects = ['student-filter-class', 'form-student-class', 'batch-student-class', 'excel-student-target-class'];
     selects.forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
@@ -725,8 +801,223 @@
     }
   }
 
+  function downloadStudentExcelTemplate() {
+    const sampleData = [
+      { "Nama Siswa": "Ahmad Maulana", "NISN": "0012345678" },
+      { "Nama Siswa": "Annisa Putri Rahayu", "NISN": "0012345679" },
+      { "Nama Siswa": "Bagas Pratama", "NISN": "0012345680" },
+      { "Nama Siswa": "Citra Lestari", "NISN": "0012345681" },
+      { "Nama Siswa": "Dimas Setiawan", "NISN": "0012345682" }
+    ];
+
+    if (typeof XLSX !== 'undefined') {
+      const ws = XLSX.utils.json_to_sheet(sampleData);
+      ws['!cols'] = [{ wch: 32 }, { wch: 20 }];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Data Siswa");
+      XLSX.writeFile(wb, "Template_Import_Siswa_SDN_Sumberejo_04.xlsx");
+      showToast('Template Excel Siswa berhasil diunduh', 'success');
+    } else {
+      const csv = "Nama Siswa,NISN\n"
+        + "Ahmad Maulana,0012345678\n"
+        + "Annisa Putri Rahayu,0012345679\n"
+        + "Bagas Pratama,0012345680\n"
+        + "Citra Lestari,0012345681\n"
+        + "Dimas Setiawan,0012345682\n";
+      const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = "Template_Import_Siswa_SDN_Sumberejo_04.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast('Template CSV Siswa berhasil diunduh', 'info');
+    }
+  }
+
+  function openUploadStudentExcelModal() {
+    populateClassSelects();
+    
+    // Set default target kelas sesuai filter yang sedang aktif atau kelas guru
+    const currentFilter = document.getElementById('student-filter-class').value;
+    const targetSelect = document.getElementById('excel-student-target-class');
+    if (targetSelect) {
+      if (currentFilter) {
+        targetSelect.value = currentFilter;
+      } else if (AppState.classes && AppState.classes.length > 0) {
+        targetSelect.value = AppState.classes[0].classId;
+      }
+    }
+
+    // Reset file input & preview
+    const fileInput = document.getElementById('excel-student-file');
+    if (fileInput) fileInput.value = '';
+    const previewSec = document.getElementById('excel-student-preview-section');
+    if (previewSec) previewSec.classList.add('hidden');
+    const btnSave = document.getElementById('btn-save-uploaded-students');
+    if (btnSave) btnSave.disabled = true;
+    window.pendingUploadedStudents = [];
+
+    document.getElementById('modal-upload-student-excel').classList.remove('hidden');
+    lucide.createIcons();
+  }
+
+  function handleStudentExcelFileSelect(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      try {
+        let students = [];
+        if (typeof XLSX !== 'undefined') {
+          const data = new Uint8Array(evt.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
+
+          if (rows.length < 2) {
+            showToast('Berkas Excel kosong atau tidak memiliki baris data.', 'warning');
+            return;
+          }
+
+          // Cari index kolom
+          const headers = rows[0].map(h => String(h).toLowerCase().trim());
+          let nameIdx = headers.findIndex(h => h.includes('nama') || h.includes('siswa') || h.includes('student'));
+          let nisnIdx = headers.findIndex(h => h.includes('nisn') || h.includes('nis') || h.includes('induk'));
+
+          if (nameIdx === -1) nameIdx = 0; // Default kolom 1
+          if (nisnIdx === -1) nisnIdx = 1; // Default kolom 2
+
+          for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            const name = String(row[nameIdx] || '').trim();
+            const nisn = String(row[nisnIdx] || '').trim();
+            if (name && !name.toLowerCase().includes('contoh')) {
+              students.push({ studentName: name, nisn: nisn });
+            }
+          }
+        } else {
+          // Fallback parsing CSV sederhana
+          const text = evt.target.result;
+          const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+          for (let i = 1; i < lines.length; i++) {
+            const parts = lines[i].split(',').map(p => p.trim().replace(/^"|"$/g, ''));
+            if (parts[0]) {
+              students.push({ studentName: parts[0], nisn: parts[1] || '' });
+            }
+          }
+        }
+
+        if (students.length === 0) {
+          showToast('Tidak ada data siswa yang valid dalam berkas.', 'warning');
+          return;
+        }
+
+        window.pendingUploadedStudents = students;
+
+        // Render preview table
+        const tbody = document.getElementById('excel-student-preview-tbody');
+        tbody.innerHTML = students.map((s, idx) => `
+          <tr class="hover:bg-white/[0.02]">
+            <td class="py-1.5 px-3 text-slate-500">${idx + 1}</td>
+            <td class="py-1.5 px-3 font-bold text-white">${s.studentName}</td>
+            <td class="py-1.5 px-3 font-mono text-amber-300 text-xs">${s.nisn || '-'}</td>
+          </tr>
+        `).join('');
+
+        document.getElementById('excel-student-preview-count').textContent = `${students.length} siswa terdeteksi`;
+        document.getElementById('excel-student-preview-section').classList.remove('hidden');
+        document.getElementById('btn-save-uploaded-students').disabled = false;
+        showToast(`${students.length} siswa berhasil dibaca dari Excel!`, 'success');
+      } catch (err) {
+        showToast('Gagal membaca berkas Excel: ' + err.message, 'error');
+      }
+    };
+
+    if (typeof XLSX !== 'undefined') {
+      reader.readAsArrayBuffer(file);
+    } else {
+      reader.readAsText(file);
+    }
+  }
+
+  async function handleSaveUploadedStudents() {
+    const classId = document.getElementById('excel-student-target-class').value;
+    if (!classId) {
+      showToast('Pilih kelas tujuan terlebih dahulu', 'warning');
+      return;
+    }
+
+    if (!window.pendingUploadedStudents || window.pendingUploadedStudents.length === 0) {
+      showToast('Belum ada data siswa yang diunggah', 'warning');
+      return;
+    }
+
+    try {
+      setLoading(true, `Menyimpan ${window.pendingUploadedStudents.length} siswa ke kelas...`);
+      const res = await runServer('saveBatchStudents', classId, window.pendingUploadedStudents);
+      if (res && res.success) {
+        closeModal('modal-upload-student-excel');
+        showToast(res.message || 'Siswa berhasil diimpor!', 'success');
+        document.getElementById('student-filter-class').value = classId;
+        await loadStudentsTable();
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function autoSelectTeacherClass() {
+    if (!AppState.currentUser || !AppState.classes || AppState.classes.length === 0) return;
+    const subj = String(AppState.currentUser.subject_name || AppState.currentUser.title || '').toLowerCase();
+    
+    // Cari kelas yang cocok, misal "Guru Kelas 2-A" -> "Kelas 2-A"
+    const matched = AppState.classes.find(c => {
+      const cName = c.className.toLowerCase();
+      return subj.includes(cName) || cName.includes(subj.replace('guru ', '').trim());
+    });
+
+    if (matched) {
+      const filterEl = document.getElementById('student-filter-class');
+      if (filterEl) {
+        filterEl.value = matched.classId;
+        loadStudentsTable();
+      }
+      const modalClassEl = document.getElementById('form-student-class');
+      if (modalClassEl) modalClassEl.value = matched.classId;
+      const batchClassEl = document.getElementById('batch-student-class');
+      if (batchClassEl) batchClassEl.value = matched.classId;
+      const excelClassEl = document.getElementById('excel-student-target-class');
+      if (excelClassEl) excelClassEl.value = matched.classId;
+    }
+  }
+
   function loadMasterView() {
     populateConfigForm();
     loadClassesTable();
+
+    // Sesuaikan hak akses peran: Guru vs Admin/Kepala Sekolah
+    const isGuru = AppState.currentUser && (AppState.currentUser.role === 'guru' || AppState.currentUser.role === 'teacher');
+    const tabConfig = document.getElementById('tab-btn-config');
+    const tabClasses = document.getElementById('tab-btn-classes');
+    const tabSubjects = document.getElementById('tab-btn-subjects');
+
+    if (isGuru) {
+      if (tabConfig) tabConfig.classList.add('hidden');
+      if (tabClasses) tabClasses.classList.add('hidden');
+      if (tabSubjects) tabSubjects.classList.add('hidden');
+      switchMasterTab('students');
+      setTimeout(() => {
+        autoSelectTeacherClass();
+      }, 150);
+    } else {
+      if (tabConfig) tabConfig.classList.remove('hidden');
+      if (tabClasses) tabClasses.classList.remove('hidden');
+      if (tabSubjects) tabSubjects.classList.remove('hidden');
+    }
   }
 </script>
