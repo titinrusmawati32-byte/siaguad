@@ -288,29 +288,75 @@ function saveStudent(student) {
 
 /**
  * Import Massal Siswa dari File Excel atau Teks
+ * Menerima array of objects [{ studentName, nisn, gender }] maupun array of string baris teks
  */
 function saveBatchStudents(classId, studentList) {
   const lock = LockService.getScriptLock();
   lock.tryLock(25000);
   try {
     const ss = getDatabaseSpreadsheet();
-    const sheet = ss.getSheetByName('_STUDENTS');
-    if (!sheet) throw new Error('Sheet _STUDENTS tidak ditemukan.');
+    let sheet = ss.getSheetByName('_STUDENTS');
+    if (!sheet) {
+      initDatabaseSchema();
+      sheet = ss.getSheetByName('_STUDENTS');
+    }
+
+    if (!classId) {
+      return errorResponse('Pilih rombel / kelas tujuan terlebih dahulu.');
+    }
+
+    // Normalisasi input jika terkirim dalam format string JSON
+    if (typeof studentList === 'string') {
+      try {
+        studentList = JSON.parse(studentList);
+      } catch (e) {
+        studentList = studentList.split(/\r?\n/);
+      }
+    }
+
+    if (!Array.isArray(studentList)) {
+      studentList = [studentList];
+    }
 
     const rowsToInsert = [];
-    studentList.forEach((item, idx) => {
+    studentList.forEach((item) => {
+      if (!item) return;
+
       let name = '';
       let nisn = '';
       let gender = 'L';
 
-      if (typeof item === 'object' && item !== null) {
-        name = String(item.studentName || item.name || item.nama || item['Nama Lengkap'] || item['Nama Siswa'] || '').trim();
-        nisn = String(item.nisn || item.nis || item.NISN || item['NISN'] || '').trim();
-        gender = String(item.gender || item.jenisKelamin || item['Jenis Kelamin'] || 'L').toUpperCase().startsWith('P') ? 'P' : 'L';
-      } else if (typeof item === 'string') {
-        const trimmed = item.trim();
-        if (trimmed) {
-          const parts = trimmed.split(/[\t,;]/);
+      // 1. Format Object dari File Excel (SheetJS)
+      if (typeof item === 'object') {
+        name = String(
+          item.studentName || 
+          item.name || 
+          item.nama || 
+          item['Nama Lengkap'] || 
+          item['Nama Siswa'] || 
+          item['Nama'] || 
+          item['nama_siswa'] || 
+          ''
+        ).trim();
+
+        nisn = String(
+          item.nisn || 
+          item.nis || 
+          item.NISN || 
+          item['NISN'] || 
+          item['NIS'] || 
+          item['nisn_siswa'] || 
+          ''
+        ).trim();
+
+        const rawGender = String(item.gender || item.jenisKelamin || item['Jenis Kelamin'] || item['L/P'] || 'L').toUpperCase().trim();
+        gender = rawGender.startsWith('P') ? 'P' : 'L';
+      } 
+      // 2. Format String (Paste langsung / Baris Teks CSV)
+      else {
+        const lineStr = String(item).trim();
+        if (lineStr) {
+          const parts = lineStr.split(/[\t,;]/);
           name = parts[0].trim();
           if (parts.length === 2) {
             if (/^[0-9]+$/.test(parts[1].trim())) {
@@ -326,7 +372,8 @@ function saveBatchStudents(classId, studentList) {
         }
       }
 
-      if (name) {
+      // Validasi: Jangan masukkan jika nama kosong atau baris header template
+      if (name && !name.toLowerCase().includes('contoh') && !name.toLowerCase().includes('nama siswa')) {
         const studentId = 'STD-' + Utilities.getUuid().substring(0, 8).toUpperCase();
         rowsToInsert.push([
           sanitizeForSheet(studentId),
@@ -340,11 +387,13 @@ function saveBatchStudents(classId, studentList) {
       }
     });
 
-    if (rowsToInsert.length > 0) {
-      sheet.getRange(sheet.getLastRow() + 1, 1, rowsToInsert.length, 7).setValues(rowsToInsert);
+    if (rowsToInsert.length === 0) {
+      return errorResponse('Tidak ada data siswa yang valid untuk disimpan.');
     }
 
-    return successResponse({ totalAdded: rowsToInsert.length }, `${rowsToInsert.length} data siswa berhasil diimpor`);
+    sheet.getRange(sheet.getLastRow() + 1, 1, rowsToInsert.length, 7).setValues(rowsToInsert);
+
+    return successResponse({ totalAdded: rowsToInsert.length }, `${rowsToInsert.length} data siswa berhasil diimpor ke kelas.`);
   } catch (err) {
     return errorResponse('Gagal impor siswa massal: ' + err.message);
   } finally {
