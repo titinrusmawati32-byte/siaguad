@@ -992,12 +992,22 @@
 
     try {
       setLoading(true, `Menyimpan ${window.pendingUploadedStudents.length} siswa ke kelas...`);
-      const res = await runServer('saveBatchStudents', classId, window.pendingUploadedStudents);
+      
+      // Format data ganda: string baris "Nama, NISN" agar 100% kompatibel baik dengan GAS versi lama maupun baru
+      const payloadData = window.pendingUploadedStudents.map(s => {
+        const name = (s.studentName || s.name || '').trim();
+        const nisn = (s.nisn || s.nis || '').trim();
+        return nisn ? `${name}, ${nisn}` : name;
+      });
+
+      const res = await runServer('saveBatchStudents', classId, payloadData);
       if (res && res.success) {
         closeModal('modal-upload-student-excel');
-        showToast(res.message || 'Siswa berhasil diimpor!', 'success');
+        showToast(res.message || `${payloadData.length} siswa berhasil disimpan ke kelas!`, 'success');
         document.getElementById('student-filter-class').value = classId;
         await loadStudentsTable();
+      } else {
+        showToast(res ? res.error : 'Gagal menyimpan siswa', 'error');
       }
     } catch (err) {
       showToast(err.message, 'error');
