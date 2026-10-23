@@ -309,12 +309,12 @@
           <p class="text-[10px] text-slate-400 font-mono">admin / kepsek123</p>
         </button>
 
-        <button type="button" onclick="fillQuickLogin('guru_budi', 'guru123', 'guru')" class="p-2.5 bg-[#1F1E28] hover:bg-[#252431] border border-sky-500/20 rounded-xl text-left transition space-y-0.5">
+        <button type="button" onclick="fillQuickLogin('guru_siti', 'guru123', 'guru')" class="p-2.5 bg-[#1F1E28] hover:bg-[#252431] border border-sky-500/20 rounded-xl text-left transition space-y-0.5">
           <div class="flex items-center gap-1 font-bold text-sky-300">
             <i data-lucide="user" class="w-3.5 h-3.5 text-sky-400"></i>
             <span>Guru Pengampu</span>
           </div>
-          <p class="text-[10px] text-slate-400 font-mono">guru_budi / guru123</p>
+          <p class="text-[10px] text-slate-400 font-mono">guru_siti / guru123</p>
         </button>
       </div>
     </div>
@@ -1019,7 +1019,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label class="block text-xs font-bold text-slate-300 mb-1">Nama Satuan Pendidikan / Sekolah</label>
-          <input type="text" id="cfg-SCHOOL_NAME" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" placeholder="Contoh: SMA Negeri 1..." required>
+          <input type="text" id="cfg-SCHOOL_NAME" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" placeholder="Contoh: SD Negeri Sumberejo 04" required>
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-300 mb-1">NPSN Sekolah</label>
@@ -1207,23 +1207,23 @@
       <input type="hidden" id="form-class-id">
       <div>
         <label class="block text-xs font-bold text-slate-300 mb-1">Nama Kelas / Rombel</label>
-        <input type="text" id="form-class-name" placeholder="Contoh: X-A atau XI MIPA 1" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required>
+        <input type="text" id="form-class-name" placeholder="Contoh: Kelas 1 atau Kelas 4-A" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required>
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="block text-xs font-bold text-slate-300 mb-1">Tingkat</label>
           <select id="form-class-grade" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none">
-            <option value="10">Kelas 10 (Fase E)</option>
-            <option value="11">Kelas 11 (Fase F)</option>
-            <option value="12">Kelas 12 (Fase F)</option>
-            <option value="7">Kelas 7 (Fase D)</option>
-            <option value="8">Kelas 8 (Fase D)</option>
-            <option value="9">Kelas 9 (Fase D)</option>
+            <option value="1">Kelas 1 (Fase A)</option>
+            <option value="2">Kelas 2 (Fase A)</option>
+            <option value="3">Kelas 3 (Fase B)</option>
+            <option value="4">Kelas 4 (Fase B)</option>
+            <option value="5">Kelas 5 (Fase C)</option>
+            <option value="6">Kelas 6 (Fase C)</option>
           </select>
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-300 mb-1">Fase / Peminatan</label>
-          <input type="text" id="form-class-phase" placeholder="Fase E / MIPA" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none">
+          <input type="text" id="form-class-phase" placeholder="Fase A / Fase B / Fase C" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none">
         </div>
       </div>
       <div class="flex justify-end gap-2 pt-3 border-t border-white/[0.08]">
@@ -1316,11 +1316,11 @@
       <input type="hidden" id="form-subject-id">
       <div>
         <label class="block text-xs font-bold text-slate-300 mb-1">Nama Mata Pelajaran</label>
-        <input type="text" id="form-subject-name" placeholder="Contoh: Biologi / Matematika" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required>
+        <input type="text" id="form-subject-name" placeholder="Contoh: Bahasa Indonesia / IPAS" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required>
       </div>
       <div>
         <label class="block text-xs font-bold text-slate-300 mb-1">Tingkat Kelas</label>
-        <input type="text" id="form-subject-grade" placeholder="10 / 11 / 12" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none">
+        <input type="text" id="form-subject-grade" placeholder="1 / 2 / 3 / 4 / 5 / 6" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none">
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div>
@@ -1800,12 +1800,12 @@
 
       <div>
         <label class="block text-xs font-bold text-slate-300 mb-1">Materi Pokok / Capaian Pembelajaran (CP) / TP / KD</label>
-        <textarea id="form-journal-topic" rows="2" placeholder="TP 10.2: Memahami struktur membran sel dan transport zat..." class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required></textarea>
+        <textarea id="form-journal-topic" rows="2" placeholder="TP 4.1: Mengidentifikasi bagian tubuh tumbuhan (akar, batang, daun) dan fungsinya..." class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required></textarea>
       </div>
 
       <div>
         <label class="block text-xs font-bold text-slate-300 mb-1">Uraian Ringkas Kegiatan Pembelajaran</label>
-        <textarea id="form-journal-activities" rows="3" placeholder="Praktikum pengamatan osmosis kentang dan presentasi hasil kelompok..." class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required></textarea>
+        <textarea id="form-journal-activities" rows="3" placeholder="Observasi tanaman di lingkungan sekolah, eksplorasi bagian akar dan daun, diskusi kelompok..." class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required></textarea>
       </div>
 
       <div>
@@ -3777,7 +3777,7 @@
     <form onsubmit="handleSaveDocument(event)" class="space-y-4">
       <div>
         <label class="block text-xs font-bold text-slate-300 mb-1">Judul Dokumen Perangkat Ajar</label>
-        <input type="text" id="doc-title" placeholder="Contoh: Modul Ajar Bab 1 - Keanekaragaman Hayati" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required>
+        <input type="text" id="doc-title" placeholder="Contoh: Modul Ajar IPAS Bab 1 - Bagian Tumbuhan" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-500 focus:border-amber-400 outline-none" required>
       </div>
 
       <div class="grid grid-cols-2 gap-3">
@@ -3793,7 +3793,7 @@
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-300 mb-1">Tingkat Kelas</label>
-          <input type="text" id="doc-grade" placeholder="10 / 11 / 12" value="10" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none">
+          <input type="text" id="doc-grade" placeholder="1 / 2 / 3 / 4 / 5 / 6" value="4" class="w-full px-3 py-2 bg-[#201F29] border border-white/10 rounded-xl text-sm text-white focus:border-amber-400 outline-none">
         </div>
       </div>
 
@@ -4501,8 +4501,8 @@
 
     <!-- KOP SURAT SEKOLAH -->
     <div class="border-b-2 border-slate-900 pb-3 text-center space-y-0.5">
-      <h3 id="prt-school-name" class="text-xl sm:text-2xl font-black uppercase tracking-wide text-slate-900">SMA NEGERI 1 INDONESIA</h3>
-      <p class="text-xs text-slate-700 font-medium">NPSN: <span id="prt-school-npsn">20104050</span> • Akreditasi A</p>
+      <h3 id="prt-school-name" class="text-xl sm:text-2xl font-black uppercase tracking-wide text-slate-900">SD NEGERI SUMBEREJO 04</h3>
+      <p class="text-xs text-slate-700 font-medium">NPSN: <span id="prt-school-npsn">20518385</span> • Akreditasi A</p>
       <p class="text-[11px] text-slate-600">Alur Administrasi & Laporan Keterlaksanaan Pembelajaran Kurikulum Nasional</p>
     </div>
 
@@ -4979,8 +4979,8 @@
       
       <!-- KOP RESMI LAPORAN SUPERVISI -->
       <div class="border-b-2 border-slate-900 pb-3 text-center space-y-0.5">
-        <h3 id="spv-recap-school-name" class="text-xl sm:text-2xl font-black uppercase tracking-wide text-slate-900">SMA NEGERI 1 INDONESIA</h3>
-        <p class="text-xs text-slate-700 font-medium">NPSN: <span id="spv-recap-npsn">20104050</span> • Laporan Supervisi Akademik & Manajerial Guru</p>
+        <h3 id="spv-recap-school-name" class="text-xl sm:text-2xl font-black uppercase tracking-wide text-slate-900">SD NEGERI SUMBEREJO 04</h3>
+        <p class="text-xs text-slate-700 font-medium">NPSN: <span id="spv-recap-npsn">20518385</span> • Laporan Supervisi Akademik & Manajerial Guru</p>
       </div>
 
       <div class="text-center space-y-1">
@@ -5594,8 +5594,8 @@
       const summary = data.summary || {};
       const list = summary.teacherProgress || [];
 
-      document.getElementById('spv-recap-school-name').textContent = hdr.schoolName || 'SMA NEGERI 1 INDONESIA';
-      document.getElementById('spv-recap-npsn').textContent = hdr.schoolNpsn || '-';
+      document.getElementById('spv-recap-school-name').textContent = hdr.schoolName || 'SD NEGERI SUMBEREJO 04';
+      document.getElementById('spv-recap-npsn').textContent = hdr.schoolNpsn || '20518385';
       document.getElementById('spv-recap-academic-year').textContent = hdr.academicYear || '2026/2027';
       document.getElementById('spv-recap-semester').textContent = hdr.semester || 'Ganjil';
       document.getElementById('spv-recap-headmaster').textContent = hdr.headmasterName || 'Kepala Sekolah';

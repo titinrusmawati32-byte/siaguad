@@ -43,7 +43,7 @@ function saveClass(cls) {
       sanitizeForSheet(classId),
       sanitizeForSheet(cls.className),
       sanitizeForSheet(cls.gradeLevel),
-      sanitizeForSheet(cls.majorPhase || 'Fase E/F'),
+      sanitizeForSheet(cls.majorPhase || 'Fase A/B/C'),
       sanitizeForSheet(cls.academicYear || '2026/2027')
     ];
 
@@ -289,7 +289,7 @@ function saveSubject(subject) {
     const rowData = [
       sanitizeForSheet(subjectId),
       sanitizeForSheet(subject.subjectName),
-      sanitizeForSheet(subject.gradeLevel || '10'),
+      sanitizeForSheet(subject.gradeLevel || '1'),
       Number(subject.weightFormative) || 40,
       Number(subject.weightSummative) || 60
     ];

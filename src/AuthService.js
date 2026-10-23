@@ -13,11 +13,11 @@ function ensureUsersSheet() {
 
   const headers = ['user_id', 'username', 'password', 'full_name', 'nip', 'role', 'subject_name', 'email', 'status', 'created_at'];
   const defaultAccounts = [
-    ['USR-000', 'admin', 'kepsek123', 'Dr. Hj. Siti Rahma, M.M.', '19760315 200212 2 003', 'kepsek', 'Kepala Sekolah', 'kepsek@sma1.sch.id', 'Aktif', '2026-10-22'],
-    ['USR-001', 'guru_budi', 'guru123', 'Budi Santoso, S.Pd., M.Pd.', '19850512 201001 1 008', 'guru', 'Biologi', 'budi.santoso@guru.sma.belajar.id', 'Aktif', '2026-10-22'],
-    ['USR-002', 'guru_dewi', 'guru123', 'Dewi Sartika, S.Pd.', '19880920 201402 2 004', 'guru', 'Matematika', 'dewi.sartika@guru.sma.belajar.id', 'Aktif', '2026-10-22'],
-    ['USR-003', 'guru_rizky', 'guru123', 'Rizky Pratama, M.Kom.', '19920110 201903 1 007', 'guru', 'Informatika', 'rizky.pratama@guru.sma.belajar.id', 'Aktif', '2026-10-22'],
-    ['USR-004', 'guru_nurul', 'guru123', 'Nurul Hidayah, S.Pd.', '19820405 200801 2 011', 'guru', 'Bahasa Indonesia', 'nurul.hidayah@guru.sma.belajar.id', 'Aktif', '2026-10-22']
+    ['USR-000', 'admin', 'kepsek123', 'Supriyadi, S.Pd., M.Pd.', '19720412 199803 1 005', 'kepsek', 'Kepala Sekolah', 'kepsek@sdnsumberejo04.sch.id', 'Aktif', '2026-10-22'],
+    ['USR-001', 'guru_siti', 'guru123', 'Siti Rahayu, S.Pd.', '19870815 201101 2 009', 'guru', 'Guru Kelas 4 (Fase B)', 'siti.rahayu@guru.sd.belajar.id', 'Aktif', '2026-10-22'],
+    ['USR-002', 'guru_ahmad', 'guru123', 'Ahmad Fauzi, S.Pd.I.', '19890321 201402 1 003', 'guru', 'Pendidikan Agama Islam (PAI)', 'ahmad.fauzi@guru.sd.belajar.id', 'Aktif', '2026-10-22'],
+    ['USR-003', 'guru_bambang', 'guru123', 'Bambang Irawan, S.Pd.', '19910510 201903 1 004', 'guru', 'PJOK (Pendidikan Jasmani)', 'bambang.irawan@guru.sd.belajar.id', 'Aktif', '2026-10-22'],
+    ['USR-004', 'guru_nurul', 'guru123', 'Nurul Annisa, S.Pd.', '19930405 202012 2 008', 'guru', 'Guru Kelas 1 (Fase A)', 'nurul.annisa@guru.sd.belajar.id', 'Aktif', '2026-10-22']
   ];
 
   if (!sheet) {

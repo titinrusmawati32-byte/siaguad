@@ -606,22 +606,22 @@ function getPrintHeaderInfo() {
     }
     const today = Utilities.formatDate(new Date(), 'Asia/Jakarta', 'd MMMM yyyy');
     return {
-      schoolName: config.SCHOOL_NAME || 'SMA NEGERI 1 INDONESIA',
-      schoolNpsn: config.SCHOOL_NPSN || '20104050',
+      schoolName: config.SCHOOL_NAME || 'SD NEGERI SUMBEREJO 04',
+      schoolNpsn: config.SCHOOL_NPSN || '20518385',
       academicYear: config.ACADEMIC_YEAR || '2026/2027',
       semester: config.SEMESTER || 'Ganjil',
-      headmasterName: config.HEADMASTER_NAME || 'Dr. Hj. Siti Rahma, M.M.',
-      headmasterNip: config.HEADMASTER_NIP || '19760315 200212 2 003',
+      headmasterName: config.HEADMASTER_NAME || 'Supriyadi, S.Pd., M.Pd.',
+      headmasterNip: config.HEADMASTER_NIP || '19720412 199803 1 005',
       printDate: today
     };
   } catch (e) {
     return {
-      schoolName: 'SMA NEGERI 1 INDONESIA',
-      schoolNpsn: '20104050',
+      schoolName: 'SD NEGERI SUMBEREJO 04',
+      schoolNpsn: '20518385',
       academicYear: '2026/2027',
       semester: 'Ganjil',
-      headmasterName: 'Dr. Hj. Siti Rahma, M.M.',
-      headmasterNip: '19760315 200212 2 003',
+      headmasterName: 'Supriyadi, S.Pd., M.Pd.',
+      headmasterNip: '19720412 199803 1 005',
       printDate: '23 Oktober 2026'
     };
   }
